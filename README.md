@@ -30,6 +30,7 @@ v18.17.0
 - Dockerコンテナ化する
 - DBの追加
 - プロキシサーバーの追加
+- プロキシサーバー → クライアント側 → サーバー側 → DBの接続確立
 - ユーザー認証機能の作成
 - ユーザー情報表示機能の作成
 
@@ -86,13 +87,24 @@ app.listen(PORT, () => {
 ```
 
 ## Dockerコンテナ化する
-アプリを起動する為のDockerfileを[client側]()、[server]()側それぞれに作成しました。
+アプリを起動する為のDockerfileを[client側](https://github.com/Lala-pukuchan/matcha/blob/main/client/Dockerfile)、[server](https://github.com/Lala-pukuchan/matcha/blob/main/server/Dockerfile)側それぞれに作成しました。
 ルートディレクトリのdocker-compose.ymlから、それらを使ってイメージを作成するように指定しました。
 ```
 docker compose up --build
 ```
+[クライアント側](http://localhost:3000/)に接続すると、画面の表示が確認できました。
+![クライアント側の表示](./img/client.png)
+[サーバー側](http://localhost:4000/)に接続すると、jsonデータの表示が確認できました。
+![サーバー側の表示](./img/server.png)
 
 ## DBの追加
+docker-compose.ymlを修正して、mariadbを追加しました。
+また、phpMyAdminを追加して、DBの内容をブラウザから確認できるようにしました。
+
 ## プロキシサーバーの追加
+docker-compose.ymlを修正して、nginxを追加しました。
+
+## プロキシサーバー → クライアント側 → サーバー側 → DBの接続確立
+
 ## ユーザー認証機能の作成
 ## ユーザー情報表示機能の作成
