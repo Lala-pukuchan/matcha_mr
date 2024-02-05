@@ -1,0 +1,19 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "42Parisのセカンドサークルの課題matchaに取り組みました。 マッチングアプリを作成する課題になります。 利用する技術は、自分で決められるので、今回は下記を利用しました。 - プロキシサーバー: nginx - フロントエンド: Next.js(React) - バックエンド: Express(Node.js) - DB: mariadb",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
