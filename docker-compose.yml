@@ -1,11 +1,17 @@
 version: '3.8'
 services:
+  proxy:
+    build: ./proxy
+    ports:
+      - 80:80
+    depends_on:
+      - client
   client:
     build: ./client
-    ports:
-      - 3000:3000
     volumes:
       - ./client:/app
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:4000
     depends_on:
       - server
   server:
@@ -14,6 +20,11 @@ services:
       - ./server:/app
     ports:
       - 4000:4000
+    environment:
+      DB_HOST: db
+      DB_USER: ${MYSQL_USER}
+      DB_PASS: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
     depends_on:
       - db
   db:
