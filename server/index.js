@@ -23,6 +23,9 @@ const pool = mariadb.createPool({
 // bcrypt for password hashing
 const bcrypt = require("bcrypt");
 
+// jwt for authentication
+const jwt = require("jsonwebtoken");
+
 // users api
 app.get("/api/users/", async (req, res) => {
   // get users
@@ -85,7 +88,13 @@ app.post("/api/login", async (req, res) => {
       if (!(await bcrypt.compare(password, user.password))) {
         return res.status(400).json({ message: "Password is invalid." });
       } else {
-        return res.json({ message: "Login successful." })
+        // put jwt token in cookie
+        const token = jwt.sign(user.id, process.env.JWT_SECRET);
+        res.cookie("jwt", token, {
+          httpOnly: true,
+          maxAge: 24 * 60 * 60 * 1000,
+        });
+        return res.json({ message: "success" });
       }
     }
   } catch (e) {
