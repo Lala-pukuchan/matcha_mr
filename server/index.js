@@ -32,9 +32,14 @@ app.use(cookieParser());
 
 // get user api
 app.get("/api/user", async (req, res) => {
-  // return jwt token
+  // return userinfo inside jwt token
   const token = req.cookies.jwt;
-  return res.json({ token });
+  const claims = jwt.verify(token, process.env.JWT_SECRET);
+  if (!claims) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+  const { password, ...user } = claims;
+  return res.json({ user });
 });
 
 // get users api

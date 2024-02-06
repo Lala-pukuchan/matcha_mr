@@ -225,6 +225,7 @@ export default function Home() {
 - サーバー側に、cookie-parserをインストールして、APIリクエストが来た際に、cookieの中に格納されているJWTを確認することが出来るようにします。
   ```
   const token = req.cookies.jwt;
+  const claims = jwt.verify(token, process.env.JWT_SECRET);
   ```
 - クライアント側で、ログイン用/ユーザー作成用フォームを作成して、サーバー側にAPIリクエストを飛ばせるようにします。
 
