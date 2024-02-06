@@ -33,7 +33,12 @@ app.use(cookieParser());
 // get user api
 app.get("/api/user", async (req, res) => {
   // return userinfo inside jwt token
-  const token = req.cookies.jwt;
+  let token;
+  try {
+    token = req.cookies.jwt;
+  } catch (e) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
   const claims = jwt.verify(token, process.env.JWT_SECRET);
   if (!claims) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -86,38 +91,10 @@ app.post("/api/user", async (req, res) => {
   }
 });
 
-// login api
-app.post("/api/login", async (req, res) => {
-  const { username, password } = req.body;
-
-  // get user
-  let conn;
-  try {
-    conn = await pool.getConnection();
-    const result = await conn.query("SELECT * FROM user WHERE username = ?", [
-      username,
-    ]);
-    if (result.length === 0) {
-      return res.status(404).json({ message: "No user is found." });
-    } else {
-      const user = result[0];
-      if (!(await bcrypt.compare(password, user.password))) {
-        return res.status(400).json({ message: "Password is invalid." });
-      } else {
-        // put jwt token in cookie
-        const token = jwt.sign(user, process.env.JWT_SECRET);
-        res.cookie("jwt", token, {
-          httpOnly: true,
-          maxAge: 24 * 60 * 60 * 1000,
-        });
-        return res.json({ message: "success" });
-      }
-    }
-  } catch (e) {
-    console.log(e);
-  } finally {
-    if (conn) return conn.end();
-  }
+// logout api
+app.post("/api/logout", async (req, res) => {
+  res.clearCookie("jwt");
+  res.send({ message: "success" });
 });
 
 // start server

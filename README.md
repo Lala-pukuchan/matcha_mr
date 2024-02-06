@@ -227,7 +227,12 @@ export default function Home() {
   const token = req.cookies.jwt;
   const claims = jwt.verify(token, process.env.JWT_SECRET);
   ```
-- クライアント側で、ログイン用/ユーザー作成用フォームを作成して、サーバー側にAPIリクエストを飛ばせるようにします。
+- サーバー側で、ログアウトAPI（/api/logout）を作成します。
+  - cookieに設定済みのjwtを削除します。
+  ```
+  res.clearCookie("jwt");
+  ```
+- クライアント側で、各APIを呼び出すGUIを作成します。
 
 
 ## ユーザー情報表示機能の作成
