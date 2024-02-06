@@ -5,7 +5,7 @@ const PORT = 4000;
 
 // use cors
 const cors = require("cors");
-app.use(cors());
+app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
 
 // use json
 app.use(express.json());
@@ -26,7 +26,18 @@ const bcrypt = require("bcrypt");
 // jwt for authentication
 const jwt = require("jsonwebtoken");
 
-// users api
+// cookie parser
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+
+// get user api
+app.get("/api/user", async (req, res) => {
+  // return jwt token
+  const token = req.cookies.jwt;
+  return res.json({ token });
+});
+
+// get users api
 app.get("/api/users/", async (req, res) => {
   // get users
   let conn;
@@ -89,7 +100,7 @@ app.post("/api/login", async (req, res) => {
         return res.status(400).json({ message: "Password is invalid." });
       } else {
         // put jwt token in cookie
-        const token = jwt.sign(user.id, process.env.JWT_SECRET);
+        const token = jwt.sign(user, process.env.JWT_SECRET);
         res.cookie("jwt", token, {
           httpOnly: true,
           maxAge: 24 * 60 * 60 * 1000,

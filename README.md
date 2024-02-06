@@ -203,10 +203,30 @@ export default function Home() {
 ## ユーザー認証機能の作成
 - サーバー側で、ユーザー登録API（/api/user）を作成します。
   - bcryptを利用して、パスワードをハッシュ化します。
+    ```
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    ```
   - POSTされたユーザーデータをDBに挿入します。
 - サーバー側で、ログインAPI（/api/login）を作成します。
   - ユーザー名とパスワードが合致するユーザーをDBで検索します。
   - 存在した場合は、ユーザー情報からjwtトークンを生成し、HTTPレスポンスのCookieに追加します。
+    ```
+    const token = jwt.sign(user, process.env.JWT_SECRET);
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    ```
+- CORSの設定をフロント側とCookieのやりとりが出来るように修正します。
+  ```
+  app.use(cors({ credentials: true, origin: "http://localhost:3000" }));
+  ```
+- サーバー側に、cookie-parserをインストールして、APIリクエストが来た際に、cookieの中に格納されているJWTを確認することが出来るようにします。
+  ```
+  const token = req.cookies.jwt;
+  ```
+- クライアント側で、ログイン用/ユーザー作成用フォームを作成して、サーバー側にAPIリクエストを飛ばせるようにします。
 
 
 ## ユーザー情報表示機能の作成
