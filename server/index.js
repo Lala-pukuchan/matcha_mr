@@ -4,7 +4,7 @@ const app = express();
 const PORT = 4000;
 
 // use cors
-const cors = require('cors');
+const cors = require("cors");
 app.use(cors());
 
 // use json
@@ -55,10 +55,41 @@ app.post("/api/user", async (req, res) => {
       "INSERT INTO user(email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?)",
       [email, username, lastname, firstname, hashedPassword]
     );
-    return res.json({ message: "User created successfully", id: result.insertId.toString() });
+    return res.json({
+      message: "User created successfully",
+      id: result.insertId.toString(),
+    });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
+// login api
+app.post("/api/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  // get user
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const result = await conn.query("SELECT * FROM user WHERE username = ?", [
+      username,
+    ]);
+    if (result.length === 0) {
+      return res.status(404).json({ message: "No user is found." });
+    } else {
+      const user = result[0];
+      if (!(await bcrypt.compare(password, user.password))) {
+        return res.status(400).json({ message: "Password is invalid." });
+      } else {
+        return res.json({ message: "Login successful." })
+      }
+    }
+  } catch (e) {
+    console.log(e);
   } finally {
     if (conn) return conn.end();
   }
