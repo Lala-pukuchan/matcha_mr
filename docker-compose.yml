@@ -39,7 +39,7 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     environment:
-      PMA_HOST: ${MYSQL_HOST}
+      PMA_HOST: db
       PMA_PORT: 3306
     ports:
       - "2306:80"

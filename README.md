@@ -201,8 +201,17 @@ export default function Home() {
 ![クライアント側 → サーバー側の接続確認](./img/connection_3.png)
 
 ## ユーザー認証機能の作成
+サーバー側で、ユーザー登録API（/api/user）を作成します。
+bcryptを利用して、パスワードをハッシュ化します。
+POSTされたユーザーデータをDBに挿入します。
+
 ## ユーザー情報表示機能の作成
 
 
 ## 参考文献
 [Expressから、MariaDBへの接続方法](https://mariadb.com/kb/en/getting-started-with-the-nodejs-connector/)
+[ExpressでのJWT認証の実装方法](https://www.youtube.com/playlist?list=PLlameCF3cMEs0NQhLQtTdbL1VEfD1tK7Y)
+
+## 補足
+- 課題要件で、ORMが使えませんでした。クラスを作成することも考えましたが、冗長だったので、API内にSQLを記載しています。
+
