@@ -30,6 +30,10 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
+// form conversion
+const multer = require('multer');
+const upload = multer();
+
 // get user api
 app.get("/api/user", async (req, res) => {
   // return userinfo inside jwt token
@@ -86,6 +90,39 @@ app.post("/api/user", async (req, res) => {
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
+// login api
+app.post("/api/login", upload.none(), async (req, res) => {
+  // validate user
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    query = "SELECT password FROM user WHERE username = ?";
+    const values = [req.body.username];
+    const rows = await conn.query(query, values);
+    if (rows.length == 0) {
+      return res.status(401).json({message: "invalid username"})
+    }
+    if (await bcrypt.compare(req.body.password, rows[0].password)) {
+      const payload = {
+        id: rows[0].id,
+        email: rows[0].email,
+        username: rows[0].username,
+        lastname: rows[0].lastname,
+        firstname: rows[0].firstname
+      }
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: '1d'})
+      res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 86400000 });
+      return res.json({ message: "success" });
+    } else {
+      return res.status(401).json({message: "invalid password"})
+    }
+  } catch (e) {
+    console.log(e);
   } finally {
     if (conn) return conn.end();
   }

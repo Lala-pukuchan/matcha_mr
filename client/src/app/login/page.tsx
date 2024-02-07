@@ -1,20 +1,27 @@
-import { FormEvent } from "react";
+'use client'
+import { useState, FormEvent } from "react";
 
 export default function login() {
-  //async function onSubmit(event: FormEvent<HTMLFormElement>) {
-  //  event.preventDefault();
-  //  const formData = new FormData(event.currentTarget);
-  //  const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
-  //    method: "POST",
-  //    body: formData,
-  //  });
-  //  const data = await response.json();
-  //  console.log(data);
-  //}
+  // set message
+  const [message, setMessage] = useState("");
+  // submit login form
+  async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/login`, {
+      method: "POST",
+      body: formData,
+    });
+    if (response.status === 200) {
+      window.location.href = 'http://localhost/';
+    } else {
+      const data = await response.json();
+      setMessage(data.message);
+    }
+  }
   return (
     <div>
-      {/*<form onSubmit={onSubmit} className="container mx-auto w-screen">*/}
-      <form className="container mx-auto w-screen">
+      <form onSubmit={onSubmit} className="container mx-auto w-screen">
         <div className="flex flex-col m-10 space-y-4">
           <label htmlFor="username">username</label>
           <input
@@ -40,6 +47,7 @@ export default function login() {
           >
             Login
           </button>
+          <div className="text-red-500">{message}</div>
         </div>
       </form>
     </div>

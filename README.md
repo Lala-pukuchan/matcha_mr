@@ -233,7 +233,7 @@ export default function Home() {
   res.clearCookie("jwt");
   ```
 - クライアント側で、各APIを呼び出すGUIを作成します。
-
+  - ![ログイン画面](./img/login.png)
 
 ## ユーザー情報表示機能の作成
 
