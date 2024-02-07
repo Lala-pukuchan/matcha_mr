@@ -31,7 +31,7 @@ const cookieParser = require("cookie-parser");
 app.use(cookieParser());
 
 // form conversion
-const multer = require('multer');
+const multer = require("multer");
 const upload = multer();
 
 // get user api
@@ -68,12 +68,19 @@ app.get("/api/users/", async (req, res) => {
 });
 
 // create user api
-app.post("/api/user", async (req, res) => {
-  const { email, username, lastname, firstname, password } = req.body;
-
+app.post("/api/user", upload.none(), async (req, res) => {
   // hash password
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+  // query parameter
+  const values = [
+    req.body.email,
+    req.body.username,
+    req.body.lastname,
+    req.body.firstname,
+    hashedPassword,
+  ];
 
   // create user
   let conn;
@@ -81,7 +88,7 @@ app.post("/api/user", async (req, res) => {
     conn = await pool.getConnection();
     const result = await conn.query(
       "INSERT INTO user(email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?)",
-      [email, username, lastname, firstname, hashedPassword]
+      values
     );
     return res.json({
       message: "User created successfully",
@@ -105,7 +112,7 @@ app.post("/api/login", upload.none(), async (req, res) => {
     const values = [req.body.username];
     const rows = await conn.query(query, values);
     if (rows.length == 0) {
-      return res.status(401).json({message: "invalid username"})
+      return res.status(401).json({ message: "invalid username" });
     }
     if (await bcrypt.compare(req.body.password, rows[0].password)) {
       const payload = {
@@ -113,13 +120,20 @@ app.post("/api/login", upload.none(), async (req, res) => {
         email: rows[0].email,
         username: rows[0].username,
         lastname: rows[0].lastname,
-        firstname: rows[0].firstname
-      }
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: '1d'})
-      res.cookie('token', token, { httpOnly: true, secure: true, sameSite: 'strict', maxAge: 86400000 });
+        firstname: rows[0].firstname,
+      };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 86400000,
+      });
       return res.json({ message: "success" });
     } else {
-      return res.status(401).json({message: "invalid password"})
+      return res.status(401).json({ message: "invalid password" });
     }
   } catch (e) {
     console.log(e);
