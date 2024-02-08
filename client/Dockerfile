@@ -5,7 +5,7 @@ FROM node:18-alpine
 WORKDIR /app
 
 # copy files
-COPY ./* ./
+COPY . .
 
 # install npm
 RUN npm install

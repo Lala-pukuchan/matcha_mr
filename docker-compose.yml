@@ -3,21 +3,21 @@ services:
   proxy:
     build: ./proxy
     ports:
-      - 80:80
+      - 1080:80
     depends_on:
       - client
   client:
     build: ./client
-    volumes:
-      - ./client:/app
+    # volumes:
+    #   - ./client:/app
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:4000
     depends_on:
       - server
   server:
     build: ./server
-    volumes:
-      - ./server:/app
+    # volumes:
+    #   - ./server:/app
     ports:
       - 4000:4000
     environment:
@@ -28,6 +28,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       GMAIL_APP_USER: ${GMAIL_APP_USER}
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
+      FRONT_URL: ${FRONT_URL}
     depends_on:
       - db
   db:

@@ -222,7 +222,7 @@ export default function Home() {
     ```
 - CORSの設定をフロント側とCookieのやりとりが出来るように修正します。
   ```
-  app.use(cors({ credentials: true, origin: "http://localhost" }));
+  app.use(cors({ credentials: true, origin: "http://localhost:1080" }));
   ```
 - サーバー側に、cookie-parserをインストールして、APIリクエストが来た際に、cookieの中に格納されているJWTを確認することが出来るようにします。
   ```

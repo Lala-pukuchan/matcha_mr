@@ -5,7 +5,7 @@ const PORT = 4000;
 
 // use cors
 const cors = require("cors");
-app.use(cors({ credentials: true, origin: "http://localhost" }));
+app.use(cors({ credentials: true, origin: process.env.FRONT_URL }));
 
 // use json
 app.use(express.json());
