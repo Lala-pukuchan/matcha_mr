@@ -185,11 +185,14 @@ app.post("/api/login", upload.none(), async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    query = "SELECT password FROM user WHERE id = ?";
-    const values = [req.body.id];
+    query = "SELECT password, enabled FROM user WHERE username = ?";
+    const values = [req.body.username];
     const rows = await conn.query(query, values);
     if (rows.length == 0) {
       return res.status(401).json({ message: "invalid username" });
+    }
+    if (!rows[0].enabled) {
+      return res.status(401).json({ message: "user is not enabled" });
     }
     if (await bcrypt.compare(req.body.password, rows[0].password)) {
       const payload = {

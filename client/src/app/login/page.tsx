@@ -4,17 +4,15 @@ import Link from "next/link";
 
 export default function login() {
   // set message
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
 
   // set message after user creation
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
-
-    let mess = "";
     if (queryParams.get("message") !== null) {
-      mess = queryParams.get("message") as string;
+      const mess = queryParams.get("message") as string;
+      setMessage(mess);
     }
-    setMessage(mess);
   });
 
   // submit login form
@@ -28,10 +26,12 @@ export default function login() {
         body: formData,
       }
     );
+    console.log("response", response);
     if (response.status === 200) {
       window.location.href = "http://localhost/";
     } else {
       const data = await response.json();
+      console.log("message", data.message);
       setMessage(data.message);
     }
   }
@@ -63,7 +63,7 @@ export default function login() {
           >
             Login
           </button>
-          <div className="text-red-500">{message}</div>
+          {message && <div className="text-red-500">{message}</div>}
           <div className="text-cyan-400">
             <Link href="signup">Create an account?</Link>
           </div>
