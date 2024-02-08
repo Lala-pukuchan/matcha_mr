@@ -29,6 +29,9 @@ const { v4: uuidv4 } = require("uuid");
 // jwt for authentication
 const jwt = require("jsonwebtoken");
 
+// password generator
+const crypto = require("crypto");
+
 // cookie parser
 const cookieParser = require("cookie-parser");
 app.use(cookieParser());
@@ -215,6 +218,49 @@ app.post("/api/login", upload.none(), async (req, res) => {
     }
   } catch (e) {
     console.log(e);
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
+// resetpassword api
+app.post("/api/resetpassword", upload.none(), async (req, res) => {
+  let conn;
+  try {
+    // generate new password
+    const buffer = crypto.randomBytes(10);
+    const newPassword = buffer.toString("hex").slice(0, 10);
+    // hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    const values = [hashedPassword, req.body.email];
+    conn = await pool.getConnection();
+    const result = await conn.query(
+      "UPDATE user SET password = ? WHERE email = ?",
+      values
+    );
+
+    // send email
+    const mailSetting = {
+      from: process.env.GMAIL_APP_USER,
+      to: req.body.email,
+      subject: "Reset Your Password",
+      html: `
+        <p>Your password is updated.<br>${newPassword}</p>
+      `,
+    };
+    transporter.sendMail(mailSetting, (error, info) => {
+      if (error) {
+        console.error("Error sending email: ", error);
+        return res.status(500).json({ message: "Internal server error" });
+      } else {
+        console.log("Email sent: ", info.response);
+      }
+    });
+    return res.json({ message: "Please confirm new password via email" });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
   } finally {
     if (conn) return conn.end();
   }
