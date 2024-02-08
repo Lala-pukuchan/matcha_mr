@@ -23,6 +23,9 @@ const pool = mariadb.createPool({
 // bcrypt for password hashing
 const bcrypt = require("bcrypt");
 
+// create unique userId
+const { v4: uuidv4 } = require("uuid");
+
 // jwt for authentication
 const jwt = require("jsonwebtoken");
 
@@ -82,16 +85,19 @@ app.get("/api/users/", async (req, res) => {
 
 // create user api
 app.post("/api/user", upload.none(), async (req, res) => {
-  // hash password
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
   // create user
   let conn;
   try {
+    // generate unique userId
+    const userId = uuidv4();
+    // hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
     // insert DB
     conn = await pool.getConnection();
     const values = [
+      userId,
       req.body.email,
       req.body.username,
       req.body.lastname,
@@ -99,13 +105,13 @@ app.post("/api/user", upload.none(), async (req, res) => {
       hashedPassword,
     ];
     const result = await conn.query(
-      "INSERT INTO user(email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?)",
+      "INSERT INTO user(id, email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?, ?)",
       values
     );
 
     // create jwt
     const payload = {
-      id: result.insertId.toString(),
+      id: userId,
       email: req.body.email,
       username: req.body.username,
       lastname: req.body.lastname,
@@ -121,7 +127,7 @@ app.post("/api/user", upload.none(), async (req, res) => {
       to: req.body.email,
       subject: "Enable Your Account",
       html: `
-        <p>To enable your account, please click <a href="http://localhost:4000/enable?token=${token}">here</a>.</p>
+        <p>To enable your account, please click <a href="http://localhost:4000/api/enable?token=${token}">here</a>.</p>
       `,
     };
     transporter.sendMail(mailSetting, (error, info) => {
@@ -146,14 +152,41 @@ app.post("/api/user", upload.none(), async (req, res) => {
   }
 });
 
+// enable user
+app.get("/api/enable", async (req, res) => {
+  const token = req.query.token;
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const userId = [decoded.id];
+      const result = await conn.query(
+        "UPDATE user SET enabled = TRUE WHERE id = ?",
+        [userId]
+      );
+      res.send(
+        '<!DOCTYPE html><html><body><p>Account has been successfully enabled.<br><a href="http://localhost">HOME</a></p></body></html>'
+      );
+    } catch (e) {
+      console.log(e);
+      return res.status(500).json({ message: "Internal server error" });
+    } finally {
+      if (conn) return conn.end();
+    }
+  } catch (error) {
+    return res.status(401).json({ message: "invalid token" });
+  }
+});
+
 // login api
 app.post("/api/login", upload.none(), async (req, res) => {
   // validate user
   let conn;
   try {
     conn = await pool.getConnection();
-    query = "SELECT password FROM user WHERE username = ?";
-    const values = [req.body.username];
+    query = "SELECT password FROM user WHERE id = ?";
+    const values = [req.body.id];
     const rows = await conn.query(query, values);
     if (rows.length == 0) {
       return res.status(401).json({ message: "invalid username" });
