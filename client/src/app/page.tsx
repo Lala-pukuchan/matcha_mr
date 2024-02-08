@@ -14,7 +14,6 @@ export default function Home() {
 
   return (
     <div className="flex justify-center">
-      {" "}
       <div className="text-pink-400">
         {user ? (
           <p>You have already loggedin, {user.username}</p>
@@ -22,7 +21,7 @@ export default function Home() {
           <p>Please log in</p>
         )}
       </div>
-      HOME
+      <h1 className="text-gray-500">HOME</h1>
     </div>
   );
 }

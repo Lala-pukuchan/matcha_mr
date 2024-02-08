@@ -33,7 +33,7 @@ export default function login() {
     );
     console.log("response", response);
     if (response.status === 200) {
-      window.location.href = "http://localhost/";
+      window.location.href = "/";
     } else {
       const data = await response.json();
       console.log("message", data.message);
@@ -46,9 +46,7 @@ export default function login() {
         <div className="flex flex-col m-10 space-y-4">
           <div className="text-pink-400">
             {user ? (
-              <p>
-                You have already loggedin, {user.username}
-              </p>
+              <p>You have already loggedin, {user.username}</p>
             ) : (
               <p>Please log in</p>
             )}

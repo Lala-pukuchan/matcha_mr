@@ -40,7 +40,7 @@ export default function signup() {
         }
       );
       if (response.status === 200) {
-        window.location.href = "http://localhost/login?message=Please enable your account via email";
+        window.location.href = "/login?message=Please enable your account via email";
       } else {
         const data = await response.json();
         setMessage(data.message);

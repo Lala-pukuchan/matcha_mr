@@ -130,7 +130,7 @@ app.post("/api/user", upload.none(), async (req, res) => {
       to: req.body.email,
       subject: "Enable Your Account",
       html: `
-        <p>To enable your account, please click <a href="http://localhost:4000/api/enable?token=${token}">here</a>.</p>
+        <p>To enable your account, please click <a href="http://localhost:${PORT}/api/enable?token=${token}">here</a>.</p>
       `,
     };
     transporter.sendMail(mailSetting, (error, info) => {
@@ -169,7 +169,7 @@ app.get("/api/enable", async (req, res) => {
         [userId]
       );
       res.send(
-        '<!DOCTYPE html><html><body><p>Account has been successfully enabled.<br><a href="http://localhost">HOME</a></p></body></html>'
+        `<!DOCTYPE html><html><body><p>Account has been successfully enabled.<br><a href="${process.env.FRONT_URL}">HOME</a></p></body></html>`
       );
     } catch (e) {
       console.log(e);
