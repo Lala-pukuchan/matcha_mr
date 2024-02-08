@@ -51,11 +51,11 @@ const transporter = nodemailer.createTransport({
 });
 
 // get user api
-app.get("/api/user", async (req, res) => {
+app.get("/api/userinfo", async (req, res) => {
   // return userinfo inside jwt token
   let token;
   try {
-    token = req.cookies.jwt;
+    token = req.cookies.token;
   } catch (e) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -63,7 +63,10 @@ app.get("/api/user", async (req, res) => {
   if (!claims) {
     return res.status(401).json({ message: "Unauthorized" });
   }
+  console.log('token: ', token);
+  console.log('claims1: ', claims);
   const { password, ...user } = claims;
+  console.log('claims2: ', claims);
   return res.json({ user });
 });
 
@@ -185,7 +188,7 @@ app.post("/api/login", upload.none(), async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    query = "SELECT password, enabled FROM user WHERE username = ?";
+    query = "SELECT * FROM user WHERE username = ?";
     const values = [req.body.username];
     const rows = await conn.query(query, values);
     if (rows.length == 0) {
@@ -207,8 +210,6 @@ app.post("/api/login", upload.none(), async (req, res) => {
       });
       res.cookie("token", token, {
         httpOnly: true,
-        secure: true,
-        sameSite: "strict",
         maxAge: 86400000,
       });
       return res.json({ message: "success" });

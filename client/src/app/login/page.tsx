@@ -24,6 +24,7 @@ export default function login() {
       {
         method: "POST",
         body: formData,
+        credentials: 'include',
       }
     );
     console.log("response", response);

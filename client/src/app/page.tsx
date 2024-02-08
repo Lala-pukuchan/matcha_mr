@@ -1,18 +1,27 @@
 "use client";
-import { useState, useEffect } from "react";
-import Image from "next/image";
+import { useEffect } from "react";
 
 export default function Home() {
-  const [users, setUsers] = useState([]);
+  async function getUserInfo() {
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/userinfo`,
+      {
+        method: "GET",
+        credentials: "include",
+      }
+    );
+    if (response.status === 200) {
+      const data = await response.json();
+      console.log("message", data);
+    } else {
+      const data = await response.json();
+      console.log("message", data.message);
+    }
+  }
+
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`)
-      .then((res) => {
-        return res.json();
-      })
-      .then((data) => setUsers(data))
-      .catch((err) => console.log(err));
-  }, []);
-  return (
-    <div className="flex justify-center">HOME</div>
-  );
+    getUserInfo();
+  });
+
+  return <div className="flex justify-center">HOME</div>;
 }
