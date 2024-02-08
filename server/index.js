@@ -34,6 +34,19 @@ app.use(cookieParser());
 const multer = require("multer");
 const upload = multer();
 
+// mail
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+  service: "Gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true,
+  auth: {
+    user: process.env.GMAIL_APP_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
+
 // get user api
 app.get("/api/user", async (req, res) => {
   // return userinfo inside jwt token
@@ -73,23 +86,54 @@ app.post("/api/user", upload.none(), async (req, res) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-  // query parameter
-  const values = [
-    req.body.email,
-    req.body.username,
-    req.body.lastname,
-    req.body.firstname,
-    hashedPassword,
-  ];
-
   // create user
   let conn;
   try {
+    // insert DB
     conn = await pool.getConnection();
+    const values = [
+      req.body.email,
+      req.body.username,
+      req.body.lastname,
+      req.body.firstname,
+      hashedPassword,
+    ];
     const result = await conn.query(
       "INSERT INTO user(email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?)",
       values
     );
+
+    // create jwt
+    const payload = {
+      id: result.insertId.toString(),
+      email: req.body.email,
+      username: req.body.username,
+      lastname: req.body.lastname,
+      firstname: req.body.firstname,
+    };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
+    // send email
+    const mailSetting = {
+      from: process.env.GMAIL_APP_USER,
+      to: req.body.email,
+      subject: "Enable Your Account",
+      html: `
+        <p>To enable your account, please click <a href="http://localhost:4000/enable?token=${token}">here</a>.</p>
+      `,
+    };
+    transporter.sendMail(mailSetting, (error, info) => {
+      if (error) {
+        console.error("Error sending email: ", error);
+        return res.status(500).json({ message: "Internal server error" });
+      } else {
+        console.log("Email sent: ", info.response);
+      }
+    });
+
+    // return success message
     return res.json({
       message: "User created successfully",
       id: result.insertId.toString(),

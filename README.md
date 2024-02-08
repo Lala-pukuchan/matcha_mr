@@ -208,6 +208,8 @@ export default function Home() {
     const hashedPassword = await bcrypt.hash(password, salt);
     ```
   - POSTされたユーザーデータをDBに挿入します。
+  - ユーザー有効化用メールは、Nodemailerを利用してgmailを送信しました。
+  - ユーザー有効化用リンクには、パラメーターにjwtを付加することで、ユーザー情報の受け渡しが出来るようにしました。
 - サーバー側で、ログインAPI（/api/login）を作成します。
   - ユーザー名とパスワードが合致するユーザーをDBで検索します。
   - 存在した場合は、ユーザー情報からjwtトークンを生成し、HTTPレスポンスのCookieに追加します。
@@ -241,6 +243,7 @@ export default function Home() {
 ## 参考文献
 [Expressから、MariaDBへの接続方法](https://mariadb.com/kb/en/getting-started-with-the-nodejs-connector/)
 [ExpressでのJWT認証の実装方法](https://www.youtube.com/playlist?list=PLlameCF3cMEs0NQhLQtTdbL1VEfD1tK7Y)
+[Gmail送信方法](https://medium.com/@y.mehnati_49486/how-to-send-an-email-from-your-gmail-account-with-nodemailer-837bf09a7628)
 
 ## 補足
 - 課題要件で、ORMが使えませんでした。クラスを作成することも考えましたが、冗長だったので、API内にSQLを記載しています。

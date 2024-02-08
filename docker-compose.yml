@@ -26,6 +26,8 @@ services:
       DB_PASS: ${MYSQL_PASSWORD}
       DB_NAME: ${MYSQL_DATABASE}
       JWT_SECRET: ${JWT_SECRET}
+      GMAIL_APP_USER: ${GMAIL_APP_USER}
+      GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
     depends_on:
       - db
   db:
