@@ -56,18 +56,15 @@ app.get("/api/userinfo", async (req, res) => {
   let token;
   try {
     token = req.cookies.token;
+    const claims = jwt.verify(token, process.env.JWT_SECRET);
+    if (!claims) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const { password, ...user } = claims;
+    return res.json({ user });
   } catch (e) {
     return res.status(401).json({ message: "Unauthorized" });
   }
-  const claims = jwt.verify(token, process.env.JWT_SECRET);
-  if (!claims) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-  console.log('token: ', token);
-  console.log('claims1: ', claims);
-  const { password, ...user } = claims;
-  console.log('claims2: ', claims);
-  return res.json({ user });
 });
 
 // get users api
@@ -225,7 +222,11 @@ app.post("/api/login", upload.none(), async (req, res) => {
 
 // logout api
 app.post("/api/logout", async (req, res) => {
-  res.clearCookie("jwt");
+  console.log("token delete");
+  res.clearCookie("token", {
+    path: "/",
+    httpOnly: true,
+  });
   res.send({ message: "success" });
 });
 

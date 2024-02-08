@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useEffect } from "react";
 
 export default function Logout() {
@@ -6,6 +7,7 @@ export default function Logout() {
   useEffect(() => {
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout`, {
       method: "POST",
+      credentials: 'include',
     })
       .then((res) => {
         return res.json();
@@ -13,6 +15,7 @@ export default function Logout() {
       .then((data) => {
         if (data.message === "success") {
           window.location.href = "/login";
+          
         } else {
           console.log(data);
           setMessage("Error logging out");

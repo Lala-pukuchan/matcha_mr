@@ -236,6 +236,8 @@ export default function Home() {
   ```
 - クライアント側で、各APIを呼び出すGUIを作成します。
   - ![ログイン画面](./img/login.png)
+- クライアント側で、cookieの中に格納されているJWTを取得し、全ページでユーザー情報を共有します。
+  - UserContextを利用し、RootLayout内に差し込むことで、Cookieのjwtに内包されたユーザー情報を一度のみ取得し、全ページで共有させます。
 
 ## ユーザー情報表示機能の作成
 
@@ -244,6 +246,7 @@ export default function Home() {
 [Expressから、MariaDBへの接続方法](https://mariadb.com/kb/en/getting-started-with-the-nodejs-connector/)
 [ExpressでのJWT認証の実装方法](https://www.youtube.com/playlist?list=PLlameCF3cMEs0NQhLQtTdbL1VEfD1tK7Y)
 [Gmail送信方法](https://medium.com/@y.mehnati_49486/how-to-send-an-email-from-your-gmail-account-with-nodemailer-837bf09a7628)
+[Contextの実装方法](https://episyche.com/blog/how-to-use-context-api-in-a-nextjs-app)
 
 ## 補足
 - 課題要件で、ORMが使えませんでした。クラスを作成することも考えましたが、冗長だったので、API内にSQLを記載しています。

@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export default function Nav() {
+
   return (
     <nav className="container mx-auto m-3">
       <ul className="flex space-x-4 text-gray-400">

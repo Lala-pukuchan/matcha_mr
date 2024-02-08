@@ -1,8 +1,12 @@
 "use client";
+
 import { useEffect, useState, FormEvent } from "react";
 import Link from "next/link";
+import { useUser } from "../../../context/context";
 
 export default function login() {
+  // getUserContext
+  const user = useUser();
   // set message
   const [message, setMessage] = useState("");
 
@@ -24,7 +28,7 @@ export default function login() {
       {
         method: "POST",
         body: formData,
-        credentials: 'include',
+        credentials: "include",
       }
     );
     console.log("response", response);
@@ -40,6 +44,15 @@ export default function login() {
     <div>
       <form onSubmit={onSubmit} className="container mx-auto w-screen">
         <div className="flex flex-col m-10 space-y-4">
+          <div className="text-pink-400">
+            {user ? (
+              <p>
+                You have already loggedin, {user.username}
+              </p>
+            ) : (
+              <p>Please log in</p>
+            )}
+          </div>
           <label htmlFor="username">username</label>
           <input
             type="username"

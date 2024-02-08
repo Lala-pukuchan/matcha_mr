@@ -1,27 +1,28 @@
 "use client";
 import { useEffect } from "react";
+import { useUser } from "../../context/context";
 
 export default function Home() {
-  async function getUserInfo() {
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/userinfo`,
-      {
-        method: "GET",
-        credentials: "include",
-      }
-    );
-    if (response.status === 200) {
-      const data = await response.json();
-      console.log("message", data);
-    } else {
-      const data = await response.json();
-      console.log("message", data.message);
-    }
-  }
 
+  // if user is not logged in, redirect to login page
+  const user = useUser();
   useEffect(() => {
-    getUserInfo();
-  });
+    if (!user) {
+      window.location.href = "/login"
+    }
+  }, [user]);
 
-  return <div className="flex justify-center">HOME</div>;
+  return (
+    <div className="flex justify-center">
+      {" "}
+      <div className="text-pink-400">
+        {user ? (
+          <p>You have already loggedin, {user.username}</p>
+        ) : (
+          <p>Please log in</p>
+        )}
+      </div>
+      HOME
+    </div>
+  );
 }
