@@ -21,6 +21,7 @@ export default function Home() {
           <p>Please log in</p>
         )}
       </div>
+      <br />
       <h1 className="text-gray-500">HOME</h1>
     </div>
   );

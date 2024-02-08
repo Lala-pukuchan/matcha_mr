@@ -155,6 +155,76 @@ app.post("/api/user", upload.none(), async (req, res) => {
   }
 });
 
+// update userinfo
+app.post("/api/user/update", upload.none(), async (req, res) => {
+  console.log("req.body:", req.body);
+  // // create user
+  // let conn;
+  // try {
+  //   // generate unique userId
+  //   const userId = uuidv4();
+  //   // hash password
+  //   const salt = await bcrypt.genSalt(10);
+  //   const hashedPassword = await bcrypt.hash(req.body.password, salt);
+
+  //   // insert DB
+  //   conn = await pool.getConnection();
+  //   const values = [
+  //     userId,
+  //     req.body.email,
+  //     req.body.username,
+  //     req.body.lastname,
+  //     req.body.firstname,
+  //     hashedPassword,
+  //   ];
+  //   const result = await conn.query(
+  //     "INSERT INTO user(id, email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?, ?)",
+  //     values
+  //   );
+
+  //   // create jwt
+  //   const payload = {
+  //     id: userId,
+  //     email: req.body.email,
+  //     username: req.body.username,
+  //     lastname: req.body.lastname,
+  //     firstname: req.body.firstname,
+  //   };
+  //   const token = jwt.sign(payload, process.env.JWT_SECRET, {
+  //     expiresIn: "1d",
+  //   });
+
+  //   // send email
+  //   const mailSetting = {
+  //     from: process.env.GMAIL_APP_USER,
+  //     to: req.body.email,
+  //     subject: "Enable Your Account",
+  //     html: `
+  //       <p>To enable your account, please click <a href="http://localhost:${PORT}/api/enable?token=${token}">here</a>.</p>
+  //     `,
+  //   };
+  //   transporter.sendMail(mailSetting, (error, info) => {
+  //     if (error) {
+  //       console.error("Error sending email: ", error);
+  //       return res.status(500).json({ message: "Internal server error" });
+  //     } else {
+  //       console.log("Email sent: ", info.response);
+  //     }
+  //   });
+
+  //   // return success message
+  //   return res.json({
+  //     message: "User created successfully",
+  //     id: result.insertId.toString(),
+  //   });
+  // } catch (e) {
+  //   console.log(e);
+  //   return res.status(500).json({ message: "Internal server error" });
+  // } finally {
+  //   if (conn) return conn.end();
+  // }
+});
+
 // enable user
 app.get("/api/enable", async (req, res) => {
   const token = req.query.token;
@@ -169,7 +239,7 @@ app.get("/api/enable", async (req, res) => {
         [userId]
       );
       res.send(
-        `<!DOCTYPE html><html><body><p>Account has been successfully enabled.<br><a href="${process.env.FRONT_URL}">HOME</a></p></body></html>`
+        `<!DOCTYPE html><html><body><p>Account has been successfully enabled.<br><a href="${process.env.FRONT_URL}/updateProfile">Update Profile</a></p></body></html>`
       );
     } catch (e) {
       console.log(e);
@@ -274,6 +344,41 @@ app.post("/api/logout", async (req, res) => {
     httpOnly: true,
   });
   res.send({ message: "success" });
+});
+
+// get tags
+app.get("/api/tags", async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query("SELECT * FROM tag");
+    console.log("tags:", rows);
+    return res.json(rows);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
+// add new tag
+app.post("/api/tag", async (req, res) => {
+  console.log("tag: ", req.body);
+
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const values = [req.body.name];
+    const rows = await conn.query("INSERT INTO tag(name) VALUES (?)", values);
+    console.log('result:', rows[0]);
+    return res.json(rows[0]);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
 });
 
 // start server
