@@ -38,7 +38,9 @@ app.use(cookieParser());
 
 // form conversion
 const multer = require("multer");
-const upload = multer();
+const upload = multer({ dest: "uploads/" });
+const directory = "/app/uploads/";
+const fs = require("fs");
 
 // mail
 const nodemailer = require("nodemailer");
@@ -156,74 +158,82 @@ app.post("/api/user", upload.none(), async (req, res) => {
 });
 
 // update userinfo
-app.post("/api/user/update", upload.none(), async (req, res) => {
-  console.log("req.body:", req.body);
-  // // create user
-  // let conn;
-  // try {
-  //   // generate unique userId
-  //   const userId = uuidv4();
-  //   // hash password
-  //   const salt = await bcrypt.genSalt(10);
-  //   const hashedPassword = await bcrypt.hash(req.body.password, salt);
+app.post(
+  "/api/user/update",
+  upload.fields([
+    { name: "profilePicture", maxCount: 1 },
+    { name: "picture1", maxCount: 1 },
+    { name: "picture2", maxCount: 1 },
+    { name: "picture3", maxCount: 1 },
+    { name: "picture4", maxCount: 1 },
+    { name: "picture5", maxCount: 1 },
+  ]),
+  async (req, res) => {
+    console.log("req.body:", req.body);
 
-  //   // insert DB
-  //   conn = await pool.getConnection();
-  //   const values = [
-  //     userId,
-  //     req.body.email,
-  //     req.body.username,
-  //     req.body.lastname,
-  //     req.body.firstname,
-  //     hashedPassword,
-  //   ];
-  //   const result = await conn.query(
-  //     "INSERT INTO user(id, email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?, ?)",
-  //     values
-  //   );
+    // save files
+    let profilePicture = "";
+    let picture1 = "";
+    let picture2 = "";
+    let picture3 = "";
+    let picture4 = "";
+    let picture5 = "";
+    if (req.files) {
+      if (req.files["profilePicture"]) {
+        const { originalname, path } = req.files["profilePicture"][0];
+        fs.renameSync(path, directory + originalname);
+        profilePicture = originalname;
+      }
+      if (req.files["picture1"]) {
+        const { originalname, path } = req.files["picture1"][0];
+        fs.renameSync(path, directory + originalname);
+        picture1 = originalname;
+      }
+      if (req.files["picture2"]) {
+        const { originalname, path } = req.files["picture2"][0];
+        fs.renameSync(path, directory + originalname);
+        picture2 = originalname;
+      }
+      if (req.files["picture3"]) {
+        const { originalname, path } = req.files["picture3"][0];
+        fs.renameSync(path, directory + originalname);
+        picture3 = originalname;
+      }
+      if (req.files["picture4"]) {
+        const { originalname, path } = req.files["picture4"][0];
+        fs.renameSync(path, directory + originalname);
+        picture4 = originalname;
+      }
+      if (req.files["picture5"]) {
+        const { originalname, path } = req.files["picture5"][0];
+        fs.renameSync(path, directory + originalname);
+        picture5 = originalname;
+      }
+    }
 
-  //   // create jwt
-  //   const payload = {
-  //     id: userId,
-  //     email: req.body.email,
-  //     username: req.body.username,
-  //     lastname: req.body.lastname,
-  //     firstname: req.body.firstname,
-  //   };
-  //   const token = jwt.sign(payload, process.env.JWT_SECRET, {
-  //     expiresIn: "1d",
-  //   });
-
-  //   // send email
-  //   const mailSetting = {
-  //     from: process.env.GMAIL_APP_USER,
-  //     to: req.body.email,
-  //     subject: "Enable Your Account",
-  //     html: `
-  //       <p>To enable your account, please click <a href="http://localhost:${PORT}/api/enable?token=${token}">here</a>.</p>
-  //     `,
-  //   };
-  //   transporter.sendMail(mailSetting, (error, info) => {
-  //     if (error) {
-  //       console.error("Error sending email: ", error);
-  //       return res.status(500).json({ message: "Internal server error" });
-  //     } else {
-  //       console.log("Email sent: ", info.response);
-  //     }
-  //   });
-
-  //   // return success message
-  //   return res.json({
-  //     message: "User created successfully",
-  //     id: result.insertId.toString(),
-  //   });
-  // } catch (e) {
-  //   console.log(e);
-  //   return res.status(500).json({ message: "Internal server error" });
-  // } finally {
-  //   if (conn) return conn.end();
-  // }
-});
+    // update user profile
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const values = [
+        req.body.gender,
+        req.body.preference,
+        req.body.biography,
+        req.body.userId
+      ];
+      const result = await conn.query(
+        "UPDATE user SET gender = ?, preference = ?, biography = ? WHERE id = ?",
+        values
+      );
+      return res.status(200).json({ message: "success" });
+    } catch (e) {
+      console.log(e);
+      return res.status(500).json({ message: "Internal server error" });
+    } finally {
+      if (conn) return conn.end();
+    }
+  }
+);
 
 // enable user
 app.get("/api/enable", async (req, res) => {
