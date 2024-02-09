@@ -7,7 +7,6 @@ export default function updateProfile() {
   const [userId, setUserId] = useState("");
   const user = useUser();
   useEffect(() => {
-    console.log("user: ", user);
     if (user) {
       setUserId(user.id);
     }
@@ -93,7 +92,7 @@ export default function updateProfile() {
         }
       );
       if (response.status === 200) {
-        window.location.href = "/myAccount"
+        window.location.href = "/myAccount";
       } else {
         const data = await response.json();
         setMessage(data.message);
@@ -119,91 +118,103 @@ export default function updateProfile() {
           readOnly
         />
         <div className="flex flex-col m-10 space-y-4">
-          <label htmlFor="gender" className="font-bold">
-            Gender
-          </label>
-          <div className="p-3 rounded">
-            <input
-              type="radio"
-              id="male"
-              name="gender"
-              value="male"
-              className="m-1"
-            />
-            <label htmlFor="male">Male</label>
-            <input
-              type="radio"
-              id="female"
-              name="gender"
-              value="female"
-              className="m-1"
-            />
-            <label htmlFor="female">Female</label>
+          <div className="grid grid-cols-2">
+            <label htmlFor="gender" className="font-bold">
+              Gender
+            </label>
+            <div className="p-3 rounded">
+              <input
+                type="radio"
+                id="male"
+                name="gender"
+                value="male"
+                className="m-1"
+              />
+              <label htmlFor="male">Male</label>
+              <input
+                type="radio"
+                id="female"
+                name="gender"
+                value="female"
+                className="m-1"
+              />
+              <label htmlFor="female">Female</label>
+            </div>
           </div>
-          <label htmlFor="preference" className="font-bold">
-            Gender You Like
-          </label>
-          <div className="p-3 rounded">
-            <input
-              type="radio"
-              id="male-pre"
-              name="preference"
-              value="male"
-              className="m-1"
-            />
-            <label htmlFor="male-pre">Male</label>
-            <input
-              type="radio"
-              id="female-pre"
-              name="preference"
-              value="female"
-              className="m-1"
-            />
-            <label htmlFor="female-pre">Female</label>
+          <div className="grid grid-cols-2">
+            <label htmlFor="preference" className="font-bold">
+              Gender You Like
+            </label>
+            <div className="p-3 rounded">
+              <input
+                type="radio"
+                id="male-pre"
+                name="preference"
+                value="male"
+                className="m-1"
+              />
+              <label htmlFor="male-pre">Male</label>
+              <input
+                type="radio"
+                id="female-pre"
+                name="preference"
+                value="female"
+                className="m-1"
+              />
+              <label htmlFor="female-pre">Female</label>
+            </div>
           </div>
-          <label htmlFor="biography" className="font-bold">
-            biography
-          </label>
-          <input
-            type="text"
-            id="biography"
-            name="biography"
-            placeholder="biography"
-            required
-            className="bg-gray-100 p-3 rounded"
-          />
-          <div>
-            <h2 className="font-bold">Tags</h2>
-            <ul>
-              {tags.map((tag) => (
-                <li key={tag.id}>
-                  <input
-                    id={tag.id}
-                    type="checkbox"
-                    value={tag.name}
-                    name="tags"
-                  ></input>
-                  <label htmlFor={tag.id} className="pl-2">
-                    {tag.name}
-                  </label>
-                </li>
-              ))}
-            </ul>
+          <div className="grid grid-cols-2">
+            <label htmlFor="biography" className="font-bold">
+              biography
+            </label>
             <input
               type="text"
-              id="addingTag"
-              name="addingTag"
-              value={inputTag}
-              onChange={handleChange}
-              placeholder="#camping"
-              className="bg-gray-100 p-3 rounded inline-block"
+              id="biography"
+              name="biography"
+              placeholder="biography"
+              required
+              className="bg-gray-100 p-3 rounded"
             />
-            <button
-              onClick={addTag}
-              className="m-3 w-40 h-9 rounded bg-cyan-400 text-white inline-block"
-            >
-              Add tag
-            </button>
+          </div>
+          <div className="grid grid-cols-2">
+            <div>
+              <h2 className="font-bold">Tags</h2>
+            </div>
+            <div>
+              <ul>
+                {tags.map((tag) => (
+                  <li key={tag.id}>
+                    <input
+                      id={tag.id}
+                      type="checkbox"
+                      value={tag.id}
+                      name="tags"
+                    ></input>
+                    <label htmlFor={tag.id} className="pl-2">
+                      {tag.name}
+                    </label>
+                  </li>
+                ))}
+              </ul>
+              <div className="grid grid-cols-2">
+                <input
+                  type="text"
+                  id="addingTag"
+                  name="addingTag"
+                  value={inputTag}
+                  onChange={handleChange}
+                  placeholder="#camping"
+                  className="bg-gray-100 m-1 p-1 rounded inline-block"
+                />
+                <button
+                  onClick={addTag}
+                  className="m-3 w-10 h-7 rounded bg-cyan-400 text-white inline-block"
+                >
+                  Add
+                </button>
+              </div>
+            </div>
           </div>
           <div className="grid grid-cols-2">
             <label htmlFor="profilePicture" className="font-bold">

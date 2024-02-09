@@ -212,6 +212,7 @@ app.post(
     }
 
     // update user profile
+    const userId = req.body.userId;
     let conn;
     try {
       conn = await pool.getConnection();
@@ -219,12 +220,27 @@ app.post(
         req.body.gender,
         req.body.preference,
         req.body.biography,
-        req.body.userId
+        userId,
       ];
       const result = await conn.query(
         "UPDATE user SET gender = ?, preference = ?, biography = ? WHERE id = ?",
         values
       );
+
+      // update user tags
+      let tagIds;
+      if (req.body.tags) {
+        tagIds = [...req.body.tags];
+        for (const tagId of tagIds) {
+          const values = [userId, tagId];
+          await conn.query(
+            "INSERT INTO usertag(user_id, tag_id) VALUES (?, ?)",
+            values
+          );
+        }
+      }
+
+      // success message
       return res.status(200).json({ message: "success" });
     } catch (e) {
       console.log(e);
