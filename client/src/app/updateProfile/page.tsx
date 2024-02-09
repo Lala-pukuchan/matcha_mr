@@ -33,31 +33,36 @@ export default function updateProfile() {
   // change add tag value
   const handleChange = (event) => {
     setInputTag(event.target.value);
+    setMessage('');
   };
 
   // add tag
   async function createNewTag() {
-    const newTagJson = JSON.stringify({ name: inputTag });
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/tag`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: newTagJson,
+    if (inputTag === "") {
+      setMessage("Please input tag name.");
+    } else {
+      const newTagJson = JSON.stringify({ name: inputTag });
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/tag`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: newTagJson,
+          }
+        );
+        if (response.status === 200) {
+          const newTag = await response.json();
+          setTags([...tags, newTag]);
+        } else {
+          const data = await response.json();
+          setMessage(data.message);
         }
-      );
-      if (response.status === 200) {
-        const newTag = await response.json();
-        setTags([...tags, newTag]);
-      } else {
-        const data = await response.json();
-        setMessage(data.message);
+      } catch (e) {
+        console.error(e);
       }
-    } catch (e) {
-      console.error(e);
     }
   }
   const addTag = (event) => {
@@ -127,24 +132,22 @@ export default function updateProfile() {
                 </li>
               ))}
             </ul>
+            <input
+              type="text"
+              id="addingTag"
+              name="addingTag"
+              value={inputTag}
+              onChange={handleChange}
+              placeholder="#camping"
+              className="bg-gray-100 p-3 rounded inline-block"
+            />
+            <button
+              onClick={addTag}
+              className="m-3 w-40 h-9 rounded bg-cyan-400 text-white inline-block"
+            >
+              Add tag
+            </button>
           </div>
-          <label htmlFor="addingTag">addingTag</label>
-          <input
-            type="text"
-            id="addingTag"
-            name="addingTag"
-            value={inputTag}
-            onChange={handleChange}
-            placeholder="addingTag"
-            className="bg-gray-100 p-3 rounded inline-block"
-          />
-          <button
-            onClick={addTag}
-            className="w-40 h-9 rounded bg-pink-400 text-white inline-block"
-          >
-            Add tag
-          </button>
-
           <button
             type="submit"
             className="w-40 h-9 rounded bg-pink-400 text-white"

@@ -9,6 +9,9 @@ export default function Nav() {
           <Link href="/">Home</Link>
         </li>
         <li>
+          <Link href="/myAccount">MyAccount</Link>
+        </li>
+        <li>
           <Link href="/login">Login</Link>
         </li>
         <li>

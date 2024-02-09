@@ -370,9 +370,20 @@ app.post("/api/tag", async (req, res) => {
   try {
     conn = await pool.getConnection();
     const values = [req.body.name];
-    const rows = await conn.query("INSERT INTO tag(name) VALUES (?)", values);
-    console.log('result:', rows[0]);
-    return res.json(rows[0]);
+    const existing = await conn.query(
+      "SELECT * FROM tag WHERE name = (?)",
+      values
+    );
+    if (existing.length > 0) {
+      return res.status(401).json({ message: "Tag is existing" });
+    } else {
+      const rows = await conn.query("INSERT INTO tag(name) VALUES (?)", values);
+      const result = await conn.query(
+        "SELECT * FROM tag WHERE name = (?)",
+        values
+      );
+      return res.json(result[0]);
+    }
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
