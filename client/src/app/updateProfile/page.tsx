@@ -3,12 +3,19 @@ import { useEffect, useState } from "react";
 import { useUser } from "../../../context/context";
 
 export default function updateProfile() {
-  // if user is not logged in, redirect to login page
-  const [userId, setUserId] = useState("");
+  // set registered user information
   const user = useUser();
+  const [selectedGender, setSelectedGender] = useState("");
+  const [selectedPreGender, setSelectedPreGender] = useState("");
   useEffect(() => {
     if (user) {
-      setUserId(user.id);
+      console.log("user: ", user);
+      if (user && user.gender) {
+        setSelectedGender(user.gender);
+      }
+      if (user && user.preference) {
+        setSelectedPreGender(user.preference);
+      }
     }
   }, [user]);
 
@@ -113,11 +120,53 @@ export default function updateProfile() {
           type="text"
           id="userId"
           name="userId"
-          value={userId}
+          defaultValue={user ? user.id : ""}
           className="hidden"
           readOnly
         />
         <div className="flex flex-col m-10 space-y-4">
+          <div className="grid grid-cols-2">
+            <label htmlFor="lastname" className="font-bold">
+              lastname
+            </label>
+            <input
+              type="text"
+              id="lastname"
+              name="lastname"
+              placeholder="lastname"
+              required
+              defaultValue={user ? user.lastname : ""}
+              className="bg-gray-100 p-3 rounded"
+            />
+          </div>
+          <div className="grid grid-cols-2">
+            <label htmlFor="firstname" className="font-bold">
+              firstname
+            </label>
+            <input
+              type="text"
+              id="firstname"
+              name="firstname"
+              placeholder="firstname"
+              required
+              defaultValue={user ? user.firstname : ""}
+              className="bg-gray-100 p-3 rounded"
+            />
+          </div>
+          <div className="grid grid-cols-2">
+            <label htmlFor="email" className="font-bold">
+              email
+            </label>
+            <input
+              type="text"
+              id="email"
+              name="email"
+              placeholder="email"
+              required
+              defaultValue={user ? user.email : ""}
+              className="bg-gray-100 p-3 rounded"
+            />
+          </div>
           <div className="grid grid-cols-2">
             <label htmlFor="gender" className="font-bold">
               Gender
@@ -129,6 +178,8 @@ export default function updateProfile() {
                 name="gender"
                 value="male"
                 className="m-1"
+                checked={selectedGender === "male"}
+                onChange={() => setSelectedGender("male")}
               />
               <label htmlFor="male">Male</label>
               <input
@@ -137,6 +188,8 @@ export default function updateProfile() {
                 name="gender"
                 value="female"
                 className="m-1"
+                checked={selectedGender === "female"}
+                onChange={() => setSelectedGender("female")}
               />
               <label htmlFor="female">Female</label>
             </div>
@@ -152,6 +205,8 @@ export default function updateProfile() {
                 name="preference"
                 value="male"
                 className="m-1"
+                checked={selectedPreGender === "male"}
+                onChange={() => setSelectedPreGender("male")}
               />
               <label htmlFor="male-pre">Male</label>
               <input
@@ -160,6 +215,8 @@ export default function updateProfile() {
                 name="preference"
                 value="female"
                 className="m-1"
+                checked={selectedPreGender === "female"}
+                onChange={() => setSelectedPreGender("female")}
               />
               <label htmlFor="female-pre">Female</label>
             </div>

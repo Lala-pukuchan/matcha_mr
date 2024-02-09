@@ -117,10 +117,6 @@ app.post("/api/user", upload.none(), async (req, res) => {
     // create jwt
     const payload = {
       id: userId,
-      email: req.body.email,
-      username: req.body.username,
-      lastname: req.body.lastname,
-      firstname: req.body.firstname,
     };
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "1d",
@@ -271,7 +267,7 @@ app.get("/api/enable", async (req, res) => {
         [userId]
       );
       res.send(
-        `<!DOCTYPE html><html><body><p>Account has been successfully enabled.<br><a href="${process.env.FRONT_URL}/updateProfile">Update Profile</a></p></body></html>`
+        `<!DOCTYPE html><html><body><p>Account has been successfully enabled.Please login from <br><a href="${process.env.FRONT_URL}/login">here</a></p></body></html>`
       );
     } catch (e) {
       console.log(e);
@@ -306,6 +302,15 @@ app.post("/api/login", upload.none(), async (req, res) => {
         username: rows[0].username,
         lastname: rows[0].lastname,
         firstname: rows[0].firstname,
+        gender: rows[0].gender,
+        preference: rows[0].preference,
+        biography: rows[0].biography,
+        profilePic: rows[0].profilePic,
+        pic1: rows[0].pic1,
+        pic2: rows[0].pic2,
+        pic3: rows[0].pic3,
+        pic4: rows[0].pic4,
+        pic5: rows[0].pic5,
       };
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "1d",
