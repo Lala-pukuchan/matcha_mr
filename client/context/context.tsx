@@ -28,7 +28,6 @@ export const UserProvider = ({ children }) => {
           setUser(null);
         }
       } catch (e) {
-        console.error("Fetch failed:", e);
         setUser(null);
       }
     };

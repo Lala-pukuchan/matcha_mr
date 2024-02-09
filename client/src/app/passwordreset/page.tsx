@@ -19,7 +19,7 @@ export default function passwordreset() {
       );
       if (response.status === 200) {
         window.location.href =
-          "http://localhost/login?message=Please find your new password via email";
+          "/login?message=Please find your new password via email";
       } else {
         const data = await response.json();
         setMessage(data.message);
