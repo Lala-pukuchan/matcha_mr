@@ -32,18 +32,23 @@ export default function signup() {
     if (!validatePassword(pass)) {
       return;
     } else {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
-        {
-          method: "POST",
-          body: formData,
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
+          {
+            method: "POST",
+            body: formData,
+          }
+        );
+        if (response.status === 200) {
+          window.location.href =
+            "/login?message=Please enable your account via email";
+        } else {
+          const data = await response.json();
+          setMessage(data.message);
         }
-      );
-      if (response.status === 200) {
-        window.location.href = "/login?message=Please enable your account via email";
-      } else {
-        const data = await response.json();
-        setMessage(data.message);
+      } catch (e) {
+        console.log("error: ", e);
       }
     }
   }

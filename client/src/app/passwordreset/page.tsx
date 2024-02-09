@@ -9,19 +9,23 @@ export default function passwordreset() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/resetpassword`,
-      {
-        method: "POST",
-        body: formData,
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/resetpassword`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (response.status === 200) {
+        window.location.href =
+          "http://localhost/login?message=Please find your new password via email";
+      } else {
+        const data = await response.json();
+        setMessage(data.message);
       }
-    );
-    if (response.status === 200) {
-      window.location.href =
-        "http://localhost/login?message=Please find your new password via email";
-    } else {
-      const data = await response.json();
-      setMessage(data.message);
+    } catch (e) {
+      console.log(e);
     }
   }
 

@@ -14,17 +14,22 @@ export const UserProvider = ({ children }) => {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/userinfo`,
-        {
-          credentials: "include",
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/userinfo`,
+          {
+            credentials: "include",
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUser(data.user);
+        } else {
+          setUser(null);
         }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      } else {
-        setUser(null)
+      } catch (e) {
+        console.error("Fetch failed:", e);
+        setUser(null);
       }
     };
 

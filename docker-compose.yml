@@ -8,16 +8,16 @@ services:
       - client
   client:
     build: ./client
-    # volumes:
-    #   - ./client:/app
+    volumes:
+      - ./client:/app
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:4000
     depends_on:
       - server
   server:
     build: ./server
-    # volumes:
-    #   - ./server:/app
+    volumes:
+      - ./server:/app
     ports:
       - 4000:4000
     environment:

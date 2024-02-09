@@ -23,21 +23,25 @@ export default function login() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/login`,
-      {
-        method: "POST",
-        body: formData,
-        credentials: "include",
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/login`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
+      console.log("response", response);
+      if (response.status === 200) {
+        window.location.href = "/";
+      } else {
+        const data = await response.json();
+        console.log("message", data.message);
+        setMessage(data.message);
       }
-    );
-    console.log("response", response);
-    if (response.status === 200) {
-      window.location.href = "/";
-    } else {
-      const data = await response.json();
-      console.log("message", data.message);
-      setMessage(data.message);
+    } catch (e) {
+      console.log("error: ", e);
     }
   }
   return (

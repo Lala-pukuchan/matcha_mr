@@ -12,15 +12,19 @@ export default function updateProfile() {
   // set created tags
   useEffect(() => {
     async function setCreatedTags() {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/tags`
-      );
-      if (response.status === 200) {
-        const data = await response.json();
-        setTags(data);
-      } else {
-        const data = await response.json();
-        setMessage(data.message);
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/tags`
+        );
+        if (response.status === 200) {
+          const data = await response.json();
+          setTags(data);
+        } else {
+          const data = await response.json();
+          setMessage(data.message);
+        }
+      } catch (e) {
+        console.error(e);
       }
     }
     setCreatedTags();
@@ -34,19 +38,26 @@ export default function updateProfile() {
   // add tag
   async function createNewTag() {
     const newTagJson = JSON.stringify({ name: inputTag });
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/tag`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: newTagJson,
-    });
-    if (response.status === 200) {
-      const newTag = await response.json();
-      setTags([...tags, newTag]);
-    } else {
-      const data = await response.json();
-      setMessage(data.message);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/tag`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: newTagJson,
+        }
+      );
+      if (response.status === 200) {
+        const newTag = await response.json();
+        setTags([...tags, newTag]);
+      } else {
+        const data = await response.json();
+        setMessage(data.message);
+      }
+    } catch (e) {
+      console.error(e);
     }
   }
   const addTag = (event) => {
@@ -57,19 +68,23 @@ export default function updateProfile() {
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const response = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/api/user/update`,
-      {
-        method: "POST",
-        body: formData,
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/user/update`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (response.status === 200) {
+        window.location.href =
+          "/login?message=Please enable your account via email";
+      } else {
+        const data = await response.json();
+        setMessage(data.message);
       }
-    );
-    if (response.status === 200) {
-      window.location.href =
-        "/login?message=Please enable your account via email";
-    } else {
-      const data = await response.json();
-      setMessage(data.message);
+    } catch (e) {
+      console.error(e);
     }
   }
 
