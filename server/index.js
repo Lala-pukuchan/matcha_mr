@@ -220,10 +220,16 @@ app.post(
         req.body.gender,
         req.body.preference,
         req.body.biography,
+        profilePicture,
+        picture1,
+        picture2,
+        picture3,
+        picture4,
+        picture5,
         userId,
       ];
       const result = await conn.query(
-        "UPDATE user SET gender = ?, preference = ?, biography = ? WHERE id = ?",
+        "UPDATE user SET gender = ?, preference = ?, biography = ?, profilePic = ?, pic1 = ?, pic2 = ?, pic3 = ?, pic4 = ?, pic5 = ? WHERE id = ?",
         values
       );
 
