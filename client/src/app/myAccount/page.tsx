@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUser } from "../../../context/context";
+import Link from "next/link";
 
 export default function myAccount() {
   // set registered user information
@@ -145,6 +146,7 @@ export default function myAccount() {
             </ul>
           </div>
         </div>
+        <Link className="text-cyan-400" href="/updateProfile">Update your profile?</Link>
         <div className="text-red-500">{message}</div>
       </div>
     </div>
