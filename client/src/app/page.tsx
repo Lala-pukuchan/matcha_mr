@@ -1,14 +1,30 @@
 "use client";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useUser } from "../../context/context";
+import UsersList from "./components/userList";
 
 export default function Home() {
-  // if user is not logged in, redirect to login page
   const user = useUser();
+  const [users, setUserList] = useState([]);
+
   useEffect(() => {
-    if (!user) {
-      window.location.href = "/login";
-    }
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUserList(data);
+        } else {
+          setUserList([]);
+        }
+      } catch (e) {
+        setUserList([]);
+        console.error(e);
+      }
+    };
+    fetchUsers();
   }, [user]);
 
   return (
@@ -22,8 +38,8 @@ export default function Home() {
           )}
         </div>
       </div>
-      <div className="flex justify-center">
-        <div className="text-gray-500">HOME</div>
+      <div className="container mx-auto w-screen flex justify-center">
+        <UsersList users={users} />
       </div>
     </>
   );
