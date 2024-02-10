@@ -7,6 +7,8 @@ export default function updateProfile() {
   const user = useUser();
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreGender, setSelectedPreGender] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState([]);
+
   useEffect(() => {
     if (user) {
       console.log("user: ", user);
@@ -15,6 +17,13 @@ export default function updateProfile() {
       }
       if (user && user.preference) {
         setSelectedPreGender(user.preference);
+      }
+      if (user && user.tagIds) {
+        let tagArray = [];
+        for (const tagId of user.tagIds) {
+          tagArray.push(parseInt(tagId, 10));
+        }
+        setSelectedTagIds(tagArray);
       }
     }
   }, [user]);
@@ -51,6 +60,17 @@ export default function updateProfile() {
   const handleChange = (event) => {
     setInputTag(event.target.value);
     setMessage("");
+  };
+
+  // handle checked tags
+  const handleTags = (event) => {
+    const { value, checked } = event.target;
+    const tagId = parseInt(value, 10);
+    if (checked) {
+      setSelectedTagIds((prev) => [...prev, tagId]);
+    } else {
+      setSelectedTagIds((prev) => prev.filter((id) => id !== tagId));
+    }
   };
 
   // add tag
@@ -96,6 +116,7 @@ export default function updateProfile() {
         {
           method: "POST",
           body: formData,
+          credentials: "include",
         }
       );
       if (response.status === 200) {
@@ -231,6 +252,7 @@ export default function updateProfile() {
               name="biography"
               placeholder="biography"
               required
+              defaultValue={user ? user.biography : ""}
               className="bg-gray-100 p-3 rounded"
             />
           </div>
@@ -247,6 +269,8 @@ export default function updateProfile() {
                       type="checkbox"
                       value={tag.id}
                       name="tags"
+                      checked={selectedTagIds.includes(tag.id)}
+                      onChange={(event) => handleTags(event)}
                     ></input>
                     <label htmlFor={tag.id} className="pl-2">
                       {tag.name}

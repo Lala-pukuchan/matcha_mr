@@ -1,3 +1,5 @@
+const getJwt = require("./functions/getJwt");
+
 // express server
 const express = require("express");
 const app = express();
@@ -230,17 +232,27 @@ app.post(
       );
 
       // update user tags
-      let tagIds;
-      if (req.body.tags) {
-        tagIds = [...req.body.tags];
-        for (const tagId of tagIds) {
-          const values = [userId, tagId];
-          await conn.query(
-            "INSERT INTO usertag(user_id, tag_id) VALUES (?, ?)",
-            values
-          );
-        }
+      const user_id = [userId];
+      await conn.query("DELETE FROM usertag WHERE user_id = ?", user_id);
+      tagIds = req.body.tags;
+      for (const tagId of tagIds) {
+        console.log("add tag: ", tagId);
+        const values = [userId, tagId];
+        await conn.query(
+          "INSERT INTO usertag(user_id, tag_id) VALUES (?, ?)",
+          values
+        );
       }
+
+      query = "SELECT * FROM user WHERE id = ?";
+      const rows = await conn.query(query, user_id);
+
+      // get jwt token
+      const token = await getJwt(rows[0], tagIds);
+      res.cookie("token", token, {
+        httpOnly: true,
+        maxAge: 86400000,
+      });
 
       // success message
       return res.status(200).json({ message: "success" });
@@ -296,25 +308,13 @@ app.post("/api/login", upload.none(), async (req, res) => {
       return res.status(401).json({ message: "user is not enabled" });
     }
     if (await bcrypt.compare(req.body.password, rows[0].password)) {
-      const payload = {
-        id: rows[0].id,
-        email: rows[0].email,
-        username: rows[0].username,
-        lastname: rows[0].lastname,
-        firstname: rows[0].firstname,
-        gender: rows[0].gender,
-        preference: rows[0].preference,
-        biography: rows[0].biography,
-        profilePic: rows[0].profilePic,
-        pic1: rows[0].pic1,
-        pic2: rows[0].pic2,
-        pic3: rows[0].pic3,
-        pic4: rows[0].pic4,
-        pic5: rows[0].pic5,
-      };
-      const token = jwt.sign(payload, process.env.JWT_SECRET, {
-        expiresIn: "1d",
-      });
+      // get user tags
+      const query = "SELECT tag_id FROM usertag WHERE user_id = ?";
+      const userId = [rows[0].id];
+      const result = await conn.query(query, userId);
+      const tagIdsArray = result.map((tag) => tag.tag_id);
+      // get jwt token
+      const token = await getJwt(rows[0], tagIdsArray);
       res.cookie("token", token, {
         httpOnly: true,
         maxAge: 86400000,
@@ -412,7 +412,7 @@ app.post("/api/tag", async (req, res) => {
       values
     );
     if (existing.length > 0) {
-      return res.status(401).json({ message: "Tag is existing" });
+      return res.status(200).json({ message: "Tag is existing" });
     } else {
       const rows = await conn.query("INSERT INTO tag(name) VALUES (?)", values);
       const result = await conn.query(
