@@ -19,12 +19,11 @@ export default function updateProfile() {
         setSelectedPreGender(user.preference);
       }
       if (user && user.tagIds) {
-        let tagArray = [];
-        for (const tagId of user.tagIds) {
-          tagArray.push(parseInt(tagId, 10));
-        }
+        const tagIds = Array.isArray(user.tagIds) ? user.tagIds : [user.tagIds];
+        const tagArray = tagIds.map(tagId => parseInt(tagId, 10));
         setSelectedTagIds(tagArray);
       }
+      
     }
   }, [user]);
 
@@ -103,7 +102,9 @@ export default function updateProfile() {
     }
   }
   const addTag = (event) => {
+    event.preventDefault();
     createNewTag();
+    setInputTag('');
   };
 
   // submit login form
@@ -297,24 +298,49 @@ export default function updateProfile() {
               </div>
             </div>
           </div>
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-3">
             <label htmlFor="profilePicture" className="font-bold">
               Profile Picture
             </label>
+            <div>
+              {user && user.profilePic ? (
+                <img
+                  src={user.profilePic}
+                  alt="Profile Pic"
+                  className="h-20 w-20 object-cover rounded"
+                />
+              ) : (
+                <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center">
+                  No Image
+                </div>
+              )}
+            </div>
             <input
               type="file"
               id="profilePicture"
               name="profilePicture"
               placeholder="profilePicture"
               accept="image/*"
-              required
               className="bg-gray-100 p-3 rounded"
             />
           </div>
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-3">
             <label htmlFor="picture1" className="font-bold">
               Picture1
             </label>
+            <div>
+              {user && user.pic1 ? (
+                <img
+                  src={user.pic1}
+                  alt="pic1"
+                  className="h-20 w-20 object-cover rounded"
+                />
+              ) : (
+                <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center">
+                  No Image
+                </div>
+              )}
+            </div>
             <input
               type="file"
               id="picture1"
@@ -324,10 +350,23 @@ export default function updateProfile() {
               className="bg-gray-100 p-3 rounded"
             />
           </div>
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-3">
             <label htmlFor="picture2" className="font-bold">
               Picture2
             </label>
+            <div>
+              {user && user.pic2 ? (
+                <img
+                  src={user.pic2}
+                  alt="pic2"
+                  className="h-20 w-20 object-cover rounded"
+                />
+              ) : (
+                <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center">
+                  No Image
+                </div>
+              )}
+            </div>
             <input
               type="file"
               id="picture2"
@@ -337,10 +376,23 @@ export default function updateProfile() {
               className="bg-gray-100 p-3 rounded"
             />
           </div>
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-3">
             <label htmlFor="picture3" className="font-bold">
               Picture3
             </label>
+            <div>
+              {user && user.pic3 ? (
+                <img
+                  src={user.pic3}
+                  alt="pic3"
+                  className="h-20 w-20 object-cover rounded"
+                />
+              ) : (
+                <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center">
+                  No Image
+                </div>
+              )}
+            </div>
             <input
               type="file"
               id="picture3"
@@ -350,10 +402,23 @@ export default function updateProfile() {
               className="bg-gray-100 p-3 rounded"
             />
           </div>
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-3">
             <label htmlFor="picture4" className="font-bold">
               Picture4
             </label>
+            <div>
+              {user && user.pic4 ? (
+                <img
+                  src={user.pic4}
+                  alt="pic4"
+                  className="h-20 w-20 object-cover rounded"
+                />
+              ) : (
+                <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center">
+                  No Image
+                </div>
+              )}
+            </div>
             <input
               type="file"
               id="picture4"
@@ -363,10 +428,23 @@ export default function updateProfile() {
               className="bg-gray-100 p-3 rounded"
             />
           </div>
-          <div className="grid grid-cols-2">
+          <div className="grid grid-cols-3">
             <label htmlFor="picture5" className="font-bold">
               Picture5
             </label>
+            <div>
+              {user && user.pic5 ? (
+                <img
+                  src={user.pic5}
+                  alt="pic5"
+                  className="h-20 w-20 object-cover rounded"
+                />
+              ) : (
+                <div className="h-20 w-20 bg-gray-200 rounded flex items-center justify-center">
+                  No Image
+                </div>
+              )}
+            </div>
             <input
               type="file"
               id="picture5"

@@ -5,6 +5,10 @@ const express = require("express");
 const app = express();
 const PORT = 4000;
 
+// access to uploaded img
+const path = require("path");
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+
 // use cors
 const cors = require("cors");
 app.use(cors({ credentials: true, origin: process.env.FRONT_URL }));
@@ -169,43 +173,70 @@ app.post(
   async (req, res) => {
     console.log("req.body:", req.body);
 
-    // save files
-    let profilePicture = "";
-    let picture1 = "";
-    let picture2 = "";
-    let picture3 = "";
-    let picture4 = "";
-    let picture5 = "";
+    let updateFields = [];
+    let values = [];
+    if (req.body.lastname) {
+      updateFields.push("lastname = ?");
+      values.push(req.body.lastname);
+    }
+    if (req.body.firstname) {
+      updateFields.push("firstname = ?");
+      values.push(req.body.firstname);
+    }
+    if (req.body.email) {
+      updateFields.push("email = ?");
+      values.push(req.body.email);
+    }
+    if (req.body.gender) {
+      updateFields.push("gender = ?");
+      values.push(req.body.gender);
+    }
+    if (req.body.preference) {
+      updateFields.push("preference = ?");
+      values.push(req.body.preference);
+    }
+    if (req.body.biography) {
+      updateFields.push("biography = ?");
+      values.push(req.body.biography);
+    }
+
+    // save uploaded images
     if (req.files) {
       if (req.files["profilePicture"]) {
         const { originalname, path } = req.files["profilePicture"][0];
         fs.renameSync(path, directory + originalname);
-        profilePicture = originalname;
+        updateFields.push("profilePic = ?");
+        values.push(`http://localhost:${PORT}/uploads/` + originalname);
       }
       if (req.files["picture1"]) {
         const { originalname, path } = req.files["picture1"][0];
         fs.renameSync(path, directory + originalname);
-        picture1 = originalname;
+        updateFields.push("pic1 = ?");
+        values.push(`http://localhost:${PORT}/uploads/` + originalname);
       }
       if (req.files["picture2"]) {
         const { originalname, path } = req.files["picture2"][0];
         fs.renameSync(path, directory + originalname);
-        picture2 = originalname;
+        updateFields.push("pic2 = ?");
+        values.push(`http://localhost:${PORT}/uploads/` + originalname);
       }
       if (req.files["picture3"]) {
         const { originalname, path } = req.files["picture3"][0];
         fs.renameSync(path, directory + originalname);
-        picture3 = originalname;
+        updateFields.push("pic3 = ?");
+        values.push(`http://localhost:${PORT}/uploads/` + originalname);
       }
       if (req.files["picture4"]) {
         const { originalname, path } = req.files["picture4"][0];
         fs.renameSync(path, directory + originalname);
-        picture4 = originalname;
+        updateFields.push("pic4 = ?");
+        values.push(`http://localhost:${PORT}/uploads/` + originalname);
       }
       if (req.files["picture5"]) {
         const { originalname, path } = req.files["picture5"][0];
         fs.renameSync(path, directory + originalname);
-        picture5 = originalname;
+        updateFields.push("pic5 = ?");
+        values.push(`http://localhost:${PORT}/uploads/` + originalname);
       }
     }
 
@@ -214,40 +245,31 @@ app.post(
     let conn;
     try {
       conn = await pool.getConnection();
-      const values = [
-        req.body.gender,
-        req.body.preference,
-        req.body.biography,
-        profilePicture,
-        picture1,
-        picture2,
-        picture3,
-        picture4,
-        picture5,
-        userId,
-      ];
-      const result = await conn.query(
-        "UPDATE user SET gender = ?, preference = ?, biography = ?, profilePic = ?, pic1 = ?, pic2 = ?, pic3 = ?, pic4 = ?, pic5 = ? WHERE id = ?",
-        values
-      );
+      let queryString =
+        "UPDATE user SET " + updateFields.join(", ") + " WHERE id = ?";
+      const userId = req.body.userId;
+      values.push(userId);
+      const result = await conn.query(queryString, values);
 
       // update user tags
       const user_id = [userId];
       await conn.query("DELETE FROM usertag WHERE user_id = ?", user_id);
       tagIds = req.body.tags;
-      for (const tagId of tagIds) {
-        console.log("add tag: ", tagId);
-        const values = [userId, tagId];
-        await conn.query(
-          "INSERT INTO usertag(user_id, tag_id) VALUES (?, ?)",
-          values
-        );
+      if (tagIds) {
+        console.log("tagIds.length: ", tagIds.length);
+        for (const tagId of tagIds) {
+          console.log("add tag: ", tagId);
+          const values = [userId, tagId];
+          await conn.query(
+            "INSERT INTO usertag(user_id, tag_id) VALUES (?, ?)",
+            values
+          );
+        }
       }
 
+      // update jwt token
       query = "SELECT * FROM user WHERE id = ?";
       const rows = await conn.query(query, user_id);
-
-      // get jwt token
       const token = await getJwt(rows[0], tagIds);
       res.cookie("token", token, {
         httpOnly: true,
