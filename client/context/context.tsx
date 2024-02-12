@@ -35,5 +35,9 @@ export const UserProvider = ({ children }) => {
     fetchUserInfo();
   }, []);
 
-  return <UserContext.Provider value={user}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
 };

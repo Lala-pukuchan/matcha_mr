@@ -4,6 +4,7 @@ import { useEffect } from "react";
 export default function users() {
 
   useEffect(() => {
+    
     const queryParams = new URLSearchParams(window.location.search);
     console.log("queryParams", queryParams);
     if (queryParams.get("userID") !== null) {

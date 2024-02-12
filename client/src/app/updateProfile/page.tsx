@@ -4,7 +4,7 @@ import { useUser } from "../../../context/context";
 
 export default function updateProfile() {
   // set registered user information
-  const user = useUser();
+  const { user, setUser } = useUser();
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreGender, setSelectedPreGender] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState([]);
@@ -20,10 +20,9 @@ export default function updateProfile() {
       }
       if (user && user.tagIds) {
         const tagIds = Array.isArray(user.tagIds) ? user.tagIds : [user.tagIds];
-        const tagArray = tagIds.map(tagId => parseInt(tagId, 10));
+        const tagArray = tagIds.map((tagId) => parseInt(tagId, 10));
         setSelectedTagIds(tagArray);
       }
-      
     }
   }, [user]);
 
@@ -104,7 +103,7 @@ export default function updateProfile() {
   const addTag = (event) => {
     event.preventDefault();
     createNewTag();
-    setInputTag('');
+    setInputTag("");
   };
 
   // submit login form
