@@ -381,6 +381,27 @@ app.post("/api/login", upload.none(), async (req, res) => {
   }
 });
 
+// viewed api
+app.post("/api/viewed", async (req, res) => {
+  console.log('req.body: ', req.body);
+  // insert viewed information
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const values = [req.body.from, req.body.to];
+    const result = await conn.query(
+      "INSERT INTO viewed (viewed_from_user_id, viewed_to_user_id, viewed_at) VALUES (?, ?, NOW())",
+      values
+    );
+    console.log('result: ', result);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
 // resetpassword api
 app.post("/api/resetpassword", upload.none(), async (req, res) => {
   let conn;
@@ -452,7 +473,6 @@ app.get("/api/tags", async (req, res) => {
 
 // add new tag
 app.post("/api/tag", async (req, res) => {
-  console.log("tag: ", req.body);
 
   let conn;
   try {
