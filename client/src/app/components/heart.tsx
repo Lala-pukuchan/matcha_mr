@@ -1,32 +1,38 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const Heart = ({ likeFromUserId, likeToUserId }) => {
-  const [isClicked, setIsClicked] = useState(false);
+const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
+  // update state
+  const [isClicked, setIsClicked] = useState(alreadyLiked);
+
+  // update like
+  useEffect(() => {
+    setIsClicked(alreadyLiked);
+  }, [alreadyLiked]);
 
   const like = () => {
+    // update state
     setIsClicked(!isClicked);
-    if (isClicked) {
-      console.log("You have unliked this post");
-    } else {
-      console.log("You have liked this post");
-    }
 
+    // update like
+    let url = "";
+    if (isClicked) {
+      url = `${process.env.NEXT_PUBLIC_API_URL}/api/unliked`;
+    } else {
+      url = `${process.env.NEXT_PUBLIC_API_URL}/api/liked`;
+    }
     async function updateLike() {
       try {
         const likeJson = JSON.stringify({
           from: likeFromUserId,
           to: likeToUserId,
         });
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/liked`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: likeJson,
-          }
-        );
+        const response = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: likeJson,
+        });
         console.log("response: ", response);
         if (response.ok) {
           const responseData = await response.json();

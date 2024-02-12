@@ -427,7 +427,6 @@ app.post("/api/user/viewed", async (req, res) => {
 
 // liked api
 app.post("/api/liked", async (req, res) => {
-  console.log("req.body: ", req.body);
   // insert liked information
   let conn;
   try {
@@ -437,7 +436,27 @@ app.post("/api/liked", async (req, res) => {
       "INSERT INTO liked (from_user_id, liked_to_user_id, liked_at) VALUES (?, ?, NOW())",
       values
     );
-    console.log("result: ", result);
+    return res.json({ message: "success" });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
+// liked api
+app.post("/api/unliked", async (req, res) => {
+  // insert liked information
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const values = [req.body.from, req.body.to];
+    result = await conn.query(
+      "DELETE FROM liked WHERE from_user_id = ? AND liked_to_user_id = ?",
+      values
+    );
+    return res.json({ message: "success" });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
@@ -468,6 +487,30 @@ app.post("/api/user/liked", async (req, res) => {
     if (conn) return conn.end();
   }
 });
+
+// liked users api
+app.post("/api/user/likedTo", async (req, res) => {
+  let conn;
+  try {
+    // get viwed from users
+    conn = await pool.getConnection();
+    let queryString =
+      "SELECT DISTINCT liked_to_user_id FROM liked WHERE from_user_id = ?";
+    let values = [req.body.userId];
+    const likedFromUsers = await conn.query(queryString, values);
+    if (likedFromUsers.length > 0) {
+      res.json(likedFromUsers);
+    } else {
+      res.json([]);
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
 // resetpassword api
 app.post("/api/resetpassword", upload.none(), async (req, res) => {
   let conn;

@@ -10,6 +10,8 @@ export default function Home() {
   const [users, setUserList] = useState([]);
   // set loading
   const [loading, setLoading] = useState(true);
+  // set liked users
+  const [likedUsersId, setLikedUsersId] = useState([]);
 
   // check user
   useEffect(() => {
@@ -37,8 +39,38 @@ export default function Home() {
       }
     };
 
+    const likedUsers = async () => {
+      try {
+        const userJson = JSON.stringify({ userId: user.id });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/likedTo`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: userJson,
+          }
+        );
+        if (response.ok) {
+          const responseData = await response.json();
+          if (responseData) {
+            const likedUsersIdArray = responseData.map(
+              (item) => item.liked_to_user_id
+            );
+            setLikedUsersId(likedUsersIdArray);
+          }
+        } else {
+          console.error("updating liked is failed");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
     checkUser();
     fetchUsers();
+    likedUsers();
   }, [user]);
 
   if (loading) {
@@ -57,7 +89,11 @@ export default function Home() {
         </div>
       </div>
       <div className="container mx-auto w-screen flex justify-center">
-        <UsersList users={users} operationUserId={user.id} />
+        <UsersList
+          users={users}
+          operationUserId={user.id}
+          likedUsersId={likedUsersId}
+        />
       </div>
     </>
   );

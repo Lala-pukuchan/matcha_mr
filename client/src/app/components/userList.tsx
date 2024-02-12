@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Heart from "./heart";
 
-export default function UsersList({ users, operationUserId }) {
+export default function UsersList({ users, operationUserId, likedUsersId }) {
   return (
     <div className="flex flex-col m-10 space-y-4">
       {users.map((user) => (
@@ -17,7 +17,7 @@ export default function UsersList({ users, operationUserId }) {
               <div className="h-80 w-80 bg-gray-200 rounded">No Image</div>
             )}
             <Link href={`/users?userID=${user.id}`}>{user.username}</Link>
-            <Heart likeFromUserId={operationUserId} likeToUserId={user.id} />
+            <Heart likeFromUserId={operationUserId} likeToUserId={user.id} alreadyLiked={likedUsersId.includes(user.id)}/>
           </div>
         </div>
       ))}
