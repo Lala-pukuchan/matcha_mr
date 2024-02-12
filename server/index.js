@@ -94,8 +94,31 @@ app.get("/api/users/", async (req, res) => {
   }
 });
 
+// get user api
+app.post("/api/user", async (req, res) => {
+
+  const userId = req.body.userId;
+  console.log("userId: ", userId);
+  // get users
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    let queryString = "SELECT * FROM user WHERE id = ?";
+    let values = req.body.userId;
+    const result = await conn.query(queryString, values);
+    console.log("result: ", result);
+    return res.json(result[0]);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
 // create user api
-app.post("/api/user", upload.none(), async (req, res) => {
+app.post("/api/createUser", upload.none(), async (req, res) => {
+
   // create user
   let conn;
   try {

@@ -34,7 +34,7 @@ export default function signup() {
     } else {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/createUser`,
           {
             method: "POST",
             body: formData,
