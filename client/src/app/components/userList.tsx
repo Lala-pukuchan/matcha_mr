@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 export default function UsersList({ users }) {
-  console.log("users: ", users);
   return (
     <div className="flex flex-col m-10 space-y-4">
       {users.map((user) => (

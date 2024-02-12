@@ -30,9 +30,13 @@ export default function myAccount() {
   return (
     <>
       {user ? <UserInfo user={user} /> : <div>Loading...</div>}
-      <Link className="text-cyan-400" href="/updateProfile">
-        Update your profile?
-      </Link>
+      <div className="container mx-auto w-screen flex justify-center">
+        <div className="flex flex-col m-10 space-y-4">
+          <Link className="text-cyan-400" href="/updateProfile">
+            Update your profile?
+          </Link>
+        </div>
+      </div>
     </>
   );
 }

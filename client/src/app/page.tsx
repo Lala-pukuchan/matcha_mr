@@ -4,10 +4,22 @@ import { useUser } from "../../context/context";
 import UsersList from "./components/userList";
 
 export default function Home() {
-  const user = useUser();
+  // get user from context
+  const { user, setUser } = useUser();
+  // set user list
   const [users, setUserList] = useState([]);
+  // set loading
+  const [loading, setLoading] = useState(true);
 
+  // check user
   useEffect(() => {
+    const checkUser = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setLoading(false);
+      if (!user) {
+        window.location.href = "/login";
+      }
+    };
     const fetchUsers = async () => {
       try {
         const response = await fetch(
@@ -15,7 +27,10 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUserList(data);
+          console.log("user", user);
+          console.log("user.id", user.id);
+          console.log("data", data);
+          setUserList(data.filter((d) => d.id !== user.id));
         } else {
           setUserList([]);
         }
@@ -24,8 +39,14 @@ export default function Home() {
         console.error(e);
       }
     };
+
+    checkUser();
     fetchUsers();
   }, [user]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
