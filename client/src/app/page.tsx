@@ -27,9 +27,6 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log("user", user);
-          console.log("user.id", user.id);
-          console.log("data", data);
           setUserList(data.filter((d) => d.id !== user.id));
         } else {
           setUserList([]);
@@ -60,7 +57,7 @@ export default function Home() {
         </div>
       </div>
       <div className="container mx-auto w-screen flex justify-center">
-        <UsersList users={users} />
+        <UsersList users={users} operationUserId={user.id} />
       </div>
     </>
   );
