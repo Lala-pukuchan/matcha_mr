@@ -96,18 +96,25 @@ app.get("/api/users/", async (req, res) => {
 
 // get user api
 app.post("/api/user", async (req, res) => {
-
   const userId = req.body.userId;
-  console.log("userId: ", userId);
-  // get users
   let conn;
   try {
+    // get user
     conn = await pool.getConnection();
     let queryString = "SELECT * FROM user WHERE id = ?";
-    let values = req.body.userId;
-    const result = await conn.query(queryString, values);
-    console.log("result: ", result);
-    return res.json(result[0]);
+    let values = [req.body.userId];
+    const userResult = await conn.query(queryString, values);
+    if (userResult.length > 0) {
+      // get tags
+      const user = userResult[0];
+      const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+      const tagsResult = await conn.query(tagQuery, values);
+      const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+      user.tagIds = tagIdsArray;
+      res.json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
@@ -118,7 +125,6 @@ app.post("/api/user", async (req, res) => {
 
 // create user api
 app.post("/api/createUser", upload.none(), async (req, res) => {
-
   // create user
   let conn;
   try {

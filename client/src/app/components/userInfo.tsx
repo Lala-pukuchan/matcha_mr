@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import Link from "next/link";
 
 export default function UserInfo({ user }) {
   console.log("user from userInfo", user);
@@ -145,9 +144,6 @@ export default function UserInfo({ user }) {
             </ul>
           </div>
         </div>
-        <Link className="text-cyan-400" href="/updateProfile">
-          Update your profile?
-        </Link>
         <div className="text-red-500">{message}</div>
       </div>
     </div>

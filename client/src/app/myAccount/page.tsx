@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { useUser } from "../../../context/context";
 import UserInfo from "../components/userInfo";
+import Link from "next/link";
 
 export default function myAccount() {
   // get user from context
@@ -26,5 +27,12 @@ export default function myAccount() {
   if (loading) {
     return <div>Loading...</div>;
   }
-  return user ? <UserInfo user={user} /> : <div>Loading...</div>;
+  return (
+    <>
+      {user ? <UserInfo user={user} /> : <div>Loading...</div>}
+      <Link className="text-cyan-400" href="/updateProfile">
+        Update your profile?
+      </Link>
+    </>
+  );
 }
