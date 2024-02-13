@@ -37,7 +37,7 @@ export default function users() {
           if (response.ok) {
             const data = await response.json();
             setDisplayedUser(data);
-            console.log("data", data);
+            console.log("user: ", data);
           } else {
             setDisplayedUser([]);
           }

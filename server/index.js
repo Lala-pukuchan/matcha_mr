@@ -111,6 +111,22 @@ app.post("/api/user", async (req, res) => {
       const tagsResult = await conn.query(tagQuery, values);
       const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
       user.tagIds = tagIdsArray;
+      // get matched count
+      const matchedQuery =
+        "SELECT * FROM matched WHERE matched_user_id_1 = ? OR matched_user_id_2 = ?";
+      const matchedValues = [userId, userId];
+      const matchedResult = await conn.query(matchedQuery, matchedValues);
+      user.matched = matchedResult.length;
+      // get liked count
+      const likedQuery = "SELECT * FROM liked WHERE liked_to_user_id = ?";
+      const likedValues = [userId];
+      const likedResult = await conn.query(likedQuery, likedValues);
+      user.liked = likedResult.length;
+      // get viewed count
+      const viewedQuery = "SELECT * FROM viewed WHERE viewed_to_user_id = ?";
+      const viewedValues = [userId];
+      const viewedResult = await conn.query(viewedQuery, viewedValues);
+      user.viewed = viewedResult.length;
       res.json(user);
     } else {
       res.status(404).json({ message: "User not found" });
@@ -441,7 +457,6 @@ app.post("/api/liked", async (req, res) => {
       "SELECT * FROM liked WHERE liked_to_user_id = ? AND from_user_id = ?",
       values
     );
-    console.log("reverseLiked: ", reverseLiked);
     // match
     if (reverseLiked.length > 0) {
       const values2 = [req.body.from, req.body.to];

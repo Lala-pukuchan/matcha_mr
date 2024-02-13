@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 
 export default function UserInfo({ user }) {
-  console.log("user from userInfo", user);
   // set message
   const [message, setMessage] = useState("");
 
@@ -144,6 +143,26 @@ export default function UserInfo({ user }) {
             </ul>
           </div>
         </div>
+        {user && user.liked ? (
+          <div className="grid grid-cols-2">
+          <p className="font-bold">Liked By Someone</p>
+          <p>
+            {user.liked}
+          </p>
+          </div>
+        ) : (
+          ""
+        )}
+        {user && user.matched ? (
+          <div className="grid grid-cols-2">
+          <p className="font-bold">Matched With Someone</p>
+          <p>
+            {user.matched}
+          </p>
+          </div>
+        ) : (
+          ""
+        )}
         <div className="text-red-500">{message}</div>
       </div>
     </div>
