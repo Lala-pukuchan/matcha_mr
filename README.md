@@ -240,8 +240,13 @@ export default function Home() {
   - UserContextを利用し、RootLayout内に差し込むことで、Cookieのjwtに内包されたユーザー情報を一度のみ取得し、全ページで共有させます。
 
 ## ユーザーの現在地設定機能
--  ユーザーの現在地は、Reactのgeolocationを使って、経度/緯度を取得し、登録出来るようにしました。
-
+- ユーザーの現在地は、Reactのgeolocationを使って、経度/緯度を取得し、登録出来るようにしました。
+- ユーザーの位置情報（国、都市など）の表示は、Google Maps Geocoding APIを利用して行いました。
+- GoogleのAPIキーは、下記の手順で作成しました。
+1. Go to the Google Cloud Console.
+2. Create a new project or select an existing one.
+3. Navigate to the "APIs & Services" > "Credentials" page.
+4. Click "Create Credentials" and select "API key".
 
 ## 参考文献
 [Expressから、MariaDBへの接続方法](https://mariadb.com/kb/en/getting-started-with-the-nodejs-connector/)

@@ -19,6 +19,8 @@ async function getJwt(row, tagIdsArray) {
     pic4: row.pic4,
     pic5: row.pic5,
     tagIds: tagIdsArray,
+    longitude: row.longitude,
+    latitude: row.latitude,
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {

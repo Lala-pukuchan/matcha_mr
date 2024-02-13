@@ -244,6 +244,14 @@ app.post(
       updateFields.push("biography = ?");
       values.push(req.body.biography);
     }
+    if (req.body.longitude) {
+      updateFields.push("longitude = ?");
+      values.push(req.body.longitude);
+    }
+    if (req.body.latitude) {
+      updateFields.push("latitude = ?");
+      values.push(req.body.latitude);
+    }
 
     // save uploaded images
     if (req.files) {

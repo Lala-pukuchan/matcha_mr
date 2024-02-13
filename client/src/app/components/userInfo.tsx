@@ -136,29 +136,40 @@ export default function UserInfo({ user }) {
                   user.tagIds &&
                   user.tagIds.includes(tag.id.toString()) && (
                     <li key={`${tag.id}-${index}`}>
-                      <p className="pl-2">#{tag.name}</p>
+                      <p>#{tag.name}</p>
                     </li>
                   )
               )}
             </ul>
           </div>
         </div>
+        <div className="grid grid-cols-2">
+          <div>
+            <h2 className="font-bold">Location</h2>
+          </div>
+          <div>
+            {user && user.latitude && user.longitude ? (
+              <div className="grid grid-cols-2">
+                <p>{user.latitude}</p>
+                <p>{user.longitude}</p>
+              </div>
+            ) : (
+              ""
+            )}
+          </div>
+        </div>
         {user && user.liked ? (
           <div className="grid grid-cols-2">
-          <p className="font-bold">Liked By Someone</p>
-          <p>
-            {user.liked}
-          </p>
+            <p className="font-bold">Liked By Someone</p>
+            <p>{user.liked}</p>
           </div>
         ) : (
           ""
         )}
         {user && user.matched ? (
           <div className="grid grid-cols-2">
-          <p className="font-bold">Matched With Someone</p>
-          <p>
-            {user.matched}
-          </p>
+            <p className="font-bold">Matched With Someone</p>
+            <p>{user.matched}</p>
           </div>
         ) : (
           ""
