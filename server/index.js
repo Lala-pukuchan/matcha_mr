@@ -427,15 +427,29 @@ app.post("/api/user/viewed", async (req, res) => {
 
 // liked api
 app.post("/api/liked", async (req, res) => {
-  // insert liked information
   let conn;
   try {
+    // insert liked information
     conn = await pool.getConnection();
     const values = [req.body.from, req.body.to];
     const result = await conn.query(
       "INSERT INTO liked (from_user_id, liked_to_user_id, liked_at) VALUES (?, ?, NOW())",
       values
     );
+    // check if liked back
+    const reverseLiked = await conn.query(
+      "SELECT * FROM liked WHERE liked_to_user_id = ? AND from_user_id = ?",
+      values
+    );
+    console.log("reverseLiked: ", reverseLiked);
+    // match
+    if (reverseLiked.length > 0) {
+      const values2 = [req.body.from, req.body.to];
+      const result2 = await conn.query(
+        "INSERT INTO matched (matched_user_id_1, matched_user_id_2) VALUES (?, ?)",
+        values
+      );
+    }
     return res.json({ message: "success" });
   } catch (e) {
     console.log(e);
@@ -447,13 +461,19 @@ app.post("/api/liked", async (req, res) => {
 
 // liked api
 app.post("/api/unliked", async (req, res) => {
-  // insert liked information
   let conn;
   try {
+    // delete liked
     conn = await pool.getConnection();
     const values = [req.body.from, req.body.to];
     result = await conn.query(
       "DELETE FROM liked WHERE from_user_id = ? AND liked_to_user_id = ?",
+      values
+    );
+    // delete matched
+    values.push(values[0], values[1]);
+    const result2 = await conn.query(
+      "DELETE FROM matched WHERE (matched_user_id_1 = ? AND matched_user_id_2 = ?) OR (matched_user_id_2 = ? AND matched_user_id_1 = ?)",
       values
     );
     return res.json({ message: "success" });
