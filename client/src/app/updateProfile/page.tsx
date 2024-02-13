@@ -8,6 +8,8 @@ export default function updateProfile() {
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreGender, setSelectedPreGender] = useState("");
   const [selectedTagIds, setSelectedTagIds] = useState([]);
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
 
   useEffect(() => {
     if (user) {
@@ -22,6 +24,12 @@ export default function updateProfile() {
         const tagIds = Array.isArray(user.tagIds) ? user.tagIds : [user.tagIds];
         const tagArray = tagIds.map((tagId) => parseInt(tagId, 10));
         setSelectedTagIds(tagArray);
+      }
+      if (user && user.latitude) {
+        setLatitude(user.latitude);
+      }
+      if (user && user.longitude) {
+        setLatitude(user.longitude);
       }
     }
   }, [user]);
@@ -104,6 +112,26 @@ export default function updateProfile() {
     event.preventDefault();
     createNewTag();
     setInputTag("");
+  };
+
+  // get current location
+  const addGeo = (event) => {
+    event.preventDefault();
+    function setGeo() {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+      });
+    }
+    setGeo();
+  };
+
+  // handle change latitude and longitude
+  const handleChangeLatitude = (e) => {
+    setLatitude(e.target.value);
+  };
+  const handleChangeLongitude = (e) => {
+    setLongitude(e.target.value);
   };
 
   // submit login form
@@ -255,6 +283,39 @@ export default function updateProfile() {
               defaultValue={user ? user.biography : ""}
               className="bg-gray-100 p-3 rounded"
             />
+          </div>
+          <div className="grid grid-cols-2">
+            <label htmlFor="location" className="font-bold">
+              location
+            </label>
+            <div>
+              <input
+                type="text"
+                id="latitude"
+                name="latitude"
+                placeholder="latitude"
+                required
+                value={latitude}
+                onChange={handleChangeLatitude}
+                className="bg-gray-100 p-3 m-1 rounded"
+              />
+              <input
+                type="text"
+                id="longitude"
+                name="longitude"
+                placeholder="longitude"
+                required
+                value={longitude}
+                onChange={handleChangeLongitude}
+                className="bg-gray-100 p-3 m-1 rounded"
+              />
+              <button
+                onClick={addGeo}
+                className="m-3 w-15 p-1 h-7 rounded bg-cyan-400 text-white inline-block"
+              >
+                Get Current Location
+              </button>
+            </div>
           </div>
           <div className="grid grid-cols-2">
             <div>

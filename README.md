@@ -9,7 +9,7 @@
 - DB: mariadb
 
 ## やってみた結果
-
+Next.jsとExpressは初めて触るので、セットアップからやることで、理解が深まりました。
 
 ## 開発環境
 - macOS
@@ -32,7 +32,7 @@ v18.17.0
 - プロキシサーバーの追加
 - プロキシサーバー → クライアント側 → サーバー側 → DBの接続確立
 - ユーザー認証機能の作成
-- ユーザー情報表示機能の作成
+- ユーザーの現在地設定機能
 
 ## クライアント側のプロジェクト作成
 Next.js(React)のプロジェクトを作成しました。
@@ -239,7 +239,8 @@ export default function Home() {
 - クライアント側で、cookieの中に格納されているJWTを取得し、全ページでユーザー情報を共有します。
   - UserContextを利用し、RootLayout内に差し込むことで、Cookieのjwtに内包されたユーザー情報を一度のみ取得し、全ページで共有させます。
 
-## ユーザー情報表示機能の作成
+## ユーザーの現在地設定機能
+-  ユーザーの現在地は、Reactのgeolocationを使って、経度/緯度を取得し、登録出来るようにしました。
 
 
 ## 参考文献
@@ -247,6 +248,7 @@ export default function Home() {
 [ExpressでのJWT認証の実装方法](https://www.youtube.com/playlist?list=PLlameCF3cMEs0NQhLQtTdbL1VEfD1tK7Y)
 [Gmail送信方法](https://medium.com/@y.mehnati_49486/how-to-send-an-email-from-your-gmail-account-with-nodemailer-837bf09a7628)
 [Contextの実装方法](https://episyche.com/blog/how-to-use-context-api-in-a-nextjs-app)
+[ユーザーのロケーションの取得方法](https://www.youtube.com/watch?v=nytKEUqzAMk)
 
 ## 補足
 - 課題要件で、ORMが使えませんでした。クラスを作成することも考えましたが、冗長だったので、API内にSQLを記載しています。
