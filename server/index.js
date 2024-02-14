@@ -117,6 +117,50 @@ app.post("/api/users/", async (req, res) => {
   }
 });
 
+// get users api
+app.post("/api/users/close", async (req, res) => {
+  // get users within 10km
+  const distanceThreshold = 10;
+  let queryFields = [
+    "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance",
+  ];
+  let values = [req.body.latitude, req.body.longitude, req.body.latitude];
+
+  // Add gender and preference conditions
+  if (req.body.gender) {
+    queryFields.push("(preference = ? OR preference = 'no')");
+    values.push(req.body.gender);
+  }
+  if (req.body.preference) {
+    if (req.body.preference !== "no") {
+      queryFields.push("gender = ?");
+      values.push(req.body.preference);
+    }
+  }
+
+  // create query
+  let baseQuery = `SELECT *, ${queryFields[0]} FROM user`;
+  if (queryFields.length > 1) {
+    const whereClause = queryFields.slice(1).join(" AND ");
+    baseQuery += " WHERE " + whereClause;
+  }
+  baseQuery += " HAVING distance < ? ORDER BY distance";
+  values.push(distanceThreshold);
+
+  // get users
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(baseQuery, values);
+    return res.json(rows);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
 // get user api
 app.post("/api/user", async (req, res) => {
   const userId = req.body.userId;

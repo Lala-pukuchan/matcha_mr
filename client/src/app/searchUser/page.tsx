@@ -1,13 +1,13 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useUser } from "../../context/context";
-import UsersList from "./components/userList";
+import { useUser } from "../../../context/context";
+import UsersList from "../components/userList";
 
 export default function Home() {
   // get user from context
   const { user, setUser } = useUser();
   // set user list
-  const [users, setUserListClose] = useState([]);
+  const [users, setUserList] = useState([]);
   // set loading
   const [loading, setLoading] = useState(true);
   // set liked users
@@ -18,9 +18,7 @@ export default function Home() {
     const checkUser = async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setLoading(false);
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="));
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='));
       if (!token) {
         window.location.href = "/login";
       }
@@ -29,7 +27,7 @@ export default function Home() {
       console.log("fetching users", user);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/close`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
           {
             method: "POST",
             headers: {
@@ -38,19 +36,17 @@ export default function Home() {
             body: JSON.stringify({
               gender: user.gender,
               preference: user.preference,
-              latitude: user.latitude,
-              longitude: user.longitude,
             }),
           }
         );
         if (response.ok) {
           const data = await response.json();
-          setUserListClose(data.filter((d) => d.id !== user.id));
+          setUserList(data.filter((d) => d.id !== user.id));
         } else {
-          setUserListClose([]);
+          setUserList([]);
         }
       } catch (e) {
-        setUserListClose([]);
+        setUserList([]);
         console.error(e);
       }
     };
@@ -95,43 +91,21 @@ export default function Home() {
 
   return (
     <>
-      <div>
-        <div className="container mx-auto w-screen flex justify-center">
-          <h1 className="text-pink-400 font-bold">User Close To You</h1>
-        </div>
-        <div className="container mx-auto w-screen flex justify-center">
-          <UsersList
-            users={users}
-            operationUserId={user.id}
-            likedUsersId={likedUsersId}
-          />
+      <div className="flex justify-center">
+        <div className="text-pink-400">
+          {user ? (
+            <p>You have already loggedin, {user.username}</p>
+          ) : (
+            <p>Please log in</p>
+          )}
         </div>
       </div>
-      <hr />
-      <div>
-        <div className="container mx-auto w-screen flex justify-center">
-          <h1 className="text-pink-400 font-bold">User Near To You</h1>
-        </div>
-        <div className="container mx-auto w-screen flex justify-center">
-          <UsersList
-            users={users}
-            operationUserId={user.id}
-            likedUsersId={likedUsersId}
-          />
-        </div>
-      </div>
-      <hr />
-      <div>
-        <div className="container mx-auto w-screen flex justify-center">
-          <h1 className="text-pink-400 font-bold">User Near To You</h1>
-        </div>
-        <div className="container mx-auto w-screen flex justify-center">
-          <UsersList
-            users={users}
-            operationUserId={user.id}
-            likedUsersId={likedUsersId}
-          />
-        </div>
+      <div className="container mx-auto w-screen flex justify-center">
+        <UsersList
+          users={users}
+          operationUserId={user.id}
+          likedUsersId={likedUsersId}
+        />
       </div>
     </>
   );
