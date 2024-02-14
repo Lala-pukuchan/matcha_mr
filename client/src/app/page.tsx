@@ -18,7 +18,8 @@ export default function Home() {
     const checkUser = async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setLoading(false);
-      if (!user) {
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='));
+      if (!token) {
         window.location.href = "/login";
       }
     };

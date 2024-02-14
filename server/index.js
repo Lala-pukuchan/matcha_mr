@@ -80,19 +80,17 @@ app.get("/api/userinfo", async (req, res) => {
 
 // get users api
 app.post("/api/users/", async (req, res) => {
-  console.log("req.body: ", req.body);
   // get gender and preference to show users
   let queryFields = [];
   let values = [];
   if (req.body.gender) {
-    queryFields.push("preference = ?");
+    queryFields.push("(preference = ? OR preference = 'no')");
     values.push(req.body.gender);
   }
   if (req.body.preference) {
     if (req.body.preference === "no") {
       console.log("no preference");
     } else {
-      console.log("preference: ", req.body.preference);
       queryFields.push("gender = ?");
       values.push(req.body.preference);
     }
@@ -104,8 +102,6 @@ app.post("/api/users/", async (req, res) => {
     const whereClause = queryFields.join(" AND ");
     baseQuery += " WHERE " + whereClause;
   }
-  console.log("baseQuery: ", baseQuery);
-  console.log("values: ", values);
 
   // get users
   let conn;
@@ -206,7 +202,7 @@ app.post("/api/createUser", upload.none(), async (req, res) => {
       to: req.body.email,
       subject: "Enable Your Account",
       html: `
-        <p>To enable your account, please click <a href="http://localhost:${PORT}/api/enable?token=${token}">here</a>.</p>
+      <p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="http://localhost:${PORT}/api/enable?token=${token}">here</a>.</p>
       `,
     };
     transporter.sendMail(mailSetting, (error, info) => {
@@ -352,7 +348,6 @@ app.post(
       const rows = await conn.query(query, user_id);
       const token = await getJwt(rows[0], tagIds);
       res.cookie("token", token, {
-        httpOnly: true,
         maxAge: 86400000,
       });
 
@@ -418,7 +413,6 @@ app.post("/api/login", upload.none(), async (req, res) => {
       // get jwt token
       const token = await getJwt(rows[0], tagIdsArray);
       res.cookie("token", token, {
-        httpOnly: true,
         maxAge: 86400000,
       });
       return res.json({ message: "success" });
@@ -629,7 +623,6 @@ app.post("/api/logout", async (req, res) => {
   console.log("token delete");
   res.clearCookie("token", {
     path: "/",
-    httpOnly: true,
   });
   res.send({ message: "success" });
 });
@@ -640,7 +633,6 @@ app.get("/api/tags", async (req, res) => {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query("SELECT * FROM tag");
-    console.log("tags:", rows);
     return res.json(rows);
   } catch (e) {
     console.log(e);

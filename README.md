@@ -216,7 +216,6 @@ export default function Home() {
     ```
     const token = jwt.sign(user, process.env.JWT_SECRET);
     res.cookie("jwt", token, {
-      httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000,
     });
     ```

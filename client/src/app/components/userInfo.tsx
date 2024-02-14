@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Geo from "./geo";
 
 export default function UserInfo({ user }) {
   // set message
@@ -149,10 +150,7 @@ export default function UserInfo({ user }) {
           </div>
           <div>
             {user && user.latitude && user.longitude ? (
-              <div className="grid grid-cols-2">
-                <p>{user.latitude}</p>
-                <p>{user.longitude}</p>
-              </div>
+              <Geo lat={user.latitude} lon={user.longitude} />
             ) : (
               ""
             )}

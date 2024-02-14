@@ -10,22 +10,25 @@ export default function Geo({ lat, lon }) {
       fetch(url)
         .then((response) => response.json())
         .then((data) => {
-          if (data.status === "OK") {
-            const addressComponents = data.results[0].address_components;
+          try {
+            if (data.status === "OK") {
+              const addressComponents = data.results[0].address_components;
 
-            const country = addressComponents.find((component) =>
-              component.types.includes("country")
-            );
-            const city = addressComponents.find(
-              (component) =>
-                component.types.includes("locality") ||
-                component.types.includes("administrative_area_level_1")
-            );
-
-            setCountry(country.long_name);
-            setCity(city.long_name);
-          } else {
-            console.error("No results found");
+              const country = addressComponents.find((component) =>
+                component.types.includes("country")
+              );
+              const city = addressComponents.find(
+                (component) =>
+                  component.types.includes("locality") ||
+                  component.types.includes("administrative_area_level_1")
+              );
+              setCountry(country.long_name);
+              setCity(city.long_name);
+            } else {
+              console.error("No results found");
+            }
+          } catch (e) {
+            console.error(e);
           }
         })
         .catch((error) => console.error("Error:", error));
@@ -54,7 +57,9 @@ export default function Geo({ lat, lon }) {
             d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
           />
         </svg>
-        <p className="inline-block">{country} {city}</p>
+        <p className="inline-block">
+          {country} {city}
+        </p>
       </div>
     </>
   );

@@ -5,9 +5,9 @@ import Geo from "./geo";
 export default function UsersList({ users, operationUserId, likedUsersId }) {
   return (
     <div className="flex flex-col m-10 space-y-4">
-      {users.map((user) => (
-        <div key={user.id} className="grid grid-cols-5">
-          <div>
+      <div className="grid md:grid-cols-3 grid-cols-1">
+        {users.map((user) => (
+          <div key={user.id} className="grid grid-cols-1 m-1">
             <Link href={`/users?userID=${user.id}`}>
               {user && user.profilePic ? (
                 <img
@@ -25,13 +25,10 @@ export default function UsersList({ users, operationUserId, likedUsersId }) {
               likeToUserId={user.id}
               alreadyLiked={likedUsersId.includes(user.id)}
             />
-            <Geo 
-              lat={user.latitude}
-              lon={user.longitude}
-            />
+            <Geo lat={user.latitude} lon={user.longitude} />
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

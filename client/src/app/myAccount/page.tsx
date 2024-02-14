@@ -23,9 +23,10 @@ export default function myAccount() {
   // check user
   useEffect(() => {
     const checkUser = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 4000));
       setLoading(false);
-      if (!user) {
+      const token = document.cookie.split('; ').find(row => row.startsWith('token='));
+      if (!token) {
         window.location.href = "/login";
       } else {
         try {
