@@ -8,6 +8,7 @@ export default function Home() {
   const { user, setUser } = useUser();
   // set user list
   const [users, setUserListClose] = useState([]);
+  const [usersCommonTags, setUsersCommonTags] = useState([]);
   // set loading
   const [loading, setLoading] = useState(true);
   // set liked users
@@ -55,6 +56,35 @@ export default function Home() {
       }
     };
 
+    const fetchUsersCommon = async () => {
+      console.log("fetchUsersCommon", user)
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/commonTags`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              gender: user.gender,
+              preference: user.preference,
+              tagIds: user.tagIds,
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUsersCommonTags(data.filter((d) => d.id !== user.id));
+        } else {
+          setUsersCommonTags([]);
+        }
+      } catch (e) {
+        setUsersCommonTags([]);
+        console.error(e);
+      }
+    };
+
     const likedUsers = async () => {
       try {
         const userJson = JSON.stringify({ userId: user.id });
@@ -86,6 +116,7 @@ export default function Home() {
 
     checkUser();
     fetchUsers();
+    fetchUsersCommon();
     likedUsers();
   }, [user]);
 
@@ -110,11 +141,11 @@ export default function Home() {
       <hr />
       <div>
         <div className="container mx-auto w-screen flex justify-center">
-          <h1 className="text-pink-400 font-bold">User Near To You</h1>
+          <h1 className="text-pink-400 font-bold">User Having Common Tags</h1>
         </div>
         <div className="container mx-auto w-screen flex justify-center">
           <UsersList
-            users={users}
+            users={usersCommonTags}
             operationUserId={user.id}
             likedUsersId={likedUsersId}
           />

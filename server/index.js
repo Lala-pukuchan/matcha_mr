@@ -179,6 +179,62 @@ app.post("/api/users/close", async (req, res) => {
   }
 });
 
+// get users api
+app.post("/api/users/commonTags", async (req, res) => {
+  // combine usertag and user tables
+  const tagIds = req.body.tagIds;
+  let query = `
+  SELECT DISTINCT u.*
+  FROM user u
+  JOIN usertag ut ON u.id = ut.user_id
+`;
+
+  // create conditions and parameters
+  let whereConditions = [];
+  let queryParams = [];
+  if (tagIds && tagIds.length > 0) {
+    const placeholders = tagIds.map(() => "?").join(", ");
+    whereConditions.push(`ut.tag_id IN (${placeholders})`);
+    queryParams.push(...tagIds);
+  }
+
+  // Add gender and preference conditions
+  if (req.body.gender) {
+    whereConditions.push("(u.preference = ? OR u.preference = 'no')");
+    queryParams.push(req.body.gender);
+  }
+  if (req.body.preference && req.body.preference !== "no") {
+    whereConditions.push("u.gender = ?");
+    queryParams.push(req.body.preference);
+  }
+
+  // Combine all conditions with "AND" and append to the query
+  if (whereConditions.length > 0) {
+    query += " WHERE " + whereConditions.join(" AND ");
+  }
+
+  // get users
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(query, queryParams);
+    if (rows.length > 0) {
+      for (row of rows) {
+        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+        const tagValues = [row.id];
+        const tagsResult = await conn.query(tagQuery, tagValues);
+        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+        row.tagIds = tagIdsArray;
+      }
+    }
+    return res.json(rows);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
 // get user api
 app.post("/api/user", async (req, res) => {
   const userId = req.body.userId;
