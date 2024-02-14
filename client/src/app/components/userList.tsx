@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Heart from "./heart";
 import Geo from "./geo";
+import Tag from "./tag";
 
 export default function UsersList({ users, operationUserId, likedUsersId }) {
   return (
@@ -26,6 +27,7 @@ export default function UsersList({ users, operationUserId, likedUsersId }) {
               alreadyLiked={likedUsersId.includes(user.id)}
             />
             <Geo lat={user.latitude} lon={user.longitude} />
+            <Tag user={user} />
           </div>
         ))}
       </div>

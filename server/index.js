@@ -108,6 +108,15 @@ app.post("/api/users/", async (req, res) => {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query(baseQuery, values);
+    if (rows.length > 0) {
+      for (row of rows) {
+        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+        const tagValues = [row.id];
+        const tagsResult = await conn.query(tagQuery, tagValues);
+        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+        row.tagIds = tagIdsArray;
+      }
+    }
     return res.json(rows);
   } catch (e) {
     console.log(e);
@@ -152,6 +161,15 @@ app.post("/api/users/close", async (req, res) => {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query(baseQuery, values);
+    if (rows.length > 0) {
+      for (row of rows) {
+        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+        const tagValues = [row.id];
+        const tagsResult = await conn.query(tagQuery, tagValues);
+        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+        row.tagIds = tagIdsArray;
+      }
+    }
     return res.json(rows);
   } catch (e) {
     console.log(e);
