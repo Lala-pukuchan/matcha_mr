@@ -229,6 +229,7 @@ export default function updateProfile() {
                 className="m-1"
                 checked={selectedGender === "male"}
                 onChange={() => setSelectedGender("male")}
+                required
               />
               <label htmlFor="male">Male</label>
               <input
@@ -239,6 +240,7 @@ export default function updateProfile() {
                 className="m-1"
                 checked={selectedGender === "female"}
                 onChange={() => setSelectedGender("female")}
+                required
               />
               <label htmlFor="female">Female</label>
             </div>
@@ -256,6 +258,7 @@ export default function updateProfile() {
                 className="m-1"
                 checked={selectedPreGender === "male"}
                 onChange={() => setSelectedPreGender("male")}
+                required
               />
               <label htmlFor="male-pre">Male</label>
               <input
@@ -266,8 +269,20 @@ export default function updateProfile() {
                 className="m-1"
                 checked={selectedPreGender === "female"}
                 onChange={() => setSelectedPreGender("female")}
+                required
               />
               <label htmlFor="female-pre">Female</label>
+              <input
+                type="radio"
+                id="no-pre"
+                name="preference"
+                value="no"
+                className="m-1"
+                checked={selectedPreGender === "no"}
+                onChange={() => setSelectedPreGender("no")}
+                required
+              />
+              <label htmlFor="no-pre">No specific</label>
             </div>
           </div>
           <div className="grid grid-cols-2">
