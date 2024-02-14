@@ -9,6 +9,8 @@ export default function Home() {
   // set user list
   const [users, setUserListClose] = useState([]);
   const [usersCommonTags, setUsersCommonTags] = useState([]);
+  const [usersFrequentlyLikedBack, setUsersFrequentlyLikedBack] = useState([]);
+
   // set loading
   const [loading, setLoading] = useState(true);
   // set liked users
@@ -27,7 +29,6 @@ export default function Home() {
       }
     };
     const fetchUsers = async () => {
-      console.log("fetching users", user);
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/close`,
@@ -57,7 +58,6 @@ export default function Home() {
     };
 
     const fetchUsersCommon = async () => {
-      console.log("fetchUsersCommon", user)
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/commonTags`,
@@ -81,6 +81,33 @@ export default function Home() {
         }
       } catch (e) {
         setUsersCommonTags([]);
+        console.error(e);
+      }
+    };
+
+    const fetchUsersFrequentlyLikedBack = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/frequentlyLikedBack`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              gender: user.gender,
+              preference: user.preference,
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUsersFrequentlyLikedBack(data.filter((d) => d.id !== user.id));
+        } else {
+          setUsersFrequentlyLikedBack([]);
+        }
+      } catch (e) {
+        setUsersFrequentlyLikedBack([]);
         console.error(e);
       }
     };
@@ -117,6 +144,7 @@ export default function Home() {
     checkUser();
     fetchUsers();
     fetchUsersCommon();
+    fetchUsersFrequentlyLikedBack();
     likedUsers();
   }, [user]);
 
@@ -139,7 +167,7 @@ export default function Home() {
         </div>
       </div>
       <hr />
-      <div>
+      <div className="mt-3">
         <div className="container mx-auto w-screen flex justify-center">
           <h1 className="text-pink-400 font-bold">User Having Common Tags</h1>
         </div>
@@ -152,13 +180,15 @@ export default function Home() {
         </div>
       </div>
       <hr />
-      <div>
+      <div className="mt-3">
         <div className="container mx-auto w-screen flex justify-center">
-          <h1 className="text-pink-400 font-bold">User Near To You</h1>
+          <h1 className="text-pink-400 font-bold">
+            User Frequently Liked Back
+          </h1>
         </div>
         <div className="container mx-auto w-screen flex justify-center">
           <UsersList
-            users={users}
+            users={usersFrequentlyLikedBack}
             operationUserId={user.id}
             likedUsersId={likedUsersId}
           />

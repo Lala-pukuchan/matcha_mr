@@ -235,6 +235,83 @@ app.post("/api/users/commonTags", async (req, res) => {
     if (conn) return conn.end();
   }
 });
+
+// get users api
+app.post("/api/users/frequentlyLikedBack", async (req, res) => {
+  // Initial part of the query without WHERE clause
+  let query = `
+    SELECT 
+      u.*,
+      m.match_count
+    FROM 
+        user u
+    JOIN 
+        (SELECT 
+            matched_user_id_second, 
+            COUNT(*) AS match_count
+        FROM 
+            matched
+        GROUP BY 
+            matched_user_id_second) m ON u.id = m.matched_user_id_second
+  `;
+
+  // Initialize conditions and parameters for the dynamic WHERE clause
+  let whereConditions = [];
+  let queryParams = [];
+
+  // Add gender and preference conditions
+  if (req.body.gender) {
+    whereConditions.push("u.preference = ? OR u.preference = 'no'");
+    queryParams.push(req.body.gender);
+  }
+  if (req.body.preference && req.body.preference !== "no") {
+    whereConditions.push("u.gender = ?");
+    queryParams.push(req.body.preference);
+  }
+
+  // Combine all conditions with "AND" and append to the query
+  if (whereConditions.length > 0) {
+    query += " WHERE " + whereConditions.join(" AND ");
+  }
+
+  // Add GROUP BY and ORDER BY clauses after WHERE conditions
+  query += `
+    GROUP BY 
+        u.id
+    ORDER BY 
+        m.match_count DESC
+    LIMIT 1;
+  `;
+
+  // get users
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(query, queryParams);
+    console.log("rows: ", rows);
+    if (rows.length > 0) {
+      for (row of rows) {
+        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+        const tagValues = [row.id];
+        const tagsResult = await conn.query(tagQuery, tagValues);
+        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+        row.tagIds = tagIdsArray;
+      }
+    }
+    const modifiedRows = rows.map((row) => ({
+      ...row,
+      match_count: Number(row.match_count),
+    }));
+    console.log("modifiedRows: ", modifiedRows);
+    res.json(modifiedRows);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
 // get user api
 app.post("/api/user", async (req, res) => {
   const userId = req.body.userId;
@@ -254,7 +331,7 @@ app.post("/api/user", async (req, res) => {
       user.tagIds = tagIdsArray;
       // get matched count
       const matchedQuery =
-        "SELECT * FROM matched WHERE matched_user_id_1 = ? OR matched_user_id_2 = ?";
+        "SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?";
       const matchedValues = [userId, userId];
       const matchedResult = await conn.query(matchedQuery, matchedValues);
       user.matched = matchedResult.length;
@@ -606,10 +683,10 @@ app.post("/api/liked", async (req, res) => {
     );
     // match
     if (reverseLiked.length > 0) {
-      const values2 = [req.body.from, req.body.to];
+      const values2 = [req.body.to, req.body.from];
       const result2 = await conn.query(
-        "INSERT INTO matched (matched_user_id_1, matched_user_id_2) VALUES (?, ?)",
-        values
+        "INSERT INTO matched (matched_user_id_first, matched_user_id_second) VALUES (?, ?)",
+        values2
       );
     }
     return res.json({ message: "success" });
@@ -635,7 +712,7 @@ app.post("/api/unliked", async (req, res) => {
     // delete matched
     values.push(values[0], values[1]);
     const result2 = await conn.query(
-      "DELETE FROM matched WHERE (matched_user_id_1 = ? AND matched_user_id_2 = ?) OR (matched_user_id_2 = ? AND matched_user_id_1 = ?)",
+      "DELETE FROM matched WHERE (matched_user_id_first = ? AND matched_user_id_second = ?) OR (matched_user_id_second = ? AND matched_user_id_first = ?)",
       values
     );
     return res.json({ message: "success" });
