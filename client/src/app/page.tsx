@@ -23,9 +23,20 @@ export default function Home() {
       }
     };
     const fetchUsers = async () => {
+      console.log("fetching users", user);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              gender: user.gender,
+              preference: user.preference,
+            }),
+          }
         );
         if (response.ok) {
           const data = await response.json();

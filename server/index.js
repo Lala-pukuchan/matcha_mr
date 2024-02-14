@@ -79,12 +79,39 @@ app.get("/api/userinfo", async (req, res) => {
 });
 
 // get users api
-app.get("/api/users/", async (req, res) => {
+app.post("/api/users/", async (req, res) => {
+  console.log("req.body: ", req.body);
+  // get gender and preference to show users
+  let queryFields = [];
+  let values = [];
+  if (req.body.gender) {
+    queryFields.push("preference = ?");
+    values.push(req.body.gender);
+  }
+  if (req.body.preference) {
+    if (req.body.preference === "no") {
+      console.log("no preference");
+    } else {
+      console.log("preference: ", req.body.preference);
+      queryFields.push("gender = ?");
+      values.push(req.body.preference);
+    }
+  }
+
+  // create query
+  let baseQuery = "SELECT * FROM user";
+  if (queryFields.length > 0) {
+    const whereClause = queryFields.join(" AND ");
+    baseQuery += " WHERE " + whereClause;
+  }
+  console.log("baseQuery: ", baseQuery);
+  console.log("values: ", values);
+
   // get users
   let conn;
   try {
     conn = await pool.getConnection();
-    const rows = await conn.query("SELECT * FROM user");
+    const rows = await conn.query(baseQuery, values);
     return res.json(rows);
   } catch (e) {
     console.log(e);

@@ -29,7 +29,7 @@ export default function updateProfile() {
         setLatitude(user.latitude);
       }
       if (user && user.longitude) {
-        setLatitude(user.longitude);
+        setLongitude(user.longitude);
       }
     }
   }, [user]);
