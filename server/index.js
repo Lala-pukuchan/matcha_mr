@@ -288,7 +288,6 @@ app.post("/api/users/frequentlyLikedBack", async (req, res) => {
   try {
     conn = await pool.getConnection();
     const rows = await conn.query(query, queryParams);
-    console.log("rows: ", rows);
     if (rows.length > 0) {
       for (row of rows) {
         const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
@@ -673,7 +672,7 @@ app.post("/api/user/viewed", async (req, res) => {
   }
 });
 
-// liked api
+// like api
 app.post("/api/liked", async (req, res) => {
   let conn;
   try {
@@ -697,7 +696,24 @@ app.post("/api/liked", async (req, res) => {
         values2
       );
     }
-    return res.json({ message: "success" });
+    // matching ratio
+    // matching ratio
+    const likeQury = "SELECT * FROM liked WHERE from_user_id = ?";
+    const likeVal = [req.body.from];
+    const likeResult = await conn.query(likeQury, likeVal);
+    const matchQuery =
+      "SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?";
+    const matchVal = [req.body.from, req.body.from];
+    const matchResult = await conn.query(matchQuery, matchVal);
+
+    // calculate match ratio
+    let matchRatio = 0;
+    if (matchResult.length !== 0 && likeResult.length !== 0) {
+      matchRatio = (matchResult.length / likeResult.length) * 100;
+    }
+    const updateMatchRatio = "UPDATE user SET match_ratio = ? WHERE id = ?";
+    const updateVal = [matchRatio, req.body.from];
+    const updateResult = await conn.query(updateMatchRatio, updateVal);
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
@@ -706,7 +722,7 @@ app.post("/api/liked", async (req, res) => {
   }
 });
 
-// liked api
+// unlike api
 app.post("/api/unliked", async (req, res) => {
   let conn;
   try {
@@ -723,6 +739,23 @@ app.post("/api/unliked", async (req, res) => {
       "DELETE FROM matched WHERE (matched_user_id_first = ? AND matched_user_id_second = ?) OR (matched_user_id_second = ? AND matched_user_id_first = ?)",
       values
     );
+    // matching ratio
+    const likeQury = "SELECT * FROM liked WHERE from_user_id = ?";
+    const likeVal = [req.body.from];
+    const likeResult = await conn.query(likeQury, likeVal);
+    const matchQuery =
+      "SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?";
+    const matchVal = [req.body.from, req.body.from];
+    const matchResult = await conn.query(matchQuery, matchVal);
+
+    // calculate match ratio
+    let matchRatio = 0;
+    if (matchResult.length !== 0 && likeResult.length !== 0) {
+      matchRatio = (matchResult.length / likeResult.length) * 100;
+    }
+    const updateMatchRatio = "UPDATE user SET match_ratio = ? WHERE id = ?";
+    const updateVal = [matchRatio, req.body.from];
+    const updateResult = await conn.query(updateMatchRatio, updateVal);
     return res.json({ message: "success" });
   } catch (e) {
     console.log(e);

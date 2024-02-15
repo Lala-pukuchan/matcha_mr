@@ -2,6 +2,7 @@ import Link from "next/link";
 import Heart from "./heart";
 import Geo from "./geo";
 import Tag from "./tag";
+import MatchRatio from "./matchRatio";
 
 export default function UsersList({ users, operationUserId, likedUsersId }) {
   return (
@@ -27,6 +28,7 @@ export default function UsersList({ users, operationUserId, likedUsersId }) {
               likeToUserId={user.id}
               alreadyLiked={likedUsersId.includes(user.id)}
             />
+            <MatchRatio matchRatio={user.match_ratio}/>
             <Geo lat={user.latitude} lon={user.longitude} />
             <Tag user={user} />
           </div>

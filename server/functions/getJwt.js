@@ -22,6 +22,7 @@ async function getJwt(row, tagIdsArray) {
     tagIds: tagIdsArray,
     longitude: row.longitude,
     latitude: row.latitude,
+    match_ratio: row.match_ratio,
   };
 
   const token = jwt.sign(payload, process.env.JWT_SECRET, {
