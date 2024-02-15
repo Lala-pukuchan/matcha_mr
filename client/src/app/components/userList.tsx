@@ -20,6 +20,7 @@ export default function UsersList({ users, operationUserId, likedUsersId }) {
                 <div className="h-80 w-80 bg-gray-200 rounded">No Image</div>
               )}
               {user.username}
+              ({user.age})
             </Link>
             <Heart
               likeFromUserId={operationUserId}

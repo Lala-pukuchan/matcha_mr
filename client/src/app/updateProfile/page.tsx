@@ -217,6 +217,22 @@ export default function updateProfile() {
             />
           </div>
           <div className="grid grid-cols-2">
+            <label htmlFor="age" className="font-bold">
+              age
+            </label>
+            <input
+              type="number"
+              id="age"
+              name="age"
+              placeholder="age"
+              min={0}
+              max={120}
+              required
+              defaultValue={user ? user.age : ""}
+              className="bg-gray-100 p-3 rounded"
+            />
+          </div>
+          <div className="grid grid-cols-2">
             <label htmlFor="gender" className="font-bold">
               Gender
             </label>

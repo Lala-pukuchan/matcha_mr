@@ -469,6 +469,16 @@ app.post(
       updateFields.push("latitude = ?");
       values.push(req.body.latitude);
     }
+    if (req.body.age) {
+      updateFields.push("age = ?");
+      const ageAsInt = parseInt(req.body.age, 10);
+      if (!isNaN(ageAsInt)) {
+        values.push(ageAsInt);
+        console.error("ageAsInt:", ageAsInt);
+      } else {
+        console.error("Invalid age value:", req.body.age);
+      }
+    }
 
     // save uploaded images
     if (req.files) {
@@ -528,7 +538,6 @@ app.post(
       if (tagIds) {
         console.log("tagIds.length: ", tagIds.length);
         for (const tagId of tagIds) {
-          console.log("add tag: ", tagId);
           const values = [userId, tagId];
           await conn.query(
             "INSERT INTO usertag(user_id, tag_id) VALUES (?, ?)",
@@ -870,7 +879,7 @@ app.post("/api/searchUser", upload.none(), async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    console.log('req.body: ', req.body);
+    console.log("req.body: ", req.body);
     return res.json({ message: "success" });
   } catch (e) {
     console.log(e);

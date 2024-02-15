@@ -9,6 +9,7 @@ async function getJwt(row, tagIdsArray) {
     username: row.username,
     lastname: row.lastname,
     firstname: row.firstname,
+    age: row.age,
     gender: row.gender,
     preference: row.preference,
     biography: row.biography,

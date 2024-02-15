@@ -110,6 +110,10 @@ export default function UserInfo({ user }) {
           <p>{user ? user.firstname : ""}</p>
         </div>
         <div className="grid grid-cols-2">
+          <p className="font-bold">age</p>
+          <p>{user ? user.age : ""}</p>
+        </div>
+        <div className="grid grid-cols-2">
           <p className="font-bold">email</p>
           <p>{user ? user.email : ""}</p>
         </div>
