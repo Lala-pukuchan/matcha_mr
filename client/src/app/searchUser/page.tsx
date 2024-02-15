@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../../../context/context";
 import UsersList from "../components/userList";
+import AgeRangeSlider from "../components/ageRangeSlider";
 
 export default function Home() {
   // get user from context
@@ -18,7 +19,9 @@ export default function Home() {
     const checkUser = async () => {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setLoading(false);
-      const token = document.cookie.split('; ').find(row => row.startsWith('token='));
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="));
       if (!token) {
         window.location.href = "/login";
       }
@@ -89,15 +92,37 @@ export default function Home() {
     return <div>Loading...</div>;
   }
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("submit");
+    console.log(
+      "age range",
+      e.target.ageRangeMin.value,
+      e.target.ageRangeMax.value
+    );
+  };
+
   return (
     <>
       <div className="flex justify-center">
-        <div className="text-pink-400">
-          {user ? (
-            <p>You have already loggedin, {user.username}</p>
-          ) : (
-            <p>Please log in</p>
-          )}
+        <div className="w-full max-w-xs">
+          <form
+            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+            onSubmit={handleSubmit}
+          >
+            <h1 className="font-bold text-gray-400">Filter By: </h1>
+            <div className="m-3">
+              <AgeRangeSlider />
+            </div>
+            <div className="flex items-center justify-between">
+              <button
+                type="submit"
+                className="w-40 h-9 rounded bg-pink-400 text-white"
+              >
+                Search
+              </button>
+            </div>
+          </form>
         </div>
       </div>
       <div className="container mx-auto w-screen flex justify-center">
