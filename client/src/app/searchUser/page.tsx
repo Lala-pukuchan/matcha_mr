@@ -98,6 +98,9 @@ export default function Home() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    if (user) {
+      formData.append("user", JSON.stringify(user));
+    }
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/searchUser`,

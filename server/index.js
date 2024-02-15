@@ -1,4 +1,5 @@
 const getJwt = require("./functions/getJwt");
+const getSearchQuery = require("./functions/getSearchQuery");
 
 // express server
 const express = require("express");
@@ -50,6 +51,7 @@ const fs = require("fs");
 
 // mail
 const nodemailer = require("nodemailer");
+const { get } = require("http");
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   host: "smtp.gmail.com",
@@ -913,7 +915,12 @@ app.post("/api/searchUser", upload.none(), async (req, res) => {
   try {
     conn = await pool.getConnection();
     console.log("req.body: ", req.body);
-    return res.json({ message: "success" });
+    const { baseQuery, values } = await getSearchQuery(req.body);
+    console.log("baseQuery: ", baseQuery);
+    console.log("values: ", values);
+    const rows = await conn.query(baseQuery, values);
+    console.log("rows: ", rows);
+    return res.json(rows);
   } catch (e) {
     console.log(e);
   } finally {
