@@ -3,6 +3,9 @@ import { useState, useEffect } from "react";
 import { useUser } from "../../../context/context";
 import UsersList from "../components/userList";
 import AgeRangeSlider from "../components/ageRangeSlider";
+import DistanceRangeSlider from "../components/distanceRangeSlider";
+import FameRatingRangeSlider from "../components/fameRatingRangeSlider";
+import TagSelection from "../components/tagSelection";
 
 export default function Home() {
   // get user from context
@@ -92,32 +95,107 @@ export default function Home() {
     return <div>Loading...</div>;
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("submit");
-    console.log(
-      "age range",
-      e.target.ageRangeMin.value,
-      e.target.ageRangeMax.value
-    );
-  };
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/searchUser`,
+        {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        }
+      );
+      if (response.status === 200) {
+        console.log("response", response);
+      } else {
+        const data = await response.json();
+        console.log("message", data.message);
+      }
+    } catch (e) {
+      console.log("error: ", e);
+    }
+  }
 
   return (
     <>
       <div className="flex justify-center">
-        <div className="w-full max-w-xs">
+        <div className="w-full max-w-5xl">
           <form
             className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
             onSubmit={handleSubmit}
           >
-            <h1 className="font-bold text-gray-400">Filter By: </h1>
-            <div className="m-3">
-              <AgeRangeSlider />
+            <h1 className="font-bold text-cyan-400">Filter By: </h1>
+            <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
+              <div className="m-3">
+                <AgeRangeSlider />
+              </div>
+              <div className="m-3">
+                <DistanceRangeSlider />
+              </div>
+              <div className="m-3">
+                <FameRatingRangeSlider />
+              </div>
+              <div className="m-3">
+                <TagSelection user={user} />
+              </div>
+            </div>
+            <h1 className="font-bold text-cyan-400 mt-6">Sort By: </h1>
+            <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
+              <div className="m-3">
+                <ul>
+                  <li>
+                    <input
+                      type="radio"
+                      id="age"
+                      name="sort"
+                      value="age"
+                    ></input>
+                    <label htmlFor="age" className="pl-2">
+                      Age
+                    </label>
+                  </li>
+                  <li>
+                    <input
+                      type="radio"
+                      id="distance"
+                      name="sort"
+                      value="distance"
+                    ></input>
+                    <label htmlFor="distance" className="pl-2">
+                      Distance
+                    </label>
+                  </li>
+                  <li>
+                    <input
+                      type="radio"
+                      id="fameRating"
+                      name="sort"
+                      value="fameRating"
+                    ></input>
+                    <label htmlFor="fameRating" className="pl-2">
+                      Liked Back Ratio
+                    </label>
+                  </li>
+                  <li>
+                    <input
+                      type="radio"
+                      id="tag"
+                      name="sort"
+                      value="tag"
+                    ></input>
+                    <label htmlFor="tag" className="pl-2">
+                      Tag
+                    </label>
+                  </li>
+                </ul>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <button
                 type="submit"
-                className="w-40 h-9 rounded bg-pink-400 text-white"
+                className="mt-4 w-60 h-9 rounded bg-pink-400 text-white"
               >
                 Search
               </button>

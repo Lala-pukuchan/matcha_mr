@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 
-function AgeRangeSlider() {
-  const [ageRange, setAgeRange] = useState({
-    ageMin: 0,
-    ageMax: 20,
+function DistanceRangeSlider() {
+  const [distanceRange, setDistanceRange] = useState({
+    distanceMin: 0,
+    distanceMax: 20,
   });
 
   const handleSliderChange = (e) => {
     const { name, value } = e.target;
-    setAgeRange(prevRange => {
+    setDistanceRange(prevRange => {
       const newValue = parseInt(value, 10);
       // Determine if we're adjusting the min or max slider
-      if (name === "ageMin" && newValue <= prevRange.ageMax) {
+      if (name === "distanceMin" && newValue <= prevRange.distanceMax) {
         return { ...prevRange, [name]: newValue };
-      } else if (name === "ageMax" && newValue >= prevRange.ageMin) {
+      } else if (name === "distanceMax" && newValue >= prevRange.distanceMin) {
         return { ...prevRange, [name]: newValue };
       }
       return prevRange; // Return previous state if new value is out of bounds
@@ -22,37 +22,36 @@ function AgeRangeSlider() {
 
   return (
     <div className="range-slider">
-      <label htmlFor="age" className="text-gray-400 font-bold">
-        Age
+      <label htmlFor="distance" className="text-gray-400 font-bold">
+        Distance
       </label>
       <br />
       <input
         type="range"
-        id="ageRangeMin"
-        name="ageMin"
+        id="distanceRangeMin"
+        name="distanceMin"
         min="0"
         max="100" // Ensure max attribute allows full range
-        value={ageRange.ageMin}
+        value={distanceRange.distanceMin}
         onChange={handleSliderChange}
         className="w-4/5"
       />
       <input
         type="range"
-        id="ageRangeMax"
-        name="ageMax"
+        id="distanceRangeMax"
+        name="distanceMax"
         min="0"
         max="100" // Ensure max attribute allows full range
-        value={ageRange.ageMax}
+        value={distanceRange.distanceMax}
         onChange={handleSliderChange}
         className="w-4/5"
       />
       <div className="range-values text-gray-400 pl-4">
-        Age range: 
-        <br />
-        {ageRange.ageMin} - {ageRange.ageMax} years old
+        Distance range: 
+        <br />{distanceRange.distanceMin} - {distanceRange.distanceMax} km
       </div>
     </div>
   );
 }
 
-export default AgeRangeSlider;
+export default DistanceRangeSlider;

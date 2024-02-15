@@ -1,19 +1,19 @@
 import React, { useState } from "react";
 
-function AgeRangeSlider() {
-  const [ageRange, setAgeRange] = useState({
-    ageMin: 0,
-    ageMax: 20,
+function FameRatingRangeSlider() {
+  const [fameRatingRange, setFameRatingRange] = useState({
+    fameRatingMin: 0,
+    fameRatingMax: 20,
   });
 
   const handleSliderChange = (e) => {
     const { name, value } = e.target;
-    setAgeRange(prevRange => {
+    setFameRatingRange(prevRange => {
       const newValue = parseInt(value, 10);
       // Determine if we're adjusting the min or max slider
-      if (name === "ageMin" && newValue <= prevRange.ageMax) {
+      if (name === "fameRatingMin" && newValue <= prevRange.fameRatingMax) {
         return { ...prevRange, [name]: newValue };
-      } else if (name === "ageMax" && newValue >= prevRange.ageMin) {
+      } else if (name === "fameRatingMax" && newValue >= prevRange.fameRatingMin) {
         return { ...prevRange, [name]: newValue };
       }
       return prevRange; // Return previous state if new value is out of bounds
@@ -22,37 +22,36 @@ function AgeRangeSlider() {
 
   return (
     <div className="range-slider">
-      <label htmlFor="age" className="text-gray-400 font-bold">
-        Age
+      <label htmlFor="fameRating" className="text-gray-400 font-bold">
+        FameRating
       </label>
       <br />
       <input
         type="range"
-        id="ageRangeMin"
-        name="ageMin"
+        id="fameRatingRangeMin"
+        name="fameRatingMin"
         min="0"
         max="100" // Ensure max attribute allows full range
-        value={ageRange.ageMin}
+        value={fameRatingRange.fameRatingMin}
         onChange={handleSliderChange}
         className="w-4/5"
       />
       <input
         type="range"
-        id="ageRangeMax"
-        name="ageMax"
+        id="fameRatingRangeMax"
+        name="fameRatingMax"
         min="0"
         max="100" // Ensure max attribute allows full range
-        value={ageRange.ageMax}
+        value={fameRatingRange.fameRatingMax}
         onChange={handleSliderChange}
         className="w-4/5"
       />
       <div className="range-values text-gray-400 pl-4">
-        Age range: 
-        <br />
-        {ageRange.ageMin} - {ageRange.ageMax} years old
+        Liked Back Ratio range: 
+        <br />{fameRatingRange.fameRatingMin} - {fameRatingRange.fameRatingMax} %
       </div>
     </div>
   );
 }
 
-export default AgeRangeSlider;
+export default FameRatingRangeSlider;

@@ -302,7 +302,6 @@ app.post("/api/users/frequentlyLikedBack", async (req, res) => {
       ...row,
       match_count: Number(row.match_count),
     }));
-    console.log("modifiedRows: ", modifiedRows);
     res.json(modifiedRows);
   } catch (e) {
     console.log(e);
@@ -860,6 +859,21 @@ app.post("/api/tag", async (req, res) => {
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
+// login api
+app.post("/api/searchUser", upload.none(), async (req, res) => {
+  // validate user
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    console.log('req.body: ', req.body);
+    return res.json({ message: "success" });
+  } catch (e) {
+    console.log(e);
   } finally {
     if (conn) return conn.end();
   }
