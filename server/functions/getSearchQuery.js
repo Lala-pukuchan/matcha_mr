@@ -17,14 +17,15 @@ async function getSearchQuery(data) {
   //    `;
   let baseQuery = `
     SELECT 
-    user.*
+    user.*,
+    (6371 * acos(cos(radians(?)) * cos(radians(user.latitude)) * cos(radians(user.longitude) - radians(?)) + sin(radians(?)) * sin(radians(user.latitude)))) AS distance
     FROM 
     user
     `;
-  //  let values = [user.latitude, user.longitude, user.latitude];
-  let values = [];
-//  values.push(user.id);
-//  values.push(user.tagIds);
+  let values = [parseFloat(user.latitude), parseFloat(user.longitude), parseFloat(user.latitude)];
+  //let values = [];
+  //  values.push(user.id);
+  //  values.push(user.tagIds);
 
   // where
   let whereConditions = [];
@@ -40,10 +41,6 @@ async function getSearchQuery(data) {
     whereConditions.push("user.age >= ? AND user.age <= ?");
     values.push(parseInt(data.ageMin), parseInt(data.ageMax));
   }
-//  if (data.distanceMin && data.distanceMax) {
-//    whereConditions.push("user.distance >= ? AND user.distance <= ?");
-//    values.push(parseInt(data.distanceMin), parseInt(data.distanceMax));
-//  }
   if (data.fameRatingMin && data.fameRatingMax) {
     whereConditions.push("user.match_ratio >= ? AND user.match_ratio <= ?");
     values.push(parseInt(data.fameRatingMin), parseInt(data.fameRatingMax));
@@ -54,6 +51,16 @@ async function getSearchQuery(data) {
   }
   if (whereConditions.length >= 0) {
     baseQuery += " WHERE " + whereConditions.join(" AND ");
+  }
+
+  // having
+  let havingConditions = [];
+  if (data.distanceMin && data.distanceMax) {
+    havingConditions.push(`distance >= ? AND distance <= ?`);
+    values.push(parseInt(data.distanceMin), parseInt(data.distanceMax));
+  }
+  if (havingConditions.length > 0) {
+    baseQuery += " HAVING " + havingConditions.join(" AND ");
   }
 
   // orderBy

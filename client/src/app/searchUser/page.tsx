@@ -112,12 +112,17 @@ export default function Home() {
       );
       if (response.status === 200) {
         console.log("response", response);
+        const data = await response.json();
+        console.log("data: ", data);
+        setUserList(data.filter((d) => d.id !== user.id));
       } else {
         const data = await response.json();
         console.log("message", data.message);
+        setUserList([]);
       }
     } catch (e) {
       console.log("error: ", e);
+      setUserList([]);
     }
   }
 
@@ -178,7 +183,7 @@ export default function Home() {
                       value="fameRating"
                     ></input>
                     <label htmlFor="fameRating" className="pl-2">
-                      Liked Back Ratio
+                      Matching Ratio
                     </label>
                   </li>
                   <li>

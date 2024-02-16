@@ -31,7 +31,7 @@ function DistanceRangeSlider() {
         id="distanceRangeMin"
         name="distanceMin"
         min="0"
-        max="100" // Ensure max attribute allows full range
+        max="10000" // Ensure max attribute allows full range
         value={distanceRange.distanceMin}
         onChange={handleSliderChange}
         className="w-4/5"
@@ -41,7 +41,7 @@ function DistanceRangeSlider() {
         id="distanceRangeMax"
         name="distanceMax"
         min="0"
-        max="100" // Ensure max attribute allows full range
+        max="10000" // Ensure max attribute allows full range
         value={distanceRange.distanceMax}
         onChange={handleSliderChange}
         className="w-4/5"

@@ -47,7 +47,7 @@ function FameRatingRangeSlider() {
         className="w-4/5"
       />
       <div className="range-values text-gray-400 pl-4">
-        Liked Back Ratio range: 
+        Matching Ratio range: 
         <br />{fameRatingRange.fameRatingMin} - {fameRatingRange.fameRatingMax} %
       </div>
     </div>
