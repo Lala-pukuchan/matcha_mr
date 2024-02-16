@@ -920,6 +920,16 @@ app.post("/api/searchUser", upload.none(), async (req, res) => {
     console.log("values: ", values);
     const rows = await conn.query(baseQuery, values);
     console.log("rows: ", rows);
+    // add tags
+    if (rows.length > 0) {
+      for (row of rows) {
+        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+        const tagValues = [row.id];
+        const tagsResult = await conn.query(tagQuery, tagValues);
+        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+        row.tagIds = tagIdsArray;
+      }
+    }
     return res.json(rows);
   } catch (e) {
     console.log(e);

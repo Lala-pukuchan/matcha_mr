@@ -31,7 +31,7 @@ export default function TagSelection({ user }) {
         Tag
       </label>
       <br />
-      <ul className="text-gray-400">
+      {/*<ul className="text-gray-400">
         {tags.map(
           (tag, index) =>
             user &&
@@ -40,7 +40,6 @@ export default function TagSelection({ user }) {
               <li key={`${tag.id}-${index}`}>
                 <input
                   id={tag.id}
-                  type="radio"
                   value={tag.id}
                   name="tagId"
                 ></input>
@@ -50,7 +49,24 @@ export default function TagSelection({ user }) {
               </li>
             )
         )}
-      </ul>
+      </ul>*/}
+      <div className="text-gray-400">
+        {tags.map((tag, index) => (
+          <div key={`${tag.id}-${index}`} className="flex items-center mb-2">
+            <input
+              type="checkbox"
+              id={`tag-${tag.id}`}
+              name="tagIds"
+              value={tag.id}
+              defaultChecked={user?.tagIds?.includes(tag.id.toString())}
+              className="checkbox-input"
+            />
+            <label htmlFor={`tag-${tag.id}`} className="pl-2">
+              #{tag.name}
+            </label>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

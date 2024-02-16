@@ -21,8 +21,13 @@ async function getSearchQuery(data) {
     (6371 * acos(cos(radians(?)) * cos(radians(user.latitude)) * cos(radians(user.longitude) - radians(?)) + sin(radians(?)) * sin(radians(user.latitude)))) AS distance
     FROM 
     user
+    JOIN usertag ON user.id = usertag.user_id
     `;
-  let values = [parseFloat(user.latitude), parseFloat(user.longitude), parseFloat(user.latitude)];
+  let values = [
+    parseFloat(user.latitude),
+    parseFloat(user.longitude),
+    parseFloat(user.latitude),
+  ];
   //let values = [];
   //  values.push(user.id);
   //  values.push(user.tagIds);
@@ -45,13 +50,18 @@ async function getSearchQuery(data) {
     whereConditions.push("user.match_ratio >= ? AND user.match_ratio <= ?");
     values.push(parseInt(data.fameRatingMin), parseInt(data.fameRatingMax));
   }
-  if (data.tagId) {
-    whereConditions.push("user.tagId = ?");
-    values.push(parseInt(data.tagId));
+  if (data.tagIds && data.tagIds.length > 0) {
+    console.log("data.tagId", data.tagIds);
+    let placeholders = data.tagIds.map(() => "?").join(",");
+    whereConditions.push(`usertag.tag_id IN (${placeholders})`);
+    values.push(...data.tagIds);
   }
   if (whereConditions.length >= 0) {
     baseQuery += " WHERE " + whereConditions.join(" AND ");
   }
+
+  // groupBy
+  baseQuery += " GROUP BY user.id";
 
   // having
   let havingConditions = [];
