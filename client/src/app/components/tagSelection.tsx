@@ -31,25 +31,6 @@ export default function TagSelection({ user }) {
         Tag
       </label>
       <br />
-      {/*<ul className="text-gray-400">
-        {tags.map(
-          (tag, index) =>
-            user &&
-            user.tagIds &&
-            user.tagIds.includes(tag.id.toString()) && (
-              <li key={`${tag.id}-${index}`}>
-                <input
-                  id={tag.id}
-                  value={tag.id}
-                  name="tagId"
-                ></input>
-                <label htmlFor={tag.id} className="pl-2">
-                  #{tag.name}
-                </label>
-              </li>
-            )
-        )}
-      </ul>*/}
       <div className="text-gray-400">
         {tags.map((tag, index) => (
           <div key={`${tag.id}-${index}`} className="flex items-center mb-2">

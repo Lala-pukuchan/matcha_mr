@@ -25,66 +25,76 @@ export default function myAccount() {
     const checkUser = async () => {
       await new Promise((resolve) => setTimeout(resolve, 4000));
       setLoading(false);
-      const token = document.cookie.split('; ').find(row => row.startsWith('token='));
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="));
       if (!token) {
         window.location.href = "/login";
       } else {
-        try {
-          const userJson = JSON.stringify({ userId: user.id });
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/user/viewed`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: userJson,
+        if (user) {
+          try {
+            const userJson = JSON.stringify({ userId: user.id });
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/user/viewed`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: userJson,
+              }
+            );
+            console.log("response: ", response);
+            if (response.ok) {
+              const responseData = await response.json();
+              if (responseData) {
+                setViewedFromUsers(responseData);
+                console.log("viewedFromUsers: ", responseData);
+              }
+            } else {
+              console.error("updating viewed is failed");
             }
-          );
-          console.log("response: ", response);
-          if (response.ok) {
-            const responseData = await response.json();
-            if (responseData) {
-              setViewedFromUsers(responseData);
-              console.log("viewedFromUsers: ", responseData);
-            }
-          } else {
-            console.error("updating viewed is failed");
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
-        }
-        try {
-          const userJson = JSON.stringify({ userId: user.id });
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/user/liked`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: userJson,
+          try {
+            const userJson = JSON.stringify({ userId: user.id });
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/user/liked`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: userJson,
+              }
+            );
+            console.log("response: ", response);
+            if (response.ok) {
+              const responseData = await response.json();
+              if (responseData) {
+                setLikedFromUsers(responseData);
+                console.log("likedFromUsers: ", responseData);
+              }
+            } else {
+              console.error("updating liked is failed");
             }
-          );
-          console.log("response: ", response);
-          if (response.ok) {
-            const responseData = await response.json();
-            if (responseData) {
-              setLikedFromUsers(responseData);
-              console.log("likedFromUsers: ", responseData);
-            }
-          } else {
-            console.error("updating liked is failed");
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
         }
       }
     };
     const fetchUsers = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
         );
         if (response.ok) {
           const data = await response.json();

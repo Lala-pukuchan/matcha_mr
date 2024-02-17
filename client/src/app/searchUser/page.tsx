@@ -33,7 +33,7 @@ export default function Home() {
       console.log("fetching users", user);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/`,
           {
             method: "POST",
             headers: {
@@ -150,7 +150,7 @@ export default function Home() {
               </div>
             </div>
             <h1 className="font-bold text-cyan-400 mt-6">Sort By: </h1>
-            <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
+            <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
               <div className="m-3">
                 <ul>
                   <li>
@@ -194,7 +194,7 @@ export default function Home() {
                       value="tag"
                     ></input>
                     <label htmlFor="tag" className="pl-2">
-                      Tag
+                      Tag (Sorted by selected tags)
                     </label>
                   </li>
                 </ul>

@@ -1,23 +1,9 @@
 async function getSearchQuery(data) {
   const user = JSON.parse(data.user);
-
-  // baseQuery
-  //  let baseQuery = `
-  //    SELECT
-  //    user.*,
-  //    (6371 * acos(cos(radians(?)) * cos(radians(user.latitude)) * cos(radians(user.longitude) - radians(?)) + sin(radians(?)) * sin(radians(user.latitude)))) AS distance,
-  //    (
-  //        SELECT COUNT(ut2.tag_id)
-  //        FROM usertag ut1
-  //        JOIN usertag ut2 ON ut1.tag_id = ut2.tag_id AND ut2.user_id = user.id
-  //        WHERE ut1.user_id = ? AND ut1.tag_id IN (?)
-  //    ) AS common_tags_count
-  //    FROM
-  //    user
-  //    `;
   let baseQuery = `
     SELECT 
     user.*,
+    COUNT(DISTINCT usertag.tag_id) AS common_tags_count,
     (6371 * acos(cos(radians(?)) * cos(radians(user.latitude)) * cos(radians(user.longitude) - radians(?)) + sin(radians(?)) * sin(radians(user.latitude)))) AS distance
     FROM 
     user
@@ -28,9 +14,6 @@ async function getSearchQuery(data) {
     parseFloat(user.longitude),
     parseFloat(user.latitude),
   ];
-  //let values = [];
-  //  values.push(user.id);
-  //  values.push(user.tagIds);
 
   // where
   let whereConditions = [];

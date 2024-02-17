@@ -930,7 +930,12 @@ app.post("/api/searchUser", upload.none(), async (req, res) => {
         row.tagIds = tagIdsArray;
       }
     }
-    return res.json(rows);
+    // Convert BigInt to String to create json
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      common_tags_count: row.common_tags_count.toString(),
+    }));
+    return res.json(serializedRows);
   } catch (e) {
     console.log(e);
   } finally {

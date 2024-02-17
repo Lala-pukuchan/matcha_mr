@@ -142,10 +142,13 @@ export default function Home() {
     };
 
     checkUser();
-    fetchUsers();
-    fetchUsersCommon();
-    fetchUsersFrequentlyLikedBack();
-    likedUsers();
+
+    if (user) {
+      fetchUsers();
+      fetchUsersCommon();
+      fetchUsersFrequentlyLikedBack();
+      likedUsers();
+    }
   }, [user]);
 
   if (loading) {
