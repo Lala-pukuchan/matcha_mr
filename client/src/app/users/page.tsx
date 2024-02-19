@@ -51,27 +51,26 @@ export default function users() {
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setLoading(false);
         if (user) {
-          viewUserId = user.id;
-        }
-        try {
-          const viewJson = JSON.stringify({ from: viewUserId, to: userId });
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/viewed`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: viewJson,
-            }
-          );
+          try {
+            const viewJson = JSON.stringify({ from: user.id, to: userId });
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/viewed`,
+              {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: viewJson,
+              }
+            );
 
-          if (response.ok) {
-          } else {
-            console.error("updating viewed is failed");
+            if (response.ok) {
+            } else {
+              console.error("updating viewed is failed");
+            }
+          } catch (e) {
+            console.error(e);
           }
-        } catch (e) {
-          console.error(e);
         }
       };
 
