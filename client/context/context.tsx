@@ -23,7 +23,6 @@ export const UserProvider = ({ children }) => {
         );
         if (response.ok) {
           const data = await response.json();
-          console.log('data context:', data)
           setUser(data.user);
         } else {
           setUser(null);

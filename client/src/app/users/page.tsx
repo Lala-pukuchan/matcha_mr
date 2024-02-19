@@ -37,7 +37,6 @@ export default function users() {
           if (response.ok) {
             const data = await response.json();
             setDisplayedUser(data);
-            console.log("user: ", data);
           } else {
             setDisplayedUser([]);
           }
@@ -88,7 +87,6 @@ export default function users() {
   return (
     <>
       <div>
-        <h1>User Page</h1>
         <UserInfo user={displayedUser} />
       </div>
     </>

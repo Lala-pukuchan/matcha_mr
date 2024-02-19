@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Geo from "./geo";
+import MatchRatio from "./matchRatio";
 
 export default function UserInfo({ user }) {
   // set message
@@ -101,35 +102,31 @@ export default function UserInfo({ user }) {
             )}
           </div>
         </div>
-        <div className="grid grid-cols-2">
+        <div className="grid gap-3 grid-cols-2">
           <p className="font-bold">lastname</p>
           <p>{user ? user.lastname : ""}</p>
         </div>
-        <div className="grid grid-cols-2">
+        <div className="grid gap-3 grid-cols-2">
           <p className="font-bold">firstname</p>
           <p>{user ? user.firstname : ""}</p>
         </div>
-        <div className="grid grid-cols-2">
+        <div className="grid gap-3 grid-cols-2">
           <p className="font-bold">age</p>
           <p>{user ? user.age : ""}</p>
         </div>
-        <div className="grid grid-cols-2">
-          <p className="font-bold">email</p>
-          <p>{user ? user.email : ""}</p>
-        </div>
-        <div className="grid grid-cols-2">
+        <div className="grid gap-3 grid-cols-2">
           <p className="font-bold">Gender</p>
           <p>{user ? user.gender : ""}</p>
         </div>
-        <div className="grid grid-cols-2">
+        <div className="grid gap-3 grid-cols-2">
           <p className="font-bold">Gender I Like</p>
           <p>{user ? user.preference : ""}</p>
         </div>
-        <div className="grid grid-cols-2">
+        <div className="grid gap-3 grid-cols-2">
           <p className="font-bold">biography</p>
           <p>{user ? user.biography : ""}</p>
         </div>
-        <div className="grid grid-cols-2">
+        <div className="grid gap-3 grid-cols-2">
           <div>
             <h2 className="font-bold">Tags</h2>
           </div>
@@ -148,7 +145,7 @@ export default function UserInfo({ user }) {
             </ul>
           </div>
         </div>
-        <div className="grid grid-cols-2">
+        <div className="grid gap-3 grid-cols-2">
           <div>
             <h2 className="font-bold">Location</h2>
           </div>
@@ -160,8 +157,20 @@ export default function UserInfo({ user }) {
             )}
           </div>
         </div>
+        <div className="grid gap-3 grid-cols-2">
+          <div>
+            <h2 className="font-bold">Match Ratio</h2>
+          </div>
+          <div>
+            {user && user.match_ratio ? (
+              <MatchRatio matchRatio={user.match_ratio} />
+            ) : (
+              ""
+            )}
+          </div>
+        </div>
         {user && user.liked ? (
-          <div className="grid grid-cols-2">
+          <div className="grid gap-3 grid-cols-2">
             <p className="font-bold">Liked By Someone</p>
             <p>{user.liked}</p>
           </div>
@@ -169,7 +178,7 @@ export default function UserInfo({ user }) {
           ""
         )}
         {user && user.matched ? (
-          <div className="grid grid-cols-2">
+          <div className="grid gap-3 grid-cols-2">
             <p className="font-bold">Matched With Someone</p>
             <p>{user.matched}</p>
           </div>
