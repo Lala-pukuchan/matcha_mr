@@ -746,7 +746,10 @@ app.post("/api/users/connected", async (req, res) => {
         userVal = [match.matched_user_id_first];
       }
       const userResult = await conn.query(userQuery, userVal);
-      usersConnected.push(userResult[0]);
+      // if user has profile pic
+      if (userResult[0].profilePic) {
+        usersConnected.push(userResult[0]);
+      }
     }
     return res.json(usersConnected);
   } catch (e) {
