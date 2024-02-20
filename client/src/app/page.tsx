@@ -2,11 +2,14 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../../context/context";
 import UsersList from "./components/userList";
+import { connect } from "http2";
+import { connected } from "process";
 
 export default function Home() {
   // get user from context
   const { user, setUser } = useUser();
   // set user list
+  const [connectedUsers, setUserListConnected] = useState([]);
   const [users, setUserListClose] = useState([]);
   const [usersCommonTags, setUsersCommonTags] = useState([]);
   const [usersFrequentlyLikedBack, setUsersFrequentlyLikedBack] = useState([]);
@@ -28,6 +31,33 @@ export default function Home() {
         window.location.href = "/login";
       }
     };
+
+    const fetchConnectedUsers = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/connected`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: user.id,
+            }),
+          }
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUserListConnected(data.filter((d) => d.id !== user.id));
+        } else {
+          setUserListConnected([]);
+        }
+      } catch (e) {
+        setUserListConnected([]);
+        console.error(e);
+      }
+    };
+
     const fetchUsers = async () => {
       try {
         const response = await fetch(
@@ -145,6 +175,7 @@ export default function Home() {
 
     if (user) {
       fetchUsers();
+      fetchConnectedUsers();
       fetchUsersCommon();
       fetchUsersFrequentlyLikedBack();
       likedUsers();
@@ -159,6 +190,19 @@ export default function Home() {
     <>
       <div>
         <div className="container mx-auto w-screen flex justify-center">
+          <h1 className="text-pink-400 font-bold">User Connected With You! (You can start the chat)</h1>
+        </div>
+        <div className="container mx-auto w-screen flex justify-center">
+          <UsersList
+            users={connectedUsers}
+            operationUserId={user.id}
+            likedUsersId={likedUsersId}
+            link='/chat'
+          />
+        </div>
+      </div>
+      <div>
+        <div className="container mx-auto w-screen flex justify-center">
           <h1 className="text-pink-400 font-bold">User Close To You</h1>
         </div>
         <div className="container mx-auto w-screen flex justify-center">
@@ -166,6 +210,7 @@ export default function Home() {
             users={users}
             operationUserId={user.id}
             likedUsersId={likedUsersId}
+            link='/users'
           />
         </div>
       </div>
@@ -179,6 +224,7 @@ export default function Home() {
             users={usersCommonTags}
             operationUserId={user.id}
             likedUsersId={likedUsersId}
+            link='/users'
           />
         </div>
       </div>
@@ -194,6 +240,7 @@ export default function Home() {
             users={usersFrequentlyLikedBack}
             operationUserId={user.id}
             likedUsersId={likedUsersId}
+            link='/users'
           />
         </div>
       </div>

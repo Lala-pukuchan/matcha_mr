@@ -52,6 +52,7 @@ const fs = require("fs");
 // mail
 const nodemailer = require("nodemailer");
 const { get } = require("http");
+const { match } = require("assert");
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   host: "smtp.gmail.com",
@@ -716,6 +717,38 @@ app.post("/api/liked", async (req, res) => {
     const updateMatchRatio = "UPDATE user SET match_ratio = ? WHERE id = ?";
     const updateVal = [matchRatio, req.body.from];
     const updateResult = await conn.query(updateMatchRatio, updateVal);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
+// connected api
+app.post("/api/users/connected", async (req, res) => {
+  let conn;
+  try {
+    // connected users
+    conn = await pool.getConnection();
+    const matchQuery =
+      "SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?";
+    const matchVal = [req.body.id, req.body.id];
+    const matchResult = await conn.query(matchQuery, matchVal);
+    // get user info
+    let usersConnected = [];
+    const userQuery = "SELECT * FROM user WHERE id = ?";
+    for (let match of matchResult) {
+      let userVal;
+      if (match.matched_user_id_first === req.body.id) {
+        userVal = [match.matched_user_id_second];
+      } else {
+        userVal = [match.matched_user_id_first];
+      }
+      const userResult = await conn.query(userQuery, userVal);
+      usersConnected.push(userResult[0]);
+    }
+    return res.json(usersConnected);
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });

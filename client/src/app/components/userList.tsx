@@ -4,13 +4,13 @@ import Geo from "./geo";
 import Tag from "./tag";
 import MatchRatio from "./matchRatio";
 
-export default function UsersList({ users, operationUserId, likedUsersId }) {
+export default function UsersList({ users, operationUserId, likedUsersId, link }) {
   return (
     <div className="flex flex-col m-10 space-y-4">
       <div className="grid md:grid-cols-3 grid-cols-1">
         {users.map((user) => (
           <div key={user.id} className="grid grid-cols-1 m-1">
-            <Link href={`/users?userID=${user.id}`}>
+            <Link href={`${link}?userID=${user.id}`}>
               {user && user.profilePic ? (
                 <img
                   src={user.profilePic}

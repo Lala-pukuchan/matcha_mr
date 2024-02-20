@@ -14,9 +14,6 @@ export default function Tag({ user }) {
         if (response.status === 200) {
           const data = await response.json();
           setTags(data);
-          console.log("tags: ", data);
-          console.log("user: ", user);
-          console.log("user.tagIds: ", user.tagIds);
         } else {
           const data = await response.json();
           console.error(data);
