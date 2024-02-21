@@ -594,6 +594,35 @@ app.get("/api/enable", async (req, res) => {
   }
 });
 
+// report user
+app.post("/api/user/report", async (req, res) => {
+  try {
+    let conn, values;
+    try {
+      conn = await pool.getConnection();
+      if (req.body.status) {
+        const result = await conn.query(
+          "UPDATE user SET fake_account = TRUE WHERE id = ?",
+          [req.body.id]
+        );
+      } else {
+        const result = await conn.query(
+          "UPDATE user SET fake_account = FALSE WHERE id = ?",
+          [req.body.id]
+        );
+      }
+      res.json({ message: "success" });
+    } catch (e) {
+      console.log(e);
+      return res.status(500).json({ message: "Internal server error" });
+    } finally {
+      if (conn) return conn.end();
+    }
+  } catch (error) {
+    return res.status(401).json({ message: "invalid token" });
+  }
+});
+
 // login api
 app.post("/api/login", upload.none(), async (req, res) => {
   // validate user
