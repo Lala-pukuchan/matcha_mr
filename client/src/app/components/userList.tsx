@@ -10,6 +10,7 @@ export default function UsersList({
   users,
   operationUserId,
   likedUsersId,
+  blockedUsersId,
   link,
 }) {
   return (

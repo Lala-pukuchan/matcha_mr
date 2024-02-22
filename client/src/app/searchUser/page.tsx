@@ -16,6 +16,8 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   // set liked users
   const [likedUsersId, setLikedUsersId] = useState([]);
+  // set blocked users
+  const [blockedUsersId, setBlockedUsersId] = useState([]);
 
   // check user
   useEffect(() => {
@@ -104,9 +106,39 @@ export default function Home() {
       }
     };
 
+    const blockedUsers = async () => {
+      try {
+        const userJson = JSON.stringify({ userId: user.id });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/user/blockedTo`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: userJson,
+          }
+        );
+        if (response.ok) {
+          const responseData = await response.json();
+          if (responseData) {
+            const blockedUsersIdArray = responseData.map(
+              (item) => item.blocked_to_user_id
+            );
+            setBlockedUsersId(blockedUsersIdArray);
+          }
+        } else {
+          console.error("updating liked is failed");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
     checkUser();
     fetchUsers();
     likedUsers();
+    blockedUsers();
   }, [user]);
 
   if (loading) {
@@ -234,6 +266,7 @@ export default function Home() {
           users={users}
           operationUserId={user.id}
           likedUsersId={likedUsersId}
+          blockedUsersId={blockedUsersId}
         />
       </div>
     </>
