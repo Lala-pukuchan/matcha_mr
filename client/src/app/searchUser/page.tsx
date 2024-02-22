@@ -31,29 +31,47 @@ export default function Home() {
     };
     const fetchUsers = async () => {
       console.log("fetching users", user);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              gender: user.gender,
-              preference: user.preference,
-            }),
+      if (user) {
+        try {
+          const blockResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/user/blockList`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: user.id,
+              }),
+            }
+          );
+          if (blockResponse.ok) {
+            const data = await blockResponse.json();
+            console.log("block list", data);
           }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setUserList(data.filter((d) => d.id !== user.id));
-        } else {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                gender: user.gender,
+                preference: user.preference,
+              }),
+            }
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setUserList(data.filter((d) => d.id !== user.id));
+          } else {
+            setUserList([]);
+          }
+        } catch (e) {
           setUserList([]);
+          console.error(e);
         }
-      } catch (e) {
-        setUserList([]);
-        console.error(e);
       }
     };
 

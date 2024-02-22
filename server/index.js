@@ -729,7 +729,6 @@ app.post("/api/liked", async (req, res) => {
       );
     }
     // matching ratio
-    // matching ratio
     const likeQury = "SELECT * FROM liked WHERE from_user_id = ?";
     const likeVal = [req.body.from];
     const likeResult = await conn.query(likeQury, likeVal);
@@ -746,6 +745,35 @@ app.post("/api/liked", async (req, res) => {
     const updateMatchRatio = "UPDATE user SET match_ratio = ? WHERE id = ?";
     const updateVal = [matchRatio, req.body.from];
     const updateResult = await conn.query(updateMatchRatio, updateVal);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
+// like api
+app.post("/api/blocked", async (req, res) => {
+  let conn;
+  try {
+    console.log("req.body: ", req.body);
+    conn = await pool.getConnection();
+    const values = [req.body.from, req.body.to];
+
+    if (req.body.blocked) {
+      // insert blocked information
+      const result = await conn.query(
+        "INSERT INTO blocked (from_user_id, blocked_to_user_id, blocked_at) VALUES (?, ?, NOW())",
+        values
+      );
+    } else {
+      // delete blocked information
+      const result = await conn.query(
+        "DELETE FROM blocked WHERE from_user_id = ? AND blocked_to_user_id = ?",
+        values
+      );
+    }
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });

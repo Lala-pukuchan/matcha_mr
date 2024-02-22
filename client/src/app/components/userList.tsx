@@ -4,6 +4,7 @@ import Geo from "./geo";
 import Tag from "./tag";
 import MatchRatio from "./matchRatio";
 import ReportFakeAccount from "./reportFakeAccount";
+import Block from "./block";
 
 export default function UsersList({
   users,
@@ -36,6 +37,11 @@ export default function UsersList({
             <ReportFakeAccount
               reportedUserId={user.id}
               alreadyReported={user.fake_account}
+            />
+            <Block  
+              blockedFromUserId={operationUserId}
+              blockedToUserId={user.id}
+              //alreadyBlocked={user.blocked}
             />
             <MatchRatio matchRatio={user.match_ratio} />
             <Geo lat={user.latitude} lon={user.longitude} />
