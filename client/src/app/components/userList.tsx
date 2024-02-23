@@ -16,7 +16,7 @@ export default function UsersList({
   return (
     <div className="flex flex-col m-10 space-y-4">
       <div className="grid md:grid-cols-3 grid-cols-1">
-        {users.map((user) => (
+        {users.filter(user => !blockedUsersId.includes(user.id)).map((user) => (
           <div key={user.id} className="grid grid-cols-1 m-1">
             <Link href={`${link}?userID=${user.id}`}>
               {user && user.profilePic ? (
@@ -42,7 +42,6 @@ export default function UsersList({
             <Block  
               blockedFromUserId={operationUserId}
               blockedToUserId={user.id}
-              //alreadyBlocked={user.blocked}
             />
             <MatchRatio matchRatio={user.match_ratio} />
             <Geo lat={user.latitude} lon={user.longitude} />

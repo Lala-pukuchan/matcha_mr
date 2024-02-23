@@ -1,16 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
-//const Block = ({ blockedFromUserId, blockedToUserId, alreadyBlocked }) => {
 const Block = ({ blockedFromUserId, blockedToUserId }) => {
-
-  //// update state
-  //const [isClicked, setIsClicked] = useState(alreadyBlocked);
   const [isClicked, setIsClicked] = useState(false);
-
-  //// update block
-  //useEffect(() => {
-  //  setIsClicked(alreadyBlocked);
-  //}, [alreadyBlocked]);
 
   const block = () => {
     // update state
@@ -51,22 +42,25 @@ const Block = ({ blockedFromUserId, blockedToUserId }) => {
   };
 
   return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      strokeWidth="1.5"
-      stroke="currentColor"
-      className="w-6 h-6"
-      fill={isClicked ? "pink" : "none"}
-      onClick={block}
-      style={{ cursor: "pointer" }}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-      />
-    </svg>
+    <div className="container">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="red"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        className="w-6 h-6 inline-block"
+        onClick={block}
+        style={{ cursor: "pointer" }}
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M10.05 4.575a1.575 1.575 0 1 0-3.15 0v3m3.15-3v-1.5a1.575 1.575 0 0 1 3.15 0v1.5m-3.15 0 .075 5.925m3.075.75V4.575m0 0a1.575 1.575 0 0 1 3.15 0V15M6.9 7.575a1.575 1.575 0 1 0-3.15 0v8.175a6.75 6.75 0 0 0 6.75 6.75h2.018a5.25 5.25 0 0 0 3.712-1.538l1.732-1.732a5.25 5.25 0 0 0 1.538-3.712l.003-2.024a.668.668 0 0 1 .198-.471 1.575 1.575 0 1 0-2.228-2.228 3.818 3.818 0 0 0-1.12 2.687M6.9 7.575V12m6.27 4.318A4.49 4.49 0 0 1 16.35 15m.002 0h-.002"
+        />
+      </svg>
+      <p className="inline-block">Block this user</p>
+    </div>
   );
 };
 

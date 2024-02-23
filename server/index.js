@@ -906,6 +906,30 @@ app.post("/api/user/likedTo", async (req, res) => {
   }
 });
 
+
+// blocked users api
+app.post("/api/user/blockedTo", async (req, res) => {
+  let conn;
+  try {
+    // get viwed from users
+    conn = await pool.getConnection();
+    let queryString =
+      "SELECT DISTINCT blocked_to_user_id FROM blocked WHERE from_user_id = ?";
+    let values = [req.body.userId];
+    const blockedFromUsers = await conn.query(queryString, values);
+    if (blockedFromUsers.length > 0) {
+      res.json(blockedFromUsers);
+    } else {
+      res.json([]);
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
 // resetpassword api
 app.post("/api/resetpassword", upload.none(), async (req, res) => {
   let conn;
