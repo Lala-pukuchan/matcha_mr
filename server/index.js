@@ -363,58 +363,66 @@ app.post("/api/createUser", upload.none(), async (req, res) => {
   // create user
   let conn;
   try {
-    // generate unique userId
-    const userId = uuidv4();
-    // hash password
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
-    // insert DB
     conn = await pool.getConnection();
-    const values = [
-      userId,
-      req.body.email,
-      req.body.username,
-      req.body.lastname,
-      req.body.firstname,
-      hashedPassword,
-    ];
-    const result = await conn.query(
-      "INSERT INTO user(id, email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?, ?)",
-      values
-    );
+    const query = "SELECT * FROM user WHERE username = ?";
+    const values = [req.body.username];
+    const result = await conn.query(query, values);
+    if (result.length == 0) {
+      // generate unique userId
+      const userId = uuidv4();
+      // hash password
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.password, salt);
 
-    // create jwt
-    const payload = {
-      id: userId,
-    };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+      // insert DB
+      //conn = await pool.getConnection();
+      const values = [
+        userId,
+        req.body.email,
+        req.body.username,
+        req.body.lastname,
+        req.body.firstname,
+        hashedPassword,
+      ];
+      const result = await conn.query(
+        "INSERT INTO user(id, email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?, ?)",
+        values
+      );
 
-    // send email
-    const mailSetting = {
-      from: process.env.GMAIL_APP_USER,
-      to: req.body.email,
-      subject: "Enable Your Account",
-      html: `
-      <p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="http://localhost:${PORT}/api/enable?token=${token}">here</a>.</p>
-      `,
-    };
-    transporter.sendMail(mailSetting, (error, info) => {
-      if (error) {
-        console.error("Error sending email: ", error);
-        return res.status(500).json({ message: "Internal server error" });
-      } else {
-        console.log("Email sent: ", info.response);
-      }
-    });
+      // create jwt
+      const payload = {
+        id: userId,
+      };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
 
-    // return success message
-    return res.json({
-      message: "User created successfully",
-      id: result.insertId.toString(),
-    });
+      // send email
+      const mailSetting = {
+        from: process.env.GMAIL_APP_USER,
+        to: req.body.email,
+        subject: "Enable Your Account",
+        html: `
+        <p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="http://localhost:${PORT}/api/enable?token=${token}">here</a>.</p>
+        `,
+      };
+      transporter.sendMail(mailSetting, (error, info) => {
+        if (error) {
+          console.error("Error sending email: ", error);
+          return res.status(500).json({ message: "Internal server error" });
+        } else {
+          console.log("Email sent: ", info.response);
+        }
+      });
+
+      // return success message
+      return res.json({
+        message: "User created successfully",
+        id: result.insertId.toString(),
+      });
+    } else {
+      return res.status(400).json({ message: "Username already exists" });
+    }
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
@@ -905,7 +913,6 @@ app.post("/api/user/likedTo", async (req, res) => {
     if (conn) return conn.end();
   }
 });
-
 
 // blocked users api
 app.post("/api/user/blockedTo", async (req, res) => {
