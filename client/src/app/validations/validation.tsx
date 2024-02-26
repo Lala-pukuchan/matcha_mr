@@ -7,8 +7,8 @@ export function validatePassword(password: string) {
   return "";
 }
 
-export function validateFirstName(firstName) {
-  const trimmedName = firstName.trim();
+export function validateName(name: string) {
+  const trimmedName = name.trim();
 
   if (!trimmedName) {
     return "First name is required.";

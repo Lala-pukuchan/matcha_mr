@@ -1,6 +1,6 @@
 "use client";
 import { useState, FormEvent } from "react";
-import { validatePassword, validateFirstName } from "../validations/validation";
+import { validatePassword, validateName } from "../validations/validation";
 
 export default function signup() {
   // set message
@@ -16,8 +16,8 @@ export default function signup() {
     if (validatePassword(formData.get("password") as string) !== "") {
       setMessage(validatePassword(formData.get("password") as string));
       return;
-    } else if (validateFirstName(formData.get("firstname") as string) !== "") {
-      setMessage(validateFirstName(formData.get("firstname") as string));
+    } else if (validateName(formData.get("firstname") as string) !== "") {
+      setMessage(validateName(formData.get("firstname") as string));
       return;
     } else {
       try {

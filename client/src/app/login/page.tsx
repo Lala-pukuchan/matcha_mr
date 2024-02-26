@@ -2,22 +2,38 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import Link from "next/link";
-import { useUser } from "../../../context/context";
 
 export default function login() {
-  // getUserContext
-  const user = useUser();
+  // set loading
+  const [loading, setLoading] = useState(true);
   // set message
   const [message, setMessage] = useState("");
 
-  // set message after user creation
+  // check user
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
     if (queryParams.get("message") !== null) {
       const mess = queryParams.get("message") as string;
       setMessage(mess);
     }
-  });
+
+    const checkUser = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      setLoading(false);
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("token="));
+      if (token) {
+        setMessage("You are already logged in");
+      }
+    };
+
+    checkUser();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   // submit login form
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -32,30 +48,20 @@ export default function login() {
           credentials: "include",
         }
       );
-      console.log("response", response);
       if (response.status === 200) {
         window.location.href = "/";
       } else {
         const data = await response.json();
-        console.log("message", data.message);
         setMessage(data.message);
       }
     } catch (e) {
       console.log("error: ", e);
     }
-    
   }
   return (
     <div>
       <form onSubmit={onSubmit} className="container mx-auto w-screen">
         <div className="flex flex-col m-10 space-y-4">
-          <div className="text-pink-400">
-            {user ? (
-              <p>You have already loggedin, {user.username}</p>
-            ) : (
-              <p>Please log in</p>
-            )}
-          </div>
           <label htmlFor="username">username</label>
           <input
             type="username"
