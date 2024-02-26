@@ -1,35 +1,23 @@
 "use client";
 import { useState, FormEvent } from "react";
+import { validatePassword, validateFirstName } from "../validations/validation";
 
 export default function signup() {
   // set message
   const [message, setMessage] = useState("");
 
-  // password validation
-  function validatePassword(password: string): boolean {
-    if (password.length < 4) {
-      setMessage("Password length should be more than 4.");
-      return false;
-    } else if (!/[A-Z]/.test(password)) {
-      setMessage("Password should have at least one capital letter.");
-      return false;
-    }
-    return true;
-  }
-
   // submit login form
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
+    // prevent default form submission
     event.preventDefault();
 
+    // validate form data and submit
     const formData = new FormData(event.currentTarget);
-
-    // password validation
-    console.log("password: ", formData.get("password"));
-    let pass = "";
-    if (formData.get("password") !== null) {
-      pass = formData.get("password") as string;
-    }
-    if (!validatePassword(pass)) {
+    if (validatePassword(formData.get("password") as string) !== "") {
+      setMessage(validatePassword(formData.get("password") as string));
+      return;
+    } else if (validateFirstName(formData.get("firstname") as string) !== "") {
+      setMessage(validateFirstName(formData.get("firstname") as string));
       return;
     } else {
       try {
