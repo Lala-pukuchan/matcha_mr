@@ -1,6 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useUser } from "../../../context/context";
+import {
+  validateName,
+  isValidLatitude,
+  isValidLongitude,
+} from "../validations/validation";
 
 export default function updateProfile() {
   // set registered user information
@@ -138,6 +143,40 @@ export default function updateProfile() {
   async function updateProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const validations = [
+      {
+        key: "firstname",
+        validate: () =>
+          validateName(formData.get("firstname") as string, "firstname"),
+      },
+      {
+        key: "lastname",
+        validate: () =>
+          validateName(formData.get("lastname") as string, "lastname"),
+      },
+      {
+        key: "username",
+        validate: () =>
+          validateName(formData.get("username") as string, "username"),
+      },
+      {
+        key: "latitude",
+        validate: () =>
+          isValidLatitude(formData.get("latitude") as string, "username"),
+      },
+      {
+        key: "longitude",
+        validate: () =>
+          isValidLongitude(formData.get("longitude") as string, "username"),
+      },
+    ];
+    for (const { validate } of validations) {
+      const message = validate();
+      if (message !== "") {
+        setMessage(message);
+        return;
+      }
+    }
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/user/update`,

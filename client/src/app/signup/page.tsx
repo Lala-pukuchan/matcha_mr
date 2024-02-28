@@ -13,31 +13,53 @@ export default function signup() {
 
     // validate form data and submit
     const formData = new FormData(event.currentTarget);
-    if (validatePassword(formData.get("password") as string) !== "") {
-      setMessage(validatePassword(formData.get("password") as string));
-      return;
-    } else if (validateName(formData.get("firstname") as string) !== "") {
-      setMessage(validateName(formData.get("firstname") as string));
-      return;
-    } else {
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/createUser`,
-          {
-            method: "POST",
-            body: formData,
-          }
-        );
-        if (response.status === 200) {
-          window.location.href =
-            "/login?message=Please enable your account via email";
-        } else {
-          const data = await response.json();
-          setMessage(data.message);
-        }
-      } catch (e) {
-        console.log("error: ", e);
+    const validations = [
+      {
+        key: "password",
+        validate: () => validatePassword(formData.get("password") as string),
+      },
+      {
+        key: "firstname",
+        validate: () =>
+          validateName(formData.get("firstname") as string, "firstname"),
+      },
+      {
+        key: "lastname",
+        validate: () =>
+          validateName(formData.get("lastname") as string, "lastname"),
+      },
+      {
+        key: "username",
+        validate: () =>
+          validateName(formData.get("username") as string, "username"),
+      },
+    ];
+    for (const { validate } of validations) {
+      const message = validate();
+      console.log("message: ", message);
+      if (message !== "") {
+        setMessage(message);
+        return;
       }
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/createUser`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (response.status === 200) {
+        window.location.href =
+          "/login?message=Please enable your account via email";
+      } else {
+        const data = await response.json();
+        setMessage(data.message);
+      }
+    } catch (e) {
+      console.log("error: ", e);
     }
   }
 
