@@ -1,11 +1,21 @@
-export function validatePassword(password: string) {
+export function validatePassword(password: string): string {
   if (!password) {
     return "Password is required.";
   }
-  if (password.length < 4) {
-    return "Password length should be more than 4.";
-  } else if (!/[A-Z]/.test(password)) {
-    return "Password should have at least one capital letter.";
+  if (password.length < 8) {
+    return "Password length should be at least 8 characters.";
+  }
+  if (!/[A-Z]/.test(password)) {
+    return "Password should have at least one uppercase letter.";
+  }
+  if (!/[a-z]/.test(password)) {
+    return "Password should have at least one lowercase letter.";
+  }
+  if (!/[0-9]/.test(password)) {
+    return "Password should have at least one digit.";
+  }
+  if (!/[^A-Za-z0-9]/.test(password)) {
+    return "Password should have at least one special character (e.g., !, @, #, etc.).";
   }
   return "";
 }
@@ -36,16 +46,16 @@ export function validateName(name: string, type: string) {
 
 export function isValidLatitude(lat) {
   if (isFinite(lat) && Math.abs(lat) <= 90) {
-    return ""
+    return "";
   } else {
-    return "Latitude must be a number between -90 and 90."
+    return "Latitude must be a number between -90 and 90.";
   }
 }
 
 export function isValidLongitude(lng) {
   if (isFinite(lng) && Math.abs(lng) <= 180) {
-    return ""
+    return "";
   } else {
-    return "Longitude must be a number between -180 and 180."
+    return "Longitude must be a number between -180 and 180.";
   }
 }

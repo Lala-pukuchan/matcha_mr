@@ -155,19 +155,14 @@ export default function updateProfile() {
           validateName(formData.get("lastname") as string, "lastname"),
       },
       {
-        key: "username",
-        validate: () =>
-          validateName(formData.get("username") as string, "username"),
-      },
-      {
         key: "latitude",
         validate: () =>
-          isValidLatitude(formData.get("latitude") as string, "username"),
+          isValidLatitude(formData.get("latitude") as string),
       },
       {
         key: "longitude",
         validate: () =>
-          isValidLongitude(formData.get("longitude") as string, "username"),
+          isValidLongitude(formData.get("longitude") as string),
       },
     ];
     for (const { validate } of validations) {
