@@ -33,6 +33,15 @@ export default function passwordreset() {
     <div>
       <form onSubmit={onSubmit} className="container mx-auto w-screen">
         <div className="flex flex-col m-10 space-y-4">
+          <label htmlFor="username">username</label>
+          <input
+            type="username"
+            id="username"
+            name="username"
+            placeholder="username"
+            required
+            className="bg-gray-100 p-3 rounded"
+          />
           <label htmlFor="email">email</label>
           <input
             type="email"

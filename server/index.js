@@ -937,20 +937,29 @@ app.post("/api/user/blockedTo", async (req, res) => {
   }
 });
 
+function generatePassword(length) {
+  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * charset.length);
+    password += charset[randomIndex];
+  }
+  return password;
+}
+
 // resetpassword api
 app.post("/api/resetpassword", upload.none(), async (req, res) => {
   let conn;
   try {
     // generate new password
-    const buffer = crypto.randomBytes(10);
-    const newPassword = buffer.toString("hex").slice(0, 10);
+    const newPassword = generatePassword(10);
     // hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
-    const values = [hashedPassword, req.body.email];
+    const values = [hashedPassword, req.body.username, req.body.email];
     conn = await pool.getConnection();
     const result = await conn.query(
-      "UPDATE user SET password = ? WHERE email = ?",
+      "UPDATE user SET password = ? WHERE username = ? AND email = ?",
       values
     );
 
