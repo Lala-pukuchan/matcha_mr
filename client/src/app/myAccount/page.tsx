@@ -7,7 +7,7 @@ import Action from "../components/action";
 
 export default function myAccount() {
   // get user from context
-  const { user, setUser } = useUser();
+  const [user, setUser] = useState([]);
 
   // set loading
   const [loading, setLoading] = useState(true);
@@ -22,69 +22,82 @@ export default function myAccount() {
 
   // check user
   useEffect(() => {
-    const checkUser = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 4000));
-      setLoading(false);
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="));
-      if (!token) {
-        window.location.href = "/login";
-      } else {
-        if (user) {
-          try {
-            const userJson = JSON.stringify({ userId: user.id });
-            const response = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/user/viewed`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: userJson,
-              }
-            );
-            console.log("response: ", response);
-            if (response.ok) {
-              const responseData = await response.json();
-              if (responseData) {
-                setViewedFromUsers(responseData);
-                console.log("viewedFromUsers: ", responseData);
-              }
-            } else {
-              console.error("updating viewed is failed");
-            }
-          } catch (e) {
-            console.error(e);
+
+    const fetchUser = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/myAccount`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
           }
-          try {
-            const userJson = JSON.stringify({ userId: user.id });
-            const response = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/user/liked`,
-              {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: userJson,
+        );
+        if (response.ok) {
+          const data = await response.json();
+          const userId = data.id;
+          setUser(data);
+
+          if (userId) {
+            try {
+              const userJson = JSON.stringify({ userId: userId });
+              const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/user/viewed`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: userJson,
+                }
+              );
+              console.log("response: ", response);
+              if (response.ok) {
+                const responseData = await response.json();
+                if (responseData) {
+                  setViewedFromUsers(responseData);
+                }
+              } else {
+                console.error("updating viewed is failed");
               }
-            );
-            console.log("response: ", response);
-            if (response.ok) {
-              const responseData = await response.json();
-              if (responseData) {
-                setLikedFromUsers(responseData);
-                console.log("likedFromUsers: ", responseData);
-              }
-            } else {
-              console.error("updating liked is failed");
+            } catch (e) {
+              console.error(e);
             }
-          } catch (e) {
-            console.error(e);
+            try {
+              const userJson = JSON.stringify({ userId: userId });
+              const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/user/liked`,
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: userJson,
+                }
+              );
+              if (response.ok) {
+                const responseData = await response.json();
+                if (responseData) {
+                  setLikedFromUsers(responseData);
+                }
+              } else {
+                console.error("updating liked is failed");
+              }
+            } catch (e) {
+              console.error(e);
+            }
           }
+        } else {
+          setUser([]);
         }
+      } catch (e) {
+        setUser([]);
+        console.error(e);
       }
     };
+
     const fetchUsers = async () => {
       try {
         const response = await fetch(
@@ -99,7 +112,6 @@ export default function myAccount() {
         if (response.ok) {
           const data = await response.json();
           setUserList(data);
-          console.log("userList: ", data);
         } else {
           setUserList([]);
         }
@@ -109,16 +121,16 @@ export default function myAccount() {
       }
     };
 
-    checkUser();
+    fetchUser();
     fetchUsers();
-  }, [user]);
+  }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  //if (loading) {
+  //  return <div>Loading...</div>;
+  //}
   return (
     <>
-      {user ? <UserInfo user={user} /> : <div>Loading...</div>}
+      <UserInfo user={user} />
       <div className="container mx-auto w-screen flex justify-center">
         <div className="flex flex-col m-10 space-y-4">
           <Link className="text-cyan-400" href="/updateProfile">

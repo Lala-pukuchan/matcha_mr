@@ -358,6 +358,32 @@ app.post("/api/user", async (req, res) => {
   }
 });
 
+
+// get user api
+app.post("/api/myAccount", async (req, res) => {
+  token = req.cookies.token;
+  const claims = jwt.verify(token, process.env.JWT_SECRET);
+  let conn;
+  try {
+    // get user
+    conn = await pool.getConnection();
+    let queryString = "SELECT * FROM user WHERE id = ?";
+    let values = [claims.id];
+    const userResult = await conn.query(queryString, values);
+    console.log('userResult:', userResult);
+    if (userResult.length > 0) {
+      res.json(userResult[0]);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+});
+
 // create user api
 app.post("/api/createUser", upload.none(), async (req, res) => {
   // create user

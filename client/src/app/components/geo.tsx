@@ -28,7 +28,7 @@ export default function Geo({ lat, lon }) {
               console.error("No results found");
             }
           } catch (e) {
-            console.error(e);
+            //console.error(e
           }
         })
         .catch((error) => console.error("Error:", error));
