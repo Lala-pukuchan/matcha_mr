@@ -221,6 +221,7 @@ export default function Home() {
   return (
     <>
       <div>
+        <hr />
         <div className="container mx-auto w-screen flex justify-center">
           <h1 className="text-pink-400 font-bold">
             User Connected With You! (You can start the chat)
@@ -237,6 +238,7 @@ export default function Home() {
         </div>
       </div>
       <div>
+        <hr />
         <div className="container mx-auto w-screen flex justify-center">
           <h1 className="text-pink-400 font-bold">User Close To You</h1>
         </div>
@@ -269,7 +271,7 @@ export default function Home() {
       <div className="mt-3">
         <div className="container mx-auto w-screen flex justify-center">
           <h1 className="text-pink-400 font-bold">
-            User Frequently Liked Back
+            User Having High Match Rate
           </h1>
         </div>
         <div className="container mx-auto w-screen flex justify-center">

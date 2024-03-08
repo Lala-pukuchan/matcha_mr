@@ -241,70 +241,13 @@ app.post("/api/users/commonTags", async (req, res) => {
 
 // get users api
 app.post("/api/users/frequentlyLikedBack", async (req, res) => {
-  // Initial part of the query without WHERE clause
-  let query = `
-    SELECT 
-      u.*,
-      m.match_count
-    FROM 
-        user u
-    JOIN 
-        (SELECT 
-            matched_user_id_second, 
-            COUNT(*) AS match_count
-        FROM 
-            matched
-        GROUP BY 
-            matched_user_id_second) m ON u.id = m.matched_user_id_second
-  `;
-
-  // Initialize conditions and parameters for the dynamic WHERE clause
-  let whereConditions = [];
-  let queryParams = [];
-
-  // Add gender and preference conditions
-  if (req.body.gender) {
-    whereConditions.push("u.preference = ? OR u.preference = 'no'");
-    queryParams.push(req.body.gender);
-  }
-  if (req.body.preference && req.body.preference !== "no") {
-    whereConditions.push("u.gender = ?");
-    queryParams.push(req.body.preference);
-  }
-
-  // Combine all conditions with "AND" and append to the query
-  if (whereConditions.length > 0) {
-    query += " WHERE " + whereConditions.join(" AND ");
-  }
-
-  // Add GROUP BY and ORDER BY clauses after WHERE conditions
-  query += `
-    GROUP BY 
-        u.id
-    ORDER BY 
-        m.match_count DESC
-    LIMIT 1;
-  `;
-
-  // get users
+  // get users who have high match ratio
   let conn;
   try {
     conn = await pool.getConnection();
-    const rows = await conn.query(query, queryParams);
-    if (rows.length > 0) {
-      for (row of rows) {
-        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
-        const tagValues = [row.id];
-        const tagsResult = await conn.query(tagQuery, tagValues);
-        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
-        row.tagIds = tagIdsArray;
-      }
-    }
-    const modifiedRows = rows.map((row) => ({
-      ...row,
-      match_count: Number(row.match_count),
-    }));
-    res.json(modifiedRows);
+    const query = "SELECT * FROM user WHERE match_ratio > 95 ORDER BY match_ratio DESC";
+    const rows = await conn.query(query);
+    res.json(rows);
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
