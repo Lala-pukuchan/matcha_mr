@@ -692,41 +692,50 @@ app.post("/api/liked", async (req, res) => {
   try {
     // insert liked information
     conn = await pool.getConnection();
-    const values = [req.body.from, req.body.to];
+    const values = [req.body.from];
     const result = await conn.query(
-      "INSERT INTO liked (from_user_id, liked_to_user_id, liked_at) VALUES (?, ?, NOW())",
+      "SELECT * FROM user WHERE id = ? AND profilePic != ''",
       values
     );
-    // check if liked back
-    const reverseLiked = await conn.query(
-      "SELECT * FROM liked WHERE liked_to_user_id = ? AND from_user_id = ?",
-      values
-    );
-    // match
-    if (reverseLiked.length > 0) {
-      const values2 = [req.body.to, req.body.from];
-      const result2 = await conn.query(
-        "INSERT INTO matched (matched_user_id_first, matched_user_id_second) VALUES (?, ?)",
-        values2
+    if (result.length > 0) {
+      const values = [req.body.from, req.body.to];
+      const result = await conn.query(
+        "INSERT INTO liked (from_user_id, liked_to_user_id, liked_at) VALUES (?, ?, NOW())",
+        values
       );
-    }
-    // matching ratio
-    const likeQury = "SELECT * FROM liked WHERE from_user_id = ?";
-    const likeVal = [req.body.from];
-    const likeResult = await conn.query(likeQury, likeVal);
-    const matchQuery =
-      "SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?";
-    const matchVal = [req.body.from, req.body.from];
-    const matchResult = await conn.query(matchQuery, matchVal);
+      // check if liked back
+      const reverseLiked = await conn.query(
+        "SELECT * FROM liked WHERE liked_to_user_id = ? AND from_user_id = ?",
+        values
+      );
+      // match
+      if (reverseLiked.length > 0) {
+        const values2 = [req.body.to, req.body.from];
+        const result2 = await conn.query(
+          "INSERT INTO matched (matched_user_id_first, matched_user_id_second) VALUES (?, ?)",
+          values2
+        );
+      }
+      // matching ratio
+      const likeQury = "SELECT * FROM liked WHERE from_user_id = ?";
+      const likeVal = [req.body.from];
+      const likeResult = await conn.query(likeQury, likeVal);
+      const matchQuery =
+        "SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?";
+      const matchVal = [req.body.from, req.body.from];
+      const matchResult = await conn.query(matchQuery, matchVal);
 
-    // calculate match ratio
-    let matchRatio = 0;
-    if (matchResult.length !== 0 && likeResult.length !== 0) {
-      matchRatio = (matchResult.length / likeResult.length) * 100;
+      // calculate match ratio
+      let matchRatio = 0;
+      if (matchResult.length !== 0 && likeResult.length !== 0) {
+        matchRatio = (matchResult.length / likeResult.length) * 100;
+      }
+      const updateMatchRatio = "UPDATE user SET match_ratio = ? WHERE id = ?";
+      const updateVal = [matchRatio, req.body.from];
+      const updateResult = await conn.query(updateMatchRatio, updateVal);
+    } else {
+      return res.status(400).json({ message: "User doesn't have a profile picture" });
     }
-    const updateMatchRatio = "UPDATE user SET match_ratio = ? WHERE id = ?";
-    const updateVal = [matchRatio, req.body.from];
-    const updateResult = await conn.query(updateMatchRatio, updateVal);
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
