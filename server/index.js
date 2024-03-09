@@ -730,7 +730,7 @@ app.post("/api/liked", async (req, res) => {
   }
 });
 
-// like api
+// block api
 app.post("/api/blocked", async (req, res) => {
   let conn;
   try {
