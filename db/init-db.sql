@@ -158,7 +158,10 @@ INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `passwor
 ('9ec4c4ca-978b-434d-8302-b4ad68565c4c', 'ruruover1105@gmail.com', 'melo', 'italo', 'melo', '$2b$10$ZV9Gi0zu4nRZki30973SG.W0aXFLIiUO9haCBygmC4GXBGRSCU2Qe', 1, 28, 'male', 'female', 'let\'s chill', 'http://localhost:4000/uploads/pexels-italo-melo-2379005.jpg', 'http://localhost:4000/uploads/pexels-jeremy-bishop-20145983.jpg', 'http://localhost:4000/uploads/pexels-alena-yanovich-20119386.jpg', 'http://localhost:4000/uploads/pexels-dilara-yÄ±lmaz-20200303.jpg', 'http://localhost:4000/uploads/pexels-elina-volkova-19985436.jpg', 'http://localhost:4000/uploads/pexels-daniel-torobekov-20058411.jpg', 2.336149, 48.885829, 0, 0),
 ('c27c9ee4-f2f3-47b5-a33b-361916016dc1', 'ruruover1105@gmail.com', 'lucas', 'pezeta', 'lucas', '$2b$10$ic7gHvggUomiVkK27v64cOZ7jU3dnArQOkHG2lUP4UJlZ4azwRsRS', 1, 0, 'female', 'male', 'take a break', 'http://localhost:4000/uploads/pexels-lucas-pezeta-2112714.jpg', 'http://localhost:4000/uploads/pexels-daniel-torobekov-20058411.jpg', 'http://localhost:4000/uploads/pexels-jeremy-bishop-20145983.jpg', 'http://localhost:4000/uploads/pexels-alena-yanovich-20119386.jpg', 'http://localhost:4000/uploads/pexels-dilara-yÄ±lmaz-20200303.jpg', 'http://localhost:4000/uploads/pexels-elina-volkova-19985436.jpg', 48.896120, 2.319370, 0, 0),
 ('e4707942-09b2-4667-a9e8-e87b75b594c7', 'ruruover1105@gmail.com', 'spencer', 'selover', 'spencer', '$2b$10$UkNeBpejAsvZlQxNbmvqt.9bTFm4dTqynLZz9VShf1Y/wZ2Uw2hnG', 1, 28, 'male', 'female', 'hello', 'http://localhost:4000/uploads/pexels-spencer-selover-775358.jpg', 'http://localhost:4000/uploads/pexels-daniel-torobekov-20058411.jpg', 'http://localhost:4000/uploads/pexels-jeremy-bishop-20145983.jpg', 'http://localhost:4000/uploads/pexels-alena-yanovich-20119386.jpg', 'http://localhost:4000/uploads/pexels-dilara-yÄ±lmaz-20200303.jpg', 'http://localhost:4000/uploads/pexels-elina-volkova-19985436.jpg', 2.336149, 48.885829, 0, 1),
-('f586f458-36ca-4396-96e1-fa2a573baa73', 'ruruover1105@gmail.com', 'Test', 'Kobayashi', 'Ruru', '$2b$10$2uIIFdtI8nEVPPZMPjzHbe1ZerFyDIxMgkgivmDOCBipXc1ZslzEO', 0, 0, '', '', '', '', '', '', '', '', '', 2.319370, 48.896120, 0, 0);
+('f586f458-36ca-4396-96e1-fa2a573baa73', 'ruruover1105@gmail.com', 'Test', 'Kobayashi', 'Ruru', '$2b$10$2uIIFdtI8nEVPPZMPjzHbe1ZerFyDIxMgkgivmDOCBipXc1ZslzEO', 0, 0, '', '', '', '', '', '', '', '', '', 2.319370, 48.896120, 0, 0),
+('8727a67e-1a50-48bb-b854-355c3ec200ea', 'ruruover1105@gmail.com', 'stephan', 'Guard', 'Stephan', '$2b$10$mMYjgSdxFG0uVcGeOePBqeL3GhiEVDo/9fZOOiZ1xeWLyuD9nP4ia', 1, 30, 'male', 'female', 'have fun', 'http://localhost:4000/uploads/stephanie-cook-NDCy2-9JhUs-unsplash.jpg', '', '', '', '', '', 2.336185, 48.885884, 0, 0),
+('ee583dd0-4da8-4b77-848f-78a515a0fc22', 'ruruover1105@gmail.com', 'Kebin', 'Edimbara', 'Kebin', '$2b$10$8SVuv2h6911KE14EKpgtJuNCb7dJdnYIWjXBjC5OyDqw2j4BcnKPO', 1, 40, 'male', 'female', 'let\'s drink beer', 'http://localhost:4000/uploads/jack-finnigan-rriAI0nhcbc-unsplash.jpg', '', '', '', '', '', -0.113968, 51.506734, 0, 0),
+('f7124659-ea40-4df8-b2dc-f2f8c5f7b1b7', 'ruruover1105@gmail.com', 'Heim', 'Libard', 'Heim', '$2b$10$.f5/yVVDr/.hoT9XG3HyU.yVcyRQfaWCLJEJtKqmb8O1i5U9VcSWW', 1, 26, 'male', 'female', 'nature', 'http://localhost:4000/uploads/elijah-hiett-umfpFoKxIVg-unsplash.jpg', '', '', '', '', '', 139.845830, 35.752097, 0, 0);
 
 INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `password`, `enabled`, `age`, `gender`, `preference`, `biography`, `profilePic`, `pic1`, `pic2`, `pic3`, `pic4`, `pic5`, `longitude`, `latitude`, `match_ratio`, `fake_account`) VALUES
 ('2cab6219-bda3-4129-b07b-001af8b864ca', 'user1@example.com', 'User1', 'Last1', 'First1', '0b14d501a594442a01c6859541bcb3e8164d183d32937b851835442f69d5c94e', 1, 21, 'female', 'female', 'Biography 1', 'http://localhost:4000/uploads/icon-1633249_1280.png', 'http://example.com/path/to/pic.jpg', 'http://example.com/path/to/pic.jpg', 'http://example.com/path/to/pic.jpg', 'http://example.com/path/to/pic.jpg', 'http://example.com/path/to/pic.jpg', 13.402719508063884, 52.51725134473067, 44, 1),
@@ -694,26 +697,16 @@ INSERT INTO `usertag` (`id`, `user_id`, `tag_id`) VALUES
 (13, '70326ac8-3f29-4faa-aed8-a72b3bfe9ca5', '25'),
 (14, '77743911-bb39-408b-af66-d84df45d73fa', '24'),
 (15, '77743911-bb39-408b-af66-d84df45d73fa', '27'),
-(16, '9ec4c4ca-978b-434d-8302-b4ad68565c4c', '26'),
-(17, '9ec4c4ca-978b-434d-8302-b4ad68565c4c', '25'),
-(18, 'c05fac87-4709-4497-a961-b531d1bad528', '26'),
-(19, 'c05fac87-4709-4497-a961-b531d1bad528', '24'),
-(20, 'c27c9ee4-f2f3-47b5-a33b-361916016dc1', '26'),
-(21, 'c27c9ee4-f2f3-47b5-a33b-361916016dc1', '24'),
-(22, 'c27c9ee4-f2f3-47b5-a33b-361916016dc1', '27'),
-(23, '9b36a8ca-d6a0-4f5a-8858-03d61d277dcd', '2'),
-(24, '9b36a8ca-d6a0-4f5a-8858-03d61d277dcd', '8'),
-(25, '23447b11-924b-47ca-8688-6d464a3acbab', '24'),
-(26, '23447b11-924b-47ca-8688-6d464a3acbab', '29'),
-(27, '310f31c1-71d7-4c3b-90af-121a312e6aac', '27'),
-(28, '310f31c1-71d7-4c3b-90af-121a312e6aac', '29'),
-(29, 'e1e9c3ff-87bb-42d2-b258-206376ffec32', '24'),
-(30, 'e1e9c3ff-87bb-42d2-b258-206376ffec32', '25'),
-(31, '2c26c1d4-aa5c-4284-bae7-d89a4a17e289', '24'),
-(32, '2c26c1d4-aa5c-4284-bae7-d89a4a17e289', '27'),
-(33, '10b70ff9-e2dc-47da-887e-1be3410ef8d8', '26'),
-(34, '10b70ff9-e2dc-47da-887e-1be3410ef8d8', '25'),
-(35, '10b70ff9-e2dc-47da-887e-1be3410ef8d8', '23');
+(16, '8727a67e-1a50-48bb-b854-355c3ec200ea', '27'),
+(17, '8727a67e-1a50-48bb-b854-355c3ec200ea', '29'),
+(18, '8727a67e-1a50-48bb-b854-355c3ec200ea', '24'),
+(19, '8727a67e-1a50-48bb-b854-355c3ec200ea', '25'),
+(20, '8727a67e-1a50-48bb-b854-355c3ec200ea', '24'),
+(21, '8727a67e-1a50-48bb-b854-355c3ec200ea', '27'),
+(22, 'ee583dd0-4da8-4b77-848f-78a515a0fc22', '24'),
+(23, 'ee583dd0-4da8-4b77-848f-78a515a0fc22', '27'),
+(24, 'f7124659-ea40-4df8-b2dc-f2f8c5f7b1b7', '27'),
+(25, 'f7124659-ea40-4df8-b2dc-f2f8c5f7b1b7', '29');
 
 -- --------------------------------------------------------
 
