@@ -34,10 +34,14 @@ async function getSearchQuery(data) {
     values.push(parseInt(data.fameRatingMin), parseInt(data.fameRatingMax));
   }
   if (data.tagIds && data.tagIds.length > 0) {
-    console.log("data.tagId", data.tagIds);
-    let placeholders = data.tagIds.map(() => "?").join(",");
-    whereConditions.push(`usertag.tag_id IN (${placeholders})`);
-    values.push(...data.tagIds);
+    if (!Array.isArray(data.tagIds)) {
+      whereConditions.push(`usertag.tag_id = ?`);
+      values.push(data.tagIds);
+    } else {
+      let placeholders = data.tagIds.map(() => "?").join(",");
+      whereConditions.push(`usertag.tag_id IN (${placeholders})`);
+      values.push(...data.tagIds);
+    }
   }
   if (whereConditions.length >= 0) {
     baseQuery += " WHERE " + whereConditions.join(" AND ");
@@ -66,7 +70,7 @@ async function getSearchQuery(data) {
       orderByClause = " ORDER BY distance";
       break;
     case "fameRating":
-      orderByClause = " ORDER BY user.match_ratio";
+      orderByClause = " ORDER BY user.match_ratio DESC";
       break;
     case "tag":
       orderByClause = " ORDER BY common_tags_count DESC";

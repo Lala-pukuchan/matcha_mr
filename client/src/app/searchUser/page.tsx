@@ -250,6 +250,7 @@ export default function Home() {
           operationUserId={user.id}
           likedUsersId={likedUsersId}
           blockedUsersId={blockedUsersId}
+          link="/users"
         />
       </div>
     </>
