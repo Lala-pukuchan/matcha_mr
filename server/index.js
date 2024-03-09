@@ -315,7 +315,12 @@ app.post("/api/myAccount", async (req, res) => {
     const userResult = await conn.query(queryString, values);
     console.log('userResult:', userResult);
     if (userResult.length > 0) {
-      res.json(userResult[0]);
+      user = userResult[0];
+      const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+      const tagsResult = await conn.query(tagQuery, values);
+      const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+      user.tagIds = tagIdsArray;
+      res.json(user);
     } else {
       res.status(404).json({ message: "User not found" });
     }
