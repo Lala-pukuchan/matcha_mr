@@ -15,6 +15,9 @@ export default function Nav() {
           <Link href="/myAccount">MyAccount</Link>
         </li>
         <li>
+          <Link href="/chat">Chat</Link>
+        </li>
+        <li>
           <Link href="/login">Login</Link>
         </li>
         <li>

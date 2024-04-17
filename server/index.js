@@ -14,6 +14,49 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 const cors = require("cors");
 app.use(cors({ credentials: true, origin: process.env.FRONT_URL }));
 
+//socket
+const http = require('http');
+const { Server } = require("socket.io");
+const server = http.createServer(app);
+const corsOptions = {
+    origin: ["http://localhost:1080", "http://localhost:3000", "http://localhost:4000"], // フロントエンドのURL
+    credentials: true,
+    methods: ["GET", "POST"],
+    transport: ["websocket"],
+    optionsSuccessStatus: 200 
+  };
+app.use(cors(corsOptions));
+const io = new Server(server, { cors: corsOptions});
+//console.log("io connected?:", io.engine);
+
+io.on('connection', (socket) => {
+  console.log(`Client ${socket.id} connected`);
+  
+  socket.on('joinRoom', (room) => {
+    socket.join(room);
+    console.log(`Socket ${socket.id} joined room ${room}`);
+  });
+
+  socket.on('leaveRoom', (room) => {
+    socket.leave(room);
+    console.log(`Socket ${socket.id} left room ${room}`);
+  });
+
+  socket.on('chat message', (room, msg) => {
+    console.log(`Received message in room ${room}: ${msg}`);
+    socket.emit('chat message', msg);
+    socket.to(room).emit('chat message', msg); // すべてのクライアントにメッセージを送信
+  });
+  
+  socket.on('error', (error) => {
+    console.error('Socket.io error: ', error);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+});
+
 // use json
 app.use(express.json());
 
@@ -1060,6 +1103,6 @@ app.post("/api/searchUser", upload.none(), async (req, res) => {
 });
 
 // start server
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server listening at http://localhost:${PORT}`);
 });

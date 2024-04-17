@@ -10,6 +10,7 @@ services:
     build: ./client
     volumes:
       - ./client:/app
+      - /app/node_modules
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:4000
       NEXT_PUBLIC_GOOGLE_API_KEY: ${NEXT_PUBLIC_GOOGLE_API_KEY}
