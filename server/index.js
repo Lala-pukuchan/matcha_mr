@@ -113,6 +113,9 @@ app.get("/api/userinfo", async (req, res) => {
   let token;
   try {
     token = req.cookies.token;
+    if (!token) {
+      return res.json({ message: "No User" });
+    }
     const claims = jwt.verify(token, process.env.JWT_SECRET);
     if (!claims) {
       return res.status(401).json({ message: "Unauthorized" });
@@ -413,7 +416,8 @@ app.post("/api/createUser", upload.none(), async (req, res) => {
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
-
+      console.log("token:\n\n", token);
+      
       // send email
       const mailSetting = {
         from: process.env.GMAIL_APP_USER,
@@ -776,6 +780,7 @@ app.post("/api/liked", async (req, res) => {
       const updateMatchRatio = "UPDATE user SET match_ratio = ? WHERE id = ?";
       const updateVal = [matchRatio, req.body.from];
       const updateResult = await conn.query(updateMatchRatio, updateVal);
+      return res.json({ message: "success" });
     } else {
       return res.status(400).json({ message: "User doesn't have a profile picture" });
     }
@@ -854,6 +859,7 @@ app.post("/api/users/connected", async (req, res) => {
 // unlike api
 app.post("/api/unliked", async (req, res) => {
   let conn;
+  console.log(req.body);
   try {
     // delete liked
     conn = await pool.getConnection();

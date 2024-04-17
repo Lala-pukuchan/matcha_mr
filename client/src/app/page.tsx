@@ -24,16 +24,22 @@ export default function Home() {
   // check user
   useEffect(() => {
     const checkUser = async () => {
+      if (!user || !user.id) {
+        window.location.href = "/login";
+        return;
+      }
       await new Promise((resolve) => setTimeout(resolve, 2000));
       setLoading(false);
       const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="));
+      .split("; ")
+      .find((row) => row.startsWith("token="));
+      console.log("token: ", token);
       if (!token) {
+        console.log("no token");
         window.location.href = "/login";
       }
     };
-
+    
     const fetchConnectedUsers = async () => {
       try {
         const response = await fetch(
@@ -47,10 +53,11 @@ export default function Home() {
               id: user.id,
             }),
           }
-        );
-        if (response.ok) {
-          const data = await response.json();
-          setUserListConnected(data.filter((d) => d.id !== user.id));
+          );
+          if (response.ok) {
+            const data = await response.json();
+            setUserListConnected(data.filter((d) => d.id !== user.id));
+
         } else {
           setUserListConnected([]);
         }

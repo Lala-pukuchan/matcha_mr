@@ -20,6 +20,7 @@ services:
     build: ./server
     volumes:
       - ./server:/app
+      - /app/node_modules
     ports:
       - 4000:4000
     environment:
