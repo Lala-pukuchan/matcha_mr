@@ -8,9 +8,8 @@ function Chat() {
   const [input, setInput] = useState('');
   const [roomID, setRoomID] = useState('');
 
-
-  // Function to connect to the WebSocket server
-  const connectSocket = () => {
+  // Connect to the WebSocket server immediately when the component mounts
+  useEffect(() => {
     const newSocket = io('http://localhost:4000/', {
       withCredentials: true,
       reconnectionAttempts: 5,
@@ -29,31 +28,32 @@ function Chat() {
 
     setSocket(newSocket);
 
-    return newSocket;
-  };
+    // Clean up the socket when the component unmounts
+    return () => {
+      if (newSocket) {
+        console.log('Disconnecting...');
+        newSocket.close();
+      }
+    };
+  }, []);
 
+  // Handle sending messages
   const sendMessage = () => {
-    if (!socket || !socket.connected) {
-      console.log('Socket is not connected, attempting to connect...');
-      const newSocket = connectSocket();
-      newSocket.on('connect', () => {
-        newSocket.emit('chat message', roomID, input);
-        setInput('');
-      });
-    } else {
+    if (socket && socket.connected) {
       socket.emit('chat message', roomID, input);
       setInput('');
+    } else {
+      console.log('Socket is not connected.');
     }
   };
 
+  // Handle changing rooms
   useEffect(() => {
-    return () => {
-      if (socket) {
-        console.log('Disconnecting...');
-        socket.close();
-      }
-    };
-  }, [socket]);
+    if (socket && roomID) {
+      socket.emit('joinRoom', roomID);
+      setMessages([]);
+    }
+  }, [roomID, socket]);
 
   return (
     <div>
@@ -63,17 +63,10 @@ function Chat() {
         ))}
       </ul>
       <select
-        onChange={(event) => {
-          const newRoomID = event.target.value;
-          setRoomID(newRoomID);
-          if (socket) {
-            socket.emit('joinRoom', newRoomID);
-          }
-          setMessages([]);
-        }}
+        onChange={(event) => setRoomID(event.target.value)}
         value={roomID}
       >
-        <option value="">---</option>
+        <option value="">Select a room</option>
         <option value="1">Room1</option>
         <option value="2">Room2</option>
       </select>
