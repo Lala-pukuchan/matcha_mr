@@ -7,7 +7,7 @@ async function getSearchQuery(data) {
     (6371 * acos(cos(radians(?)) * cos(radians(user.latitude)) * cos(radians(user.longitude) - radians(?)) + sin(radians(?)) * sin(radians(user.latitude)))) AS distance
     FROM 
     user
-    JOIN usertag ON user.id = usertag.user_id
+    LEFT JOIN usertag ON user.id = usertag.user_id
     `;
   let values = [
     parseFloat(user.latitude),
@@ -18,13 +18,16 @@ async function getSearchQuery(data) {
   // where
   let whereConditions = [];
   if (user.gender) {
-    whereConditions.push("(user.preference = ? OR user.preference = 'no')");
-    values.push(user.gender);
+    whereConditions.push(`(user.gender = ? OR user.preference = ? OR user.preference = '')`);
+    values.push(user.gender, user.gender);
   }
-  if (user.preference && user.preference !== "no") {
-    whereConditions.push("user.gender = ?");
+  if (user.preference && user.preference !== "") {
+    whereConditions.push(`(user.preference = ? OR user.preference = '')`);
     values.push(user.preference);
+  } else {
+    whereConditions.push("(user.preference = '' OR user.preference IS NULL)");
   }
+
   if (data.ageMin && data.ageMax) {
     whereConditions.push("user.age >= ? AND user.age <= ?");
     values.push(parseInt(data.ageMin), parseInt(data.ageMax));
@@ -46,10 +49,10 @@ async function getSearchQuery(data) {
   if (whereConditions.length >= 0) {
     baseQuery += " WHERE " + whereConditions.join(" AND ");
   }
-
+  
   // groupBy
   baseQuery += " GROUP BY user.id";
-
+  
   // having
   let havingConditions = [];
   if (data.distanceMin && data.distanceMax) {
@@ -59,7 +62,7 @@ async function getSearchQuery(data) {
   if (havingConditions.length > 0) {
     baseQuery += " HAVING " + havingConditions.join(" AND ");
   }
-
+  
   // orderBy
   let orderByClause = "";
   switch (data.sort) {
@@ -79,10 +82,10 @@ async function getSearchQuery(data) {
       break;
   }
   baseQuery += orderByClause;
-
-  console.log("baseQuery", baseQuery);
-  console.log("values", values);
-
+  
+  console.log("Final baseQuery", baseQuery);
+  console.log("Final values", values);
+  
   return { baseQuery, values };
 }
 
