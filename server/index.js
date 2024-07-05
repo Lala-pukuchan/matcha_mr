@@ -96,6 +96,10 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 const { get } = require("http");
 const { match } = require("assert");
+const { profile } = require("console");
+require('dotenv').config();
+console.log("GMAIL_APP_PASSWORD", process.env.GMAIL_APP_PASSWORD);
+console.log("GMAIL_APP_USER", process.env.GMAIL_APP_USER);
 const transporter = nodemailer.createTransport({
   service: "Gmail",
   host: "smtp.gmail.com",
@@ -393,20 +397,36 @@ app.post("/api/createUser", upload.none(), async (req, res) => {
       // hash password
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(req.body.password, salt);
-
+      // Set profilePic based on gender
+      const gender = req.body.gender;
+      const preference = req.body.preference;
+      console.log("preferences:", preference);
+      let profilePic;
+      if (gender === "male") {
+        const randomNumber = Math.floor(Math.random() * 12) + 1;
+        profilePic = `http://localhost:4000/uploads/${randomNumber}_boy.png`;
+      } else if (gender === "female") {
+        const randomNumber = Math.floor(Math.random() * 12) + 1;
+        profilePic = `http://localhost:4000/uploads/${randomNumber}_girl.png`;
+      } else {
+        profilePic = "";
+      }
       // insert DB
       //conn = await pool.getConnection();
-      const values = [
+      const insertValues = [
         userId,
         req.body.email,
         req.body.username,
         req.body.lastname,
         req.body.firstname,
         hashedPassword,
+        req.body.gender,
+        preference,
+        profilePic,
       ];
       const result = await conn.query(
-        "INSERT INTO user(id, email, username, lastname, firstname, password) VALUES (?, ?, ?, ?, ?, ?)",
-        values
+        "INSERT INTO user(id, email, username, lastname, firstname, password, gender, preference, profilePic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        insertValues
       );
 
       // create jwt

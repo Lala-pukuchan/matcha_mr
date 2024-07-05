@@ -116,7 +116,7 @@ export default function Signup() {
                 type="radio"
                 name="gender"
                 value="male"
-                onChange={() => setSelectedGender("male")}
+                required
               /> Male
             </label>
             <label>
@@ -124,7 +124,7 @@ export default function Signup() {
                 type="radio"
                 name="gender"
                 value="female"
-                onChange={() => setSelectedGender("female")}
+                required
               /> Female
             </label>
           </div>
@@ -137,7 +137,7 @@ export default function Signup() {
                 type="radio"
                 name="preference"
                 value="male"
-                onChange={() => setSelectedPreGender("male")}
+                required
               /> Male
             </label>
             <label>
@@ -145,7 +145,7 @@ export default function Signup() {
                 type="radio"
                 name="preference"
                 value="female"
-                onChange={() => setSelectedPreGender("female")}
+                required
               /> Female
             </label>
             <label>
@@ -153,7 +153,7 @@ export default function Signup() {
                 type="radio"
                 name="preference"
                 value="no"
-                onChange={() => setSelectedPreGender("")}
+                required
               /> No specific
             </label>
           </div>

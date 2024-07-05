@@ -49,7 +49,7 @@ export default function login() {
         }
       );
       if (response.status === 200) {
-        window.location.href = "/";
+        window.location.href = "/myAccount";
       } else {
         const data = await response.json();
         setMessage(data.message);
