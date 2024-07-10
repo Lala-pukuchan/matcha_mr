@@ -1,14 +1,16 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { io } from 'socket.io-client';
+import { useUser } from "../../../context/context";
 
 function Chat() {
   const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [roomID, setRoomID] = useState('');
+  const [matches, setMatches] = useState([]);
+  const { user } = useUser();
 
-  // Connect to the WebSocket server immediately when the component mounts
   useEffect(() => {
     const newSocket = io('http://localhost:4000/', {
       withCredentials: true,
@@ -28,7 +30,6 @@ function Chat() {
 
     setSocket(newSocket);
 
-    // Clean up the socket when the component unmounts
     return () => {
       if (newSocket) {
         console.log('Disconnecting...');
@@ -37,17 +38,27 @@ function Chat() {
     };
   }, []);
 
-  // Handle sending messages
+  useEffect(() => {
+    console.log("user.id: ", user);
+    if (user && user.id) {
+      fetch(`http://localhost:4000/matches/${user.id}`)
+        .then(response => response.json())
+        .then(data => setMatches(data))
+        .catch(error => console.error('Error fetching matches:', error));
+    }
+  }, [user]);
+
   const sendMessage = () => {
-    if (socket && socket.connected) {
-      socket.emit('chat message', roomID, input);
+    if (socket && socket.connected && roomID) {
+      const message = { to: roomID, text: input, sent_at: new Date().toISOString() };
+      socket.emit('chat message', roomID, message);
+      setMessages(prevMessages => [...prevMessages, message]);
       setInput('');
     } else {
-      console.log('Socket is not connected.');
+      console.log('Socket is not connected or no room selected.');
     }
   };
 
-  // Handle changing rooms
   useEffect(() => {
     if (socket && roomID) {
       socket.emit('joinRoom', roomID);
@@ -59,16 +70,17 @@ function Chat() {
     <div>
       <ul>
         {messages.map((message, index) => (
-          <li key={index}>{message}</li>
+          <li key={index}>{`${message.text} (Sent at: ${new Date(message.sent_at).toLocaleString()})`}</li>
         ))}
       </ul>
       <select
         onChange={(event) => setRoomID(event.target.value)}
         value={roomID}
       >
-        <option value="">Select a room</option>
-        <option value="1">Room1</option>
-        <option value="2">Room2</option>
+        <option value="">Select a match</option>
+        {matches.map(match => (
+          <option key={match.id} value={match.room_id}>{match.username}</option>
+        ))}
       </select>
       <input type="text" value={input} onChange={(e) => setInput(e.target.value)} />
       <button onClick={sendMessage}>Send</button>

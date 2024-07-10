@@ -103,7 +103,10 @@ CREATE TABLE `messages` (
   `from_user_id` varchar(256) NOT NULL,
   `to_user_id` varchar(256) NOT NULL,
   `message` text NOT NULL,
-  `sent_at` datetime NOT NULL
+  `sent_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`from_user_id`) REFERENCES `user` (`id`),
+  FOREIGN KEY (`to_user_id`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------

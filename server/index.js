@@ -15,6 +15,7 @@ const cors = require("cors");
 app.use(cors({ credentials: true, origin: process.env.FRONT_URL }));
 
 //socket
+const moment = require('moment');
 const http = require('http');
 const { Server } = require("socket.io");
 const server = http.createServer(app);
@@ -26,12 +27,36 @@ const corsOptions = {
     optionsSuccessStatus: 200 
   };
 app.use(cors(corsOptions));
+app.use(express.json());
+
+app.get('/matches/:userId', async (req, res) => {
+  const userId = req.params.userId;
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const query = `
+      SELECT u.id, u.username, r.room_id 
+      FROM matched m 
+      JOIN user u ON (m.matched_user_id_first = u.id OR m.matched_user_id_second = u.id)
+      JOIN rooms r ON (r.user_id_first = ? AND r.user_id_second = u.id) OR (r.user_id_first = u.id AND r.user_id_second = ?)
+      WHERE (m.matched_user_id_first = ? OR m.matched_user_id_second = ?) AND u.id != ?`;
+    const rows = await conn.query(query, [userId, userId, userId, userId, userId]);
+    res.json(rows);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Server error');
+  } finally {
+    if (conn) conn.end();
+  }
+  console.log("userId:", userId);
+});
+
 const io = new Server(server, { cors: corsOptions});
 //console.log("io connected?:", io.engine);
 
-io.on('connection', (socket) => {
-  console.log(`Client ${socket.id} connected`);
-  
+  io.on('connection', (socket) => {
+    console.log(`Client ${socket.id} connected`);
+    
   socket.on('joinRoom', (room) => {
     socket.join(room);
     console.log(`Socket ${socket.id} joined room ${room}`);
@@ -42,10 +67,22 @@ io.on('connection', (socket) => {
     console.log(`Socket ${socket.id} left room ${room}`);
   });
 
-  socket.on('chat message', (room, msg) => {
-    console.log(`Received message in room ${room}: ${msg}`);
-    socket.emit('chat message', msg);
-    socket.to(room).emit('chat message', msg); // すべてのクライアントにメッセージを送信
+  socket.on('chat message', async (room, message) => {
+    console.log(`Received message in room ${room}: ${message.text}`);
+    io.to(room).emit('chat message', message);
+    // メッセージをデータベースに保存
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const query = 'INSERT INTO messages (from_user_id, to_user_id, message, sent_at) VALUES (?, ?, ?, ?)';
+      const formattedDate = moment(message.sent_at).format('YYYY-MM-DD HH:mm:ss');
+      const params = [socket.id, message.to, message.text, formattedDate];
+      await conn.query(query, params);
+    } catch (error) {
+      console.error('Error saving message to database: ', error);
+    } finally {
+      if (conn) conn.end();
+    }
   });
   
   socket.on('error', (error) => {
@@ -781,6 +818,12 @@ app.post("/api/liked", async (req, res) => {
         const result2 = await conn.query(
           "INSERT INTO matched (matched_user_id_first, matched_user_id_second) VALUES (?, ?)",
           values2
+        );
+        //create chat room
+        const roomValues = [req.body.from, req.body.to];
+        const createRoom = await conn.query(
+          "INSERT INTO rooms (user_id_first, user_id_second) VALUES (?, ?)",
+          roomValues
         );
       }
       // matching ratio
