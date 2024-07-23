@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- ホスト: db:3306
--- 生成日時: 2024 年 4 月 24 日 14:25
+-- 生成日時: 2024 年 7 月 22 日 19:17
 -- サーバのバージョン： 10.5.8-MariaDB-1:10.5.8+maria~focal
 -- PHP のバージョン: 8.2.8
 
@@ -66,8 +66,8 @@ INSERT INTO `liked` (`id`, `from_user_id`, `liked_to_user_id`, `liked_at`) VALUE
 (29, '77743911-bb39-408b-af66-d84df45d73fa', '73de925b-0b9a-4a11-a7c4-d95fec823a9b', '2024-02-16 05:02:43'),
 (30, '57457753-b995-41bd-9c9e-f78d7b0d6699', '73de925b-0b9a-4a11-a7c4-d95fec823a9b', '2024-02-20 06:10:05'),
 (31, '73de925b-0b9a-4a11-a7c4-d95fec823a9b', '57457753-b995-41bd-9c9e-f78d7b0d6699', '2024-02-20 06:11:29'),
-(32, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-04-18 10:13:26'),
-(33, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '2024-04-18 10:13:50');
+(34, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-07-22 14:25:01'),
+(35, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '2024-07-22 14:25:31');
 
 -- --------------------------------------------------------
 
@@ -90,7 +90,7 @@ INSERT INTO `matched` (`id`, `matched_user_id_first`, `matched_user_id_second`, 
 (4, 'e4707942-09b2-4667-a9e8-e87b75b594c7', '73de925b-0b9a-4a11-a7c4-d95fec823a9b', '2024-02-15 09:56:30'),
 (5, '73de925b-0b9a-4a11-a7c4-d95fec823a9b', '77743911-bb39-408b-af66-d84df45d73fa', '2024-02-16 05:02:43'),
 (6, '57457753-b995-41bd-9c9e-f78d7b0d6699', '73de925b-0b9a-4a11-a7c4-d95fec823a9b', '2024-02-20 06:11:29'),
-(7, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-04-18 10:13:50');
+(8, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-07-22 14:25:31');
 
 -- --------------------------------------------------------
 
@@ -100,14 +100,21 @@ INSERT INTO `matched` (`id`, `matched_user_id_first`, `matched_user_id_second`, 
 
 CREATE TABLE `messages` (
   `id` int(11) NOT NULL,
+  `room_id` int(11) NOT NULL,
   `from_user_id` varchar(256) NOT NULL,
   `to_user_id` varchar(256) NOT NULL,
   `message` text NOT NULL,
-  `sent_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (`from_user_id`) REFERENCES `user` (`id`),
-  FOREIGN KEY (`to_user_id`) REFERENCES `user` (`id`)
+  `sent_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- テーブルのデータのダンプ `messages`
+--
+
+INSERT INTO `messages` (`id`, `room_id`, `from_user_id`, `to_user_id`, `message`, `sent_at`) VALUES
+(1, 1, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'test message', '2024-07-22 17:02:34'),
+(2, 1, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'Hi I\'m Eric', '2024-07-22 19:04:31'),
+(3, 1, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'Hello Eric', '2024-07-22 19:04:41');
 
 -- --------------------------------------------------------
 
@@ -120,6 +127,13 @@ CREATE TABLE `rooms` (
   `user_id_first` varchar(256) NOT NULL,
   `user_id_second` varchar(256) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- テーブルのデータのダンプ `rooms`
+--
+
+INSERT INTO `rooms` (`room_id`, `user_id_first`, `user_id_second`) VALUES
+(1, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273');
 
 -- --------------------------------------------------------
 
@@ -570,7 +584,7 @@ INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `passwor
 ('bbd57dc3-99eb-4503-b235-13ce8cbc112e', 'noah304@example.com', 'Noah304', 'Hill', 'Noah', '710b89212f8ebfa75d3bbc0013a9726437cad4d615fcedc2f9a2b9fde4ea9618', 0, 39, 'male', 'female', 'Hi, I\'m Noah Hill, welcome to my profile!', 'http://localhost:4000/uploads/8_boy.png', '', '', '', '', '', 5.369780, 43.296482, 56, 1),
 ('bbdc7332-812b-448a-bd6f-bad5f5078c45', 'ruth368@example.com', 'Ruth368', 'Jones', 'Ruth', '506c0eac83293d59b4d5daee60aec11e587860770151abcb209f48cce167f1c5', 0, 73, 'female', 'male', 'Hi, I\'m Ruth Jones, welcome to my profile!', 'http://localhost:4000/uploads/4_girl.png', '', '', '', '', '', -117.161084, 32.715738, 45, 1),
 ('bc931057-53df-4c13-82d3-caf8c75d86eb', 'linda87@example.com', 'Linda87', 'Roberts', 'Linda', '0e3d1ff5111b4fe10af191b5bf69378159bd7ca6cba1eb7262a405c18088afe2', 0, 48, 'female', 'male', 'Hi, I\'m Linda Roberts, welcome to my profile!', 'http://localhost:4000/uploads/8_girl.png', '', '', '', '', '', 2.295753, 49.894067, 60, 1),
-('bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'tsujimarico@gmail.com', 'Heidi', 'Turner', 'Heidi', '$2b$10$qu0pKMWYofEdhv7ddFJvS.1fFot6UIZjWy/AbRPLUN5aaefDj78pG', 1, 20, 'female', 'female', 'Hi Eric', 'http://localhost:4000/uploads/alter-egos-heidi-turner-w-hat.png', '', '', '', '', '', 2.319370, 48.896120, 0, 0),
+('bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'tsujimarico@gmail.com', 'Heidi', 'Turner', 'Heidi', '$2b$10$qu0pKMWYofEdhv7ddFJvS.1fFot6UIZjWy/AbRPLUN5aaefDj78pG', 1, 20, 'female', 'male', 'Hi Eric', 'http://localhost:4000/uploads/alter-egos-heidi-turner-w-hat.png', '', '', '', '', '', 2.319370, 48.896120, 0, 0),
 ('bdac9e43-ac7a-49ee-a7d8-caa94013364a', 'frank486@example.com', 'Frank486', 'Nguyen', 'Frank', '04f44bc44afb2db4ec4bb35219ec5bdb5878928c6a8f8ed4022b798be34a7b63', 0, 44, 'male', 'female', 'Hi, I\'m Frank Nguyen, welcome to my profile!', 'http://localhost:4000/uploads/5_boy.png', '', '', '', '', '', 135.768029, 35.011636, 39, 0),
 ('bee12eaa-9e42-4330-a85d-ca95145739e0', 'lauren144@example.com', 'Lauren144', 'Mitchell', 'Lauren', 'ad6cd891ccf7d78ead86fb2788e8a32948d59b001706bce811750a9e77471060', 0, 92, 'female', 'male', 'Hi, I\'m Lauren Mitchell, welcome to my profile!', 'http://localhost:4000/uploads/6_girl.png', '', '', '', '', '', 21.011486, 52.225406, 64, 0),
 ('bf55fdaf-2671-4b76-957a-4e5d19352867', 'sarah80@example.com', 'Sarah80', 'Jones', 'Sarah', '24069004ae289e583afeb41e969e0f2b8c1b7d80326dcf9be9ec7411698dd33b', 0, 72, 'female', 'male', 'Hi, I\'m Sarah Jones, welcome to my profile!', 'http://localhost:4000/uploads/6_girl.png', '', '', '', '', '', 1.444209, 43.604652, 3, 0),
@@ -821,7 +835,9 @@ INSERT INTO `viewed` (`id`, `from_user_id`, `viewed_to_user_id`, `viewed_at`) VA
 (123, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'eb7f1e94-8865-4feb-b213-4a8a429c0bcb', '2024-04-24'),
 (124, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'eb7f1e94-8865-4feb-b213-4a8a429c0bcb', '2024-04-24'),
 (125, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '70b3135b-3012-45f0-94f9-665bb5538a97', '2024-04-24'),
-(126, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '70b3135b-3012-45f0-94f9-665bb5538a97', '2024-04-24');
+(126, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '70b3135b-3012-45f0-94f9-665bb5538a97', '2024-04-24'),
+(127, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '2024-07-22'),
+(128, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '2024-07-22');
 
 --
 -- ダンプしたテーブルのインデックス
@@ -851,7 +867,8 @@ ALTER TABLE `matched`
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`),
   ADD KEY `from_user_id` (`from_user_id`),
-  ADD KEY `to_user_id` (`to_user_id`);
+  ADD KEY `to_user_id` (`to_user_id`),
+  ADD KEY `fk_room_id` (`room_id`);
 
 --
 -- テーブルのインデックス `rooms`
@@ -908,25 +925,25 @@ ALTER TABLE `blocked`
 -- テーブルの AUTO_INCREMENT `liked`
 --
 ALTER TABLE `liked`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- テーブルの AUTO_INCREMENT `matched`
 --
 ALTER TABLE `matched`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- テーブルの AUTO_INCREMENT `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- テーブルの AUTO_INCREMENT `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- テーブルの AUTO_INCREMENT `room_messages`
@@ -950,7 +967,7 @@ ALTER TABLE `usertag`
 -- テーブルの AUTO_INCREMENT `viewed`
 --
 ALTER TABLE `viewed`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=127;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=129;
 
 --
 -- ダンプしたテーブルの制約
@@ -960,8 +977,10 @@ ALTER TABLE `viewed`
 -- テーブルの制約 `messages`
 --
 ALTER TABLE `messages`
+  ADD CONSTRAINT `fk_room_id` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `messages_ibfk_1` FOREIGN KEY (`from_user_id`) REFERENCES `user` (`id`),
-  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`to_user_id`) REFERENCES `user` (`id`);
+  ADD CONSTRAINT `messages_ibfk_2` FOREIGN KEY (`to_user_id`) REFERENCES `user` (`id`),
+  ADD CONSTRAINT `messages_ibfk_3` FOREIGN KEY (`room_id`) REFERENCES `rooms` (`room_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- テーブルの制約 `rooms`

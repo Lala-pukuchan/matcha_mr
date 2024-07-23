@@ -20,7 +20,7 @@ const http = require('http');
 const { Server } = require("socket.io");
 const server = http.createServer(app);
 const corsOptions = {
-    origin: ["http://localhost:1080", "http://localhost:3000", "http://localhost:4000"], // フロントエンドのURL
+    origin: ["http://localhost:1080", "http://localhost:3000"], // フロントエンドのURL
     credentials: true,
     methods: ["GET", "POST"],
     transport: ["websocket"],
@@ -35,7 +35,7 @@ app.get('/matches/:userId', async (req, res) => {
   try {
     conn = await pool.getConnection();
     const query = `
-      SELECT u.id, u.username, r.room_id 
+      SELECT u.id, u.username, u.profilePic, r.room_id 
       FROM matched m 
       JOIN user u ON (m.matched_user_id_first = u.id OR m.matched_user_id_second = u.id)
       JOIN rooms r ON (r.user_id_first = ? AND r.user_id_second = u.id) OR (r.user_id_first = u.id AND r.user_id_second = ?)
@@ -51,12 +51,87 @@ app.get('/matches/:userId', async (req, res) => {
   console.log("userId:", userId);
 });
 
-const io = new Server(server, { cors: corsOptions});
-//console.log("io connected?:", io.engine);
+app.get('/messages/:roomID', async (req, res) => {
+  const roomID = req.params.roomID;
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const query = 'SELECT * FROM messages WHERE room_id = ? ORDER BY sent_at ASC';
+    const messages = await conn.query(query, [roomID]);
+    res.json(messages);
+  } catch (error) {
+    console.error('Error fetching messages from database: ', error);
+    res.status(500).send('Internal Server Error');
+  } finally {
+    if (conn) conn.end();
+  }
+});
 
-  io.on('connection', (socket) => {
-    console.log(`Client ${socket.id} connected`);
-    
+const io = new Server(server, {
+  cors: corsOptions,
+  transports: ['websocket', 'polling'],
+});
+const onlineUsers = new Map();
+
+io.on('connection', (socket) => {
+  console.log(`Client ${socket.id} connected`);
+
+  socket.on('login', async (userId) => {
+    onlineUsers.set(userId, socket.id);
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const query = 'UPDATE user SET last_active = ? WHERE id = ?';
+      await conn.query(query, [new Date(), userId]);
+      io.emit('user status', { userId, status: 'online' });
+    } catch (error) {
+      console.error('Error updating user status: ', error);
+    } finally {
+      if (conn) conn.end();
+    }
+  });
+
+  socket.on('logout', async (userId) => {
+    onlineUsers.delete(userId);
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const query = 'UPDATE user SET last_active = ? WHERE id = ?';
+      await conn.query(query, [new Date(), userId]);
+      io.emit('user status', { userId, status: 'offline' });
+    } catch (error) {
+      console.error('Error updating user status: ', error);
+    } finally {
+      if (conn) conn.end();
+    }
+  });
+
+  socket.on('disconnect', async () => {
+    console.log(`Client ${socket.id} disconnected`);
+    let userId;
+    for (let [key, value] of onlineUsers) {
+      if (value === socket.id) {
+        userId = key;
+        onlineUsers.delete(key);
+        break;
+      }
+    }
+
+    if (userId) {
+      let conn;
+      try {
+        conn = await pool.getConnection();
+        const query = 'UPDATE user SET last_active = ? WHERE id = ?';
+        await conn.query(query, [new Date(), userId]);
+        io.emit('user status', { userId, status: 'offline' });
+      } catch (error) {
+        console.error('Error updating user status: ', error);
+      } finally {
+        if (conn) conn.end();
+      }
+    }
+  });
+
   socket.on('joinRoom', (room) => {
     socket.join(room);
     console.log(`Socket ${socket.id} joined room ${room}`);
@@ -68,15 +143,30 @@ const io = new Server(server, { cors: corsOptions});
   });
 
   socket.on('chat message', async (room, message) => {
-    console.log(`Received message in room ${room}: ${message.text}`);
+    console.log(`Received message in room ${room}: ${message.message}`);
+    console.log("this is message: \n", message);
     io.to(room).emit('chat message', message);
+
     // メッセージをデータベースに保存
     let conn;
     try {
       conn = await pool.getConnection();
-      const query = 'INSERT INTO messages (from_user_id, to_user_id, message, sent_at) VALUES (?, ?, ?, ?)';
+
+      // 送信相手を特定
+      const roomQuery = 'SELECT user_id_first, user_id_second FROM rooms WHERE room_id = ?';
+      const roomResult = await conn.query(roomQuery, [room]);
+      console.log("roomResult", roomResult); // ここでログを追加して結果を確認
+
+      if (!roomResult || roomResult.length === 0) {
+        throw new Error('Room not found');
+      }
+
+      const { user_id_first, user_id_second } = roomResult[0];
+      const toUserId = (message.from_user_id === user_id_first) ? user_id_second : user_id_first;
+
+      const query = 'INSERT INTO messages (room_id, from_user_id, to_user_id, message, sent_at) VALUES (?, ?, ?, ?, ?)';
       const formattedDate = moment(message.sent_at).format('YYYY-MM-DD HH:mm:ss');
-      const params = [socket.id, message.to, message.text, formattedDate];
+      const params = [room, message.from_user_id, toUserId, message.message, formattedDate];
       await conn.query(query, params);
     } catch (error) {
       console.error('Error saving message to database: ', error);
@@ -84,13 +174,9 @@ const io = new Server(server, { cors: corsOptions});
       if (conn) conn.end();
     }
   });
-  
+
   socket.on('error', (error) => {
     console.error('Socket.io error: ', error);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
   });
 });
 
