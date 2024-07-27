@@ -20,16 +20,16 @@ function Chat() {
 
   useEffect(() => {
     console.log("useEffect triggered");
-  
+
     if (!user || !user.id) return;
-  
+
     const newSocket = io('http://localhost:4000', {
       withCredentials: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 5000,
       transports: ['websocket', 'polling'], // フォールバックとしてpollingを追加
     });
-  
+
     newSocket.on('connect', () => {
       console.log('WebSocket connected');
       if (userRef.current && userRef.current.id) {
@@ -37,20 +37,16 @@ function Chat() {
         newSocket.emit('login', userRef.current.id);
       }
     });
-  
+
     newSocket.on('disconnect', () => {
       console.log('WebSocket disconnected');
-      if (userRef.current && userRef.current.id) {
-        console.log('Emitting logout event');
-        newSocket.emit('logout', userRef.current.id);
-      }
     });
-  
+
     newSocket.on('chat message', (message) => {
       console.log('Received chat message:', message);
       setMessages(prevMessages => [...prevMessages, message]);
     });
-  
+
     newSocket.on('user status', ({ userId, status }) => {
       console.log(`User status updated: ${userId} is ${status}`);
       setOnlineStatus(prevStatus => ({
@@ -58,9 +54,9 @@ function Chat() {
         [userId]: status
       }));
     });
-  
+
     setSocket(newSocket);
-  
+
     return () => {
       console.log('Running cleanup function');
       if (newSocket) {

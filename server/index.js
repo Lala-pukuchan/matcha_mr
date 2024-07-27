@@ -77,7 +77,11 @@ io.on('connection', (socket) => {
   console.log(`Client ${socket.id} connected`);
 
   socket.on('login', async (userId) => {
-    onlineUsers.set(userId, socket.id);
+    console.log(`User ${userId} logged in with socket ${socket.id}`);
+    if (!onlineUsers.has(userId)) {
+      onlineUsers.set(userId, new Set());
+    }
+    onlineUsers.get(userId).add(socket.id);
     let conn;
     try {
       conn = await pool.getConnection();
@@ -92,13 +96,19 @@ io.on('connection', (socket) => {
   });
 
   socket.on('logout', async (userId) => {
-    onlineUsers.delete(userId);
+    console.log(`User ${userId} logged out with socket ${socket.id}`);
+    if (onlineUsers.has(userId)) {
+      onlineUsers.get(userId).delete(socket.id);
+      if (onlineUsers.get(userId).size === 0) {
+        onlineUsers.delete(userId);
+      }
+    }
     let conn;
     try {
       conn = await pool.getConnection();
       const query = 'UPDATE user SET last_active = ? WHERE id = ?';
       await conn.query(query, [new Date(), userId]);
-      io.emit('user status', { userId, status: 'offline' });
+      io.emit('user status', { userId, status: onlineUsers.has(userId) ? 'online' : 'offline' });
     } catch (error) {
       console.error('Error updating user status: ', error);
     } finally {
@@ -110,9 +120,12 @@ io.on('connection', (socket) => {
     console.log(`Client ${socket.id} disconnected`);
     let userId;
     for (let [key, value] of onlineUsers) {
-      if (value === socket.id) {
+      if (value.has(socket.id)) {
         userId = key;
-        onlineUsers.delete(key);
+        value.delete(socket.id);
+        if (value.size === 0) {
+          onlineUsers.delete(key);
+        }
         break;
       }
     }
@@ -123,7 +136,7 @@ io.on('connection', (socket) => {
         conn = await pool.getConnection();
         const query = 'UPDATE user SET last_active = ? WHERE id = ?';
         await conn.query(query, [new Date(), userId]);
-        io.emit('user status', { userId, status: 'offline' });
+        io.emit('user status', { userId, status: onlineUsers.has(userId) ? 'online' : 'offline' });
       } catch (error) {
         console.error('Error updating user status: ', error);
       } finally {
@@ -179,6 +192,7 @@ io.on('connection', (socket) => {
     console.error('Socket.io error: ', error);
   });
 });
+
 
 // use json
 app.use(express.json());
