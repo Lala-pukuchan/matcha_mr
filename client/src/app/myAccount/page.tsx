@@ -26,7 +26,7 @@ export default function myAccount() {
     const fetchUser = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/myAccount`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/myAccount`,
           {
             method: "POST",
             headers: {
@@ -44,7 +44,7 @@ export default function myAccount() {
             try {
               const userJson = JSON.stringify({ userId: userId });
               const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/user/viewed`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/viewed`,
                 {
                   method: "POST",
                   headers: {
@@ -68,7 +68,7 @@ export default function myAccount() {
             try {
               const userJson = JSON.stringify({ userId: userId });
               const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/user/liked`,
+                `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/liked`,
                 {
                   method: "POST",
                   headers: {
@@ -101,7 +101,7 @@ export default function myAccount() {
     const fetchUsers = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/getUser`,
           {
             method: "POST",
             headers: {

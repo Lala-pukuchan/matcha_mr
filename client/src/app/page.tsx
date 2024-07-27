@@ -155,7 +155,7 @@ export default function Home() {
       try {
         const userJson = JSON.stringify({ userId: user.id });
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user/likedTo`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/likedTo`,
           {
             method: "POST",
             headers: {

@@ -16,7 +16,7 @@ export const UserProvider = ({ children }) => {
     const fetchUserInfo = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/userinfo`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/userinfo`,
           {
             credentials: "include",
           }
