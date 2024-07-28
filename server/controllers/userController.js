@@ -1,9 +1,15 @@
+const multer = require('multer');
+const upload = multer({ dest: "uploads/" });
+module.exports = upload;
 const pool = require('../services/dbService');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const { v4: uuidv4 } = require('uuid');
 const transporter = require('../services/emailService');
 const moment = require('moment');
+const fs = require("fs");
+const getJwt = require("../functions/getJwt");
+
 
 const getUserInfo = async (req, res) => {
   let token;
@@ -124,37 +130,37 @@ const updateUser = async (req, res) => {
       const { originalname, path } = req.files["profilePicture"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("profilePic = ?");
-      values.push(`http://localhost:${PORT}/uploads/` + originalname);
+      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
     }
     if (req.files["picture1"]) {
       const { originalname, path } = req.files["picture1"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic1 = ?");
-      values.push(`http://localhost:${PORT}/uploads/` + originalname);
+      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
     }
     if (req.files["picture2"]) {
       const { originalname, path } = req.files["picture2"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic2 = ?");
-      values.push(`http://localhost:${PORT}/uploads/` + originalname);
+      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
     }
     if (req.files["picture3"]) {
       const { originalname, path } = req.files["picture3"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic3 = ?");
-      values.push(`http://localhost:${PORT}/uploads/` + originalname);
+      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
     }
     if (req.files["picture4"]) {
       const { originalname, path } = req.files["picture4"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic4 = ?");
-      values.push(`http://localhost:${PORT}/uploads/` + originalname);
+      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
     }
     if (req.files["picture5"]) {
       const { originalname, path } = req.files["picture5"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic5 = ?");
-      values.push(`http://localhost:${PORT}/uploads/` + originalname);
+      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
     }
   }
 
@@ -470,6 +476,7 @@ const getTags = async (req, res) => {
     if (conn) return conn.end();
   }
 };
+
 const addNewTags = async (req, res) => {
   let conn;
   try {
@@ -497,6 +504,156 @@ const addNewTags = async (req, res) => {
   }
 }
 
+const closeAccount = async (req, res) => {
+  // get users within 10km
+  const distanceThreshold = 10;
+  let queryFields = [
+    "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance",
+  ];
+  let values = [req.body.latitude, req.body.longitude, req.body.latitude];
+
+  // Add gender and preference conditions
+  if (req.body.gender) {
+    queryFields.push("(preference = ? OR preference = 'no')");
+    values.push(req.body.gender);
+  }
+  if (req.body.preference) {
+    if (req.body.preference !== "no") {
+      queryFields.push("gender = ?");
+      values.push(req.body.preference);
+    }
+  }
+}  
+
+
+const insertConnected = async (req, res) => {
+  let conn;
+  try {
+    // connected users
+    conn = await pool.getConnection();
+    const matchQuery =
+      "SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?";
+    const matchVal = [req.body.id, req.body.id];
+    const matchResult = await conn.query(matchQuery, matchVal);
+    // get user info
+    let usersConnected = [];
+    const userQuery = "SELECT * FROM user WHERE id = ?";
+    for (let match of matchResult) {
+      let userVal;
+      if (match.matched_user_id_first === req.body.id) {
+        userVal = [match.matched_user_id_second];
+      } else {
+        userVal = [match.matched_user_id_first];
+      }
+      const userResult = await conn.query(userQuery, userVal);
+      // if user has profile pic
+      if (userResult[0] && userResult[0].profilePic) {
+        usersConnected.push(userResult[0]);
+      }
+    }
+    return res.json(usersConnected);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+};
+
+const getCommonTags = async (req, res) => {
+  // combine usertag and user tables
+  const tagIds = req.body.tagIds;
+  let query = `
+  SELECT DISTINCT u.*
+  FROM user u
+  JOIN usertag ut ON u.id = ut.user_id
+`;
+
+  // create conditions and parameters
+  let whereConditions = [];
+  let queryParams = [];
+  if (tagIds && tagIds.length > 0) {
+    const placeholders = tagIds.map(() => "?").join(", ");
+    whereConditions.push(`ut.tag_id IN (${placeholders})`);
+    queryParams.push(...tagIds);
+  }
+
+  // Add gender and preference conditions
+  if (req.body.gender) {
+    whereConditions.push("(u.preference = ? OR u.preference = 'no')");
+    queryParams.push(req.body.gender);
+  }
+  if (req.body.preference && req.body.preference !== "no") {
+    whereConditions.push("u.gender = ?");
+    queryParams.push(req.body.preference);
+  }
+
+  // Combine all conditions with "AND" and append to the query
+  if (whereConditions.length > 0) {
+    query += " WHERE " + whereConditions.join(" AND ");
+  }
+
+  // get users
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(query, queryParams);
+    if (rows.length > 0) {
+      for (row of rows) {
+        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+        const tagValues = [row.id];
+        const tagsResult = await conn.query(tagQuery, tagValues);
+        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+        row.tagIds = tagIdsArray;
+      }
+    }
+    return res.json(rows);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+};
+
+const getFrequentlyLikedBack = async (req, res) => {
+  // get users who have high match ratio
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const query = "SELECT * FROM user WHERE match_ratio > 95 ORDER BY match_ratio DESC";
+    const rows = await conn.query(query);
+    res.json(rows);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+};
+
+const getBlockedTo = async (req, res) => {
+  let conn;
+  try {
+    // get viwed from users
+    conn = await pool.getConnection();
+    let queryString =
+      "SELECT DISTINCT blocked_to_user_id FROM blocked WHERE from_user_id = ?";
+    let values = [req.body.userId];
+    const blockedFromUsers = await conn.query(queryString, values);
+    if (blockedFromUsers.length > 0) {
+      res.json(blockedFromUsers);
+    } else {
+      res.json([]);
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+};
+
 module.exports = {
   getUserInfo,
   getUser,
@@ -515,4 +672,9 @@ module.exports = {
   myAccount,
   getTags,
   addNewTags,
+  closeAccount,
+  insertConnected,
+  getCommonTags,
+  getFrequentlyLikedBack,
+  getBlockedTo,
 };

@@ -9,7 +9,7 @@ export default function TagSelection({ user }) {
     async function setCreatedTags() {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/tags`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`
         );
         if (response.status === 200) {
           const data = await response.json();

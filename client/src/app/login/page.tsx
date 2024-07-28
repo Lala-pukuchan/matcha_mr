@@ -41,7 +41,7 @@ export default function login() {
     const formData = new FormData(event.currentTarget);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/login`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
         {
           method: "POST",
           body: formData,

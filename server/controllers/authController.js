@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const transporter = require('../services/emailService');
+const getJwt = require("../functions/getJwt");
 
 const createUser = async (req, res) => {
   let conn;
@@ -38,19 +39,28 @@ const createUser = async (req, res) => {
         preference,
         profilePic,
       ];
-      await conn.query(
+      const result = await conn.query(
         "INSERT INTO user(id, email, username, lastname, firstname, password, gender, preference, profilePic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         insertValues
       );
 
-      const payload = { id: userId };
-      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "1d" });
+      // create jwt
+      const payload = {
+        id: userId,
+      };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+      console.log("token:\n\n", token);
       
+      // send email
       const mailSetting = {
         from: process.env.GMAIL_APP_USER,
         to: req.body.email,
         subject: "Enable Your Account",
-        html: `<p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="http://localhost:${PORT}/api/enable?token=${token}">here</a>.</p>`,
+        html: `
+        <p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="http://localhost:${process.env.PORT}/api/enable?token=${token}">here</a>.</p>
+        `,
       };
       transporter.sendMail(mailSetting, (error, info) => {
         if (error) {
@@ -61,6 +71,7 @@ const createUser = async (req, res) => {
         }
       });
 
+      // return success message
       return res.json({
         message: "User created successfully",
         id: result.insertId.toString(),
@@ -72,7 +83,7 @@ const createUser = async (req, res) => {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
   } finally {
-    if (conn) conn.end();
+    if (conn) return conn.end();
   }
 };
 
@@ -110,7 +121,7 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
   res.clearCookie("token", { path: "/" });
-  res.send({ message: "Success" });
+  res.send({ message: "success" });
 };
 
 const resetPassword = async (req, res) => {

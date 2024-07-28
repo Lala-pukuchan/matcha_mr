@@ -32,6 +32,7 @@ services:
       GMAIL_APP_USER: ${GMAIL_APP_USER}
       GMAIL_APP_PASSWORD: ${GMAIL_APP_PASSWORD}
       FRONT_URL: ${FRONT_URL}
+      PORT: ${PORT}
     depends_on:
       - db
   db:

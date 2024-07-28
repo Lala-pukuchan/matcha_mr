@@ -25,7 +25,12 @@ router.post('/unliked', userController.insertUnliked);
 router.post('/user/liked', userController.getLikedUsers);
 router.post('/user/likedTo', userController.getLikedToUsers);
 router.post('/user/blockedTo', userController.getBlockedToUsers);
-router.get('tags',userController.getTags);
+router.get('/tags',userController.getTags);
 router.post('/user/tags', userController.addNewTags);
-
+router.post('/close', userController.closeAccount);
+router.post('/connected', userController.insertConnected);
+router.post('/commonTags', userController.getCommonTags);
+router.post('/frequentlyLikedBack', userController.getFrequentlyLikedBack);
+router.post('/blockedTo', userController.getBlockedTo);
+//close, connected, commonTags, frequestlyLikedBack, blockedto, 
 module.exports = router;

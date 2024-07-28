@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 export default function Logout() {
   const [message, setMessage] = useState("");
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/logout`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
       method: "POST",
       credentials: 'include',
     })

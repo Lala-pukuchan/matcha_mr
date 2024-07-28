@@ -184,7 +184,7 @@ export default function Home() {
       try {
         const userJson = JSON.stringify({ userId: user.id });
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user/blockedTo`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/blockedTo`,
           {
             method: "POST",
             headers: {

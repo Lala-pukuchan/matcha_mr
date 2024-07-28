@@ -19,9 +19,7 @@ function Chat() {
   }, [user]);
 
   useEffect(() => {
-    console.log("useEffect triggered");
-
-    if (!user || !user.id) return;
+    if (!user || !user.id) return; // userがnullまたはidがない場合は何もしない
 
     const newSocket = io('http://localhost:4000', {
       withCredentials: true,
@@ -58,26 +56,24 @@ function Chat() {
     setSocket(newSocket);
 
     return () => {
-      console.log('Running cleanup function');
       if (newSocket) {
-        console.log('Disconnecting...');
         if (userRef.current && userRef.current.id) {
           newSocket.emit('logout', userRef.current.id);
         }
         newSocket.close();
       }
     };
-  }, [user?.id]); // 依存配列をuser?.idに変更
+  }, [user]);
 
   useEffect(() => {
     if (user && user.id) {
       console.log('Fetching matches');
-      fetch(`http://localhost:4000/matches/${user.id}`)
+      fetch(`http://localhost:4000/api/matches/${user.id}`)
         .then(response => response.json())
         .then(data => setMatches(data))
         .catch(error => console.error('Error fetching matches:', error));
     }
-  }, [user?.id]); // 依存配列をuser?.idに変更
+  }, [user]);
 
   const sendMessage = () => {
     if (socket && socket.connected && roomID) {
@@ -94,7 +90,7 @@ function Chat() {
     if (socket && roomID) {
       console.log('Joining room', roomID);
       socket.emit('joinRoom', roomID);
-      fetch(`http://localhost:4000/messages/${roomID}`)
+      fetch(`http://localhost:4000/api/messages/${roomID}`)
         .then(response => response.json())
         .then(data => {
           console.log("Fetched messages: ", data);
@@ -103,6 +99,11 @@ function Chat() {
         .catch(error => console.error('Error fetching messages:', error));
     }
   }, [roomID, socket]);
+
+  // userがnullの場合は何も表示しない
+  if (!user || !user.id) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col items-center">
