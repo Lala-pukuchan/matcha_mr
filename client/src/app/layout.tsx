@@ -1,3 +1,4 @@
+// layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -16,12 +17,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isLoginPage = typeof window !== "undefined" && window.location.pathname === "/login"; // ログインページかどうかを判定
 
   return (
     <UserProvider>
       <html lang="en">
         <body className={inter.className}>
-          <Nav />
+          {!isLoginPage && <Nav />}  {/* ログインページではナビゲーションを非表示 */}
           {children}
           <Footer />
         </body>
