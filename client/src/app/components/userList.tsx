@@ -44,7 +44,7 @@ export default function UsersList({
               blockedToUserId={user.id}
             />
             <MatchRatio matchRatio={user.match_ratio} />
-            <Geo lat={user.latitude} lon={user.longitude} />
+            <Geo lat={user.latitude} lon={user.longitude} isRealUser={user.isRealUser} />
             <Tag user={user} />
           </div>
         ))}

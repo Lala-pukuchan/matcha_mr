@@ -136,7 +136,7 @@ export default function Home() {
     }
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/searchUser`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/searchUser`,
         {
           method: "POST",
           body: formData,

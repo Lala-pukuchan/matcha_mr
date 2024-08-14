@@ -1,13 +1,15 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { io } from 'socket.io-client';
 import { useUser } from "../../../context/context";
 import UserInfo from "../components/userInfo";
 import Link from "next/link";
 import Action from "../components/action";
 
-export default function myAccount() {
+export default function MyAccount() {
   // get user from context
   const [user, setUser] = useState([]);
+  const userRef = useRef(user);
 
   // set loading
   const [loading, setLoading] = useState(true);
@@ -19,10 +21,45 @@ export default function myAccount() {
 
   // set user list
   const [userList, setUserList] = useState([]);
+  const [socket, setSocket] = useState(null);
 
-  // check user
   useEffect(() => {
+    // Socket.IOの初期化
+    const newSocket = io('http://localhost:4000', {
+      withCredentials: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 5000,
+      transports: ['websocket', 'polling'],
+    });
 
+    newSocket.on('connect', () => {
+      console.log('WebSocket connected');
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('WebSocket disconnected');
+    });
+
+    setSocket(newSocket);
+
+    return () => {
+      if (newSocket) {
+        if (userRef.current && userRef.current.id) {
+          newSocket.emit('logout', userRef.current.id);
+        }
+        newSocket.close();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (socket && user && user.id) {
+      console.log('Emitting login event');
+      socket.emit('login', user.id);
+    }
+  }, [socket, user]);
+
+  useEffect(() => {
     const fetchUser = async () => {
       try {
         const response = await fetch(
@@ -53,7 +90,6 @@ export default function myAccount() {
                   body: userJson,
                 }
               );
-              console.log("response: ", response);
               if (response.ok) {
                 const responseData = await response.json();
                 if (responseData) {
@@ -125,9 +161,6 @@ export default function myAccount() {
     fetchUsers();
   }, []);
 
-  //if (loading) {
-  //  return <div>Loading...</div>;
-  //}
   return (
     <>
       <UserInfo user={user} />

@@ -21,7 +21,7 @@ const ReportFakeAccount = ({ reportedUserId, alreadyReported }) => {
           status: !isClicked,
         });
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user/report`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/report`,
           {
             method: "POST",
             headers: {

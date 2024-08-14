@@ -24,7 +24,7 @@ export default function users() {
       const fetchUser = async () => {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users/userById`,
             {
               method: "POST",
               headers: {

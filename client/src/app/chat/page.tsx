@@ -25,19 +25,15 @@ function Chat() {
       withCredentials: true,
       reconnectionAttempts: 5,
       reconnectionDelay: 5000,
-      transports: ['websocket', 'polling'], // フォールバックとしてpollingを追加
+      transports: ['websocket', 'polling'],
     });
 
     newSocket.on('connect', () => {
-      console.log('WebSocket connected');
-      if (userRef.current && userRef.current.id) {
-        console.log('Emitting login event');
-        newSocket.emit('login', userRef.current.id);
-      }
+      console.log('WebSocket connected for chat');
     });
 
     newSocket.on('disconnect', () => {
-      console.log('WebSocket disconnected');
+      console.log('WebSocket disconnected from chat');
     });
 
     newSocket.on('chat message', (message) => {
@@ -57,9 +53,6 @@ function Chat() {
 
     return () => {
       if (newSocket) {
-        if (userRef.current && userRef.current.id) {
-          newSocket.emit('logout', userRef.current.id);
-        }
         newSocket.close();
       }
     };
@@ -116,7 +109,7 @@ function Chat() {
               onClick={() => setRoomID(match.room_id)}
             >
               <img
-                src={match.profilePic ? match.profilePic : `path_to_default_picture/default.jpg`} // プロフィール写真のパスを適切に変更してください
+                src={match.profilePic ? match.profilePic : `../../../../server/uploads/icon-1633249_1280.png`}
                 alt={match.username}
                 className="profile-picture"
               />

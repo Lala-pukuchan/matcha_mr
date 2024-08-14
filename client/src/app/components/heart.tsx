@@ -15,7 +15,7 @@ const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
     // update like
     let url = "";
     if (isClicked) {
-      url = `${process.env.NEXT_PUBLIC_API_URL}/api/unliked`;
+      url = `${process.env.NEXT_PUBLIC_API_URL}/api/users/unliked`;
     } else {
       url = `${process.env.NEXT_PUBLIC_API_URL}/api/users/liked`;
     }

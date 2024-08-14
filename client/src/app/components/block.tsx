@@ -8,7 +8,7 @@ const Block = ({ blockedFromUserId, blockedToUserId }) => {
     setIsClicked(!isClicked);
 
     // update block
-    let url = `${process.env.NEXT_PUBLIC_API_URL}/api/blocked`;
+    let url = `${process.env.NEXT_PUBLIC_API_URL}/api/users/blocked`;
     let blocked = true;
     if (isClicked) {
       blocked = false;
