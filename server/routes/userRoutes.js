@@ -5,6 +5,7 @@ const upload = require('../middlewares/uploadMiddleware');
 
 router.get('/userinfo', userController.getUserInfo);
 router.post('/getUser', userController.getUser);
+router.post('/userById', userController.getUserById);
 router.post('/user/update', upload.fields([
   { name: 'profilePicture', maxCount: 1 },
   { name: 'picture1', maxCount: 1 },
@@ -32,5 +33,7 @@ router.post('/connected', userController.insertConnected);
 router.post('/commonTags', userController.getCommonTags);
 router.post('/frequentlyLikedBack', userController.getFrequentlyLikedBack);
 router.post('/blockedTo', userController.getBlockedTo);
+router.post('/searchUser', upload.none(), userController.searchUser);
+
 //close, connected, commonTags, frequestlyLikedBack, blockedto, 
 module.exports = router;

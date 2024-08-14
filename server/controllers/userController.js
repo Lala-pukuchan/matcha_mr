@@ -9,6 +9,7 @@ const transporter = require('../services/emailService');
 const moment = require('moment');
 const fs = require("fs");
 const getJwt = require("../functions/getJwt");
+const getSearchQuery = require("../functions/getSearchQuery");
 
 
 const getUserInfo = async (req, res) => {
@@ -76,6 +77,50 @@ const getUser =  async (req, res) => {
     if (conn) return conn.end();
   }
 };
+
+const getUserById = async (req, res) => {
+  const userId = req.body.userId;
+  let conn;
+  try {
+    // get user
+    conn = await pool.getConnection();
+    let queryString = "SELECT * FROM user WHERE id = ?";
+    let values = [req.body.userId];
+    const userResult = await conn.query(queryString, values);
+    if (userResult.length > 0) {
+      // get tags
+      const user = userResult[0];
+      const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+      const tagsResult = await conn.query(tagQuery, values);
+      const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+      user.tagIds = tagIdsArray;
+      // get matched count
+      const matchedQuery =
+        "SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?";
+      const matchedValues = [userId, userId];
+      const matchedResult = await conn.query(matchedQuery, matchedValues);
+      user.matched = matchedResult.length;
+      // get liked count
+      const likedQuery = "SELECT * FROM liked WHERE liked_to_user_id = ?";
+      const likedValues = [userId];
+      const likedResult = await conn.query(likedQuery, likedValues);
+      user.liked = likedResult.length;
+      // get viewed count
+      const viewedQuery = "SELECT * FROM viewed WHERE viewed_to_user_id = ?";
+      const viewedValues = [userId];
+      const viewedResult = await conn.query(viewedQuery, viewedValues);
+      user.viewed = viewedResult.length;
+      res.json(user);
+    } else {
+      res.status(404).json({ message: "User not found" });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
+  }
+}
 
 const updateUser = async (req, res) => {
   let updateFields = [];
@@ -247,7 +292,6 @@ const insertViewed = async (req, res) => {
   try {
     conn = await pool.getConnection();
     await conn.query("INSERT INTO viewed (from_user_id, viewed_to_user_id, viewed_at) VALUES (?, ?, NOW())", [req.body.from, req.body.to]);
-    console.log("result: ", result);
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
@@ -310,6 +354,7 @@ const insertLiked = async (req, res) => {
 
 const insertBlocked = async (req, res) => {
   let conn;
+  console.log("req.body: ", req.body);
   try {
     conn = await pool.getConnection();
     const values = [req.body.from, req.body.to];
@@ -318,6 +363,7 @@ const insertBlocked = async (req, res) => {
     } else {
       await conn.query("DELETE FROM blocked WHERE from_user_id = ? AND blocked_to_user_id = ?", values);
     }
+    return res.status(200).json({ message: "Block status updated successfully" });
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
@@ -507,6 +553,7 @@ const addNewTags = async (req, res) => {
 const closeAccount = async (req, res) => {
   // get users within 10km
   const distanceThreshold = 10;
+  console.log("close account; req.body:", req.body);
   let queryFields = [
     "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance",
   ];
@@ -522,6 +569,37 @@ const closeAccount = async (req, res) => {
       queryFields.push("gender = ?");
       values.push(req.body.preference);
     }
+  }
+  // create query
+  let baseQuery = `SELECT *, ${queryFields[0]} FROM user`;
+  if (queryFields.length > 1) {
+    const whereClause = queryFields.slice(1).join(" AND ");
+    baseQuery += " WHERE " + whereClause;
+  }
+  baseQuery += " HAVING distance < ? ORDER BY distance";
+  values.push(distanceThreshold);
+
+  // get users
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const rows = await conn.query(baseQuery, values);
+    if (rows.length > 0) {
+      for (row of rows) {
+        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+        const tagValues = [row.id];
+        const tagsResult = await conn.query(tagQuery, tagValues);
+        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+        row.tagIds = tagIdsArray;
+      }
+    }
+    console.log("rows:", rows);
+    return res.json(rows);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) return conn.end();
   }
 }  
 
@@ -654,9 +732,44 @@ const getBlockedTo = async (req, res) => {
   }
 };
 
+const searchUser = async (req, res) => {
+  // validate user
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    console.log("req.body: ", req.body);
+    const { baseQuery, values } = await getSearchQuery(req.body);
+    console.log("baseQuery: ", baseQuery);
+    console.log("values: ", values);
+    const rows = await conn.query(baseQuery, values);
+    console.log("rows: ", rows);
+    // add tags
+    if (rows.length > 0) {
+      for (row of rows) {
+        const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
+        const tagValues = [row.id];
+        const tagsResult = await conn.query(tagQuery, tagValues);
+        const tagIdsArray = tagsResult.map((tag) => tag.tag_id);
+        row.tagIds = tagIdsArray;
+      }
+    }
+    // Convert BigInt to String to create json
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      common_tags_count: row.common_tags_count.toString(),
+    }));
+    return res.json(serializedRows);
+  } catch (e) {
+    console.log(e);
+  } finally {
+    if (conn) return conn.end();
+  }
+};
+
 module.exports = {
   getUserInfo,
   getUser,
+  getUserById,
   updateUser,
   enableUser,
   reportUser,
@@ -677,4 +790,5 @@ module.exports = {
   getCommonTags,
   getFrequentlyLikedBack,
   getBlockedTo,
+  searchUser,
 };

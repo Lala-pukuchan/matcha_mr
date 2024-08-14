@@ -14,8 +14,11 @@ function setupSocket(io, pool) {
       let conn;
       try {
         conn = await pool.getConnection();
-        const query = 'UPDATE user SET last_active = ? WHERE id = ?';
-        await conn.query(query, [new Date(), userId]);
+        
+        // Update the status to 'online'
+        const query = 'UPDATE user SET status = ?, last_active = ? WHERE id = ?';
+        await conn.query(query, ['online', new Date(), userId]);
+
         io.emit('user status', { userId, status: 'online' });
       } catch (error) {
         console.error('Error updating user status: ', error);
@@ -35,9 +38,12 @@ function setupSocket(io, pool) {
       let conn;
       try {
         conn = await pool.getConnection();
-        const query = 'UPDATE user SET last_active = ? WHERE id = ?';
-        await conn.query(query, [new Date(), userId]);
-        io.emit('user status', { userId, status: onlineUsers.has(userId) ? 'online' : 'offline' });
+
+        // Update the status to 'offline'
+        const query = 'UPDATE user SET status = ?, last_active = ? WHERE id = ?';
+        await conn.query(query, ['offline', new Date(), userId]);
+
+        io.emit('user status', { userId, status: 'offline' });
       } catch (error) {
         console.error('Error updating user status: ', error);
       } finally {
@@ -63,9 +69,12 @@ function setupSocket(io, pool) {
         let conn;
         try {
           conn = await pool.getConnection();
-          const query = 'UPDATE user SET last_active = ? WHERE id = ?';
-          await conn.query(query, [new Date(), userId]);
-          io.emit('user status', { userId, status: onlineUsers.has(userId) ? 'online' : 'offline' });
+
+          // Update the status to 'offline'
+          const query = 'UPDATE user SET status = ?, last_active = ? WHERE id = ?';
+          await conn.query(query, ['offline', new Date(), userId]);
+
+          io.emit('user status', { userId, status: 'offline' });
         } catch (error) {
           console.error('Error updating user status: ', error);
         } finally {
@@ -89,15 +98,15 @@ function setupSocket(io, pool) {
       console.log("this is message: \n", message);
       io.to(room).emit('chat message', message);
 
-      // メッセージをデータベースに保存
+      // Save message to the database
       let conn;
       try {
         conn = await pool.getConnection();
 
-        // 送信相手を特定
+        // Identify the recipient
         const roomQuery = 'SELECT user_id_first, user_id_second FROM rooms WHERE room_id = ?';
         const roomResult = await conn.query(roomQuery, [room]);
-        console.log("roomResult", roomResult); // ここでログを追加して結果を確認
+        console.log("roomResult", roomResult);
 
         if (!roomResult || roomResult.length === 0) {
           throw new Error('Room not found');

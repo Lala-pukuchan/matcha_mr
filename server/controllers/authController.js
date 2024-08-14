@@ -18,6 +18,7 @@ const createUser = async (req, res) => {
       const hashedPassword = await bcrypt.hash(req.body.password, salt);
       const gender = req.body.gender;
       const preference = req.body.preference;
+      const isRealUser = 1;
       let profilePic;
       if (gender === "male") {
         const randomNumber = Math.floor(Math.random() * 12) + 1;
@@ -38,9 +39,10 @@ const createUser = async (req, res) => {
         req.body.gender,
         preference,
         profilePic,
+        isRealUser,
       ];
       const result = await conn.query(
-        "INSERT INTO user(id, email, username, lastname, firstname, password, gender, preference, profilePic) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO user(id, email, username, lastname, firstname, password, gender, preference, profilePic, isRealUser) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         insertValues
       );
 
@@ -59,7 +61,7 @@ const createUser = async (req, res) => {
         to: req.body.email,
         subject: "Enable Your Account",
         html: `
-        <p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="http://localhost:${process.env.PORT}/api/enable?token=${token}">here</a>.</p>
+        <p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="http://localhost:${process.env.PORT}/api/users/enable?token=${token}">here</a>.</p>
         `,
       };
       transporter.sendMail(mailSetting, (error, info) => {
@@ -107,7 +109,11 @@ const login = async (req, res) => {
       const tagIdsArray = result.map((tag) => tag.tag_id);
       const token = await getJwt(rows[0], tagIdsArray);
       res.cookie("token", token, { maxAge: 86400000 });
-      return res.json({ message: "Success" });
+
+      await conn.query('UPDATE user SET status = ? WHERE id = ?', ['online', rows[0].id]);
+      console.log(`User ${rows[0].id} logged in`);
+
+      return res.json({ message: "Success", userId: rows[0].id }); // userIdを返す
     } else {
       return res.status(401).json({ message: "Invalid password" });
     }
@@ -119,10 +125,33 @@ const login = async (req, res) => {
   }
 };
 
-const logout = (req, res) => {
-  res.clearCookie("token", { path: "/" });
-  res.send({ message: "success" });
+
+const logout = async (req, res) => {
+  let conn;
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.id;
+
+    conn = await pool.getConnection();
+
+    await conn.query('UPDATE user SET status = ? WHERE id = ?', ['offline', userId]);
+    console.log(`User ${userId} logged out`);
+
+    res.clearCookie("token", { path: "/" });
+    res.send({ message: "success", userId });
+  } catch (e) {
+    console.log(e);
+    res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) conn.end();
+  }
 };
+
+
 
 const resetPassword = async (req, res) => {
   let conn;
