@@ -107,10 +107,10 @@ const login = async (req, res) => {
       const userId = [rows[0].id];
       const result = await conn.query(query, userId);
       const tagIdsArray = result.map((tag) => tag.tag_id);
+      await conn.query('UPDATE user SET status = ? WHERE id = ?', ['online', rows[0].id]);
       const token = await getJwt(rows[0], tagIdsArray);
       res.cookie("token", token, { maxAge: 86400000 });
 
-      await conn.query('UPDATE user SET status = ? WHERE id = ?', ['online', rows[0].id]);
       console.log(`User ${rows[0].id} logged in`);
 
       return res.json({ message: "Success", userId: rows[0].id }); // userIdを返す

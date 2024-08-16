@@ -1,102 +1,69 @@
 "use client";
-import React, { useState, useEffect, useRef } from 'react';
-import { io } from 'socket.io-client';
+import React, { useState, useEffect } from 'react';
 import { useUser } from "../../../context/context";
+import useWebSocket from "../hooks/useWebSocket";
+import useChatRoom from "../hooks/useChatRoom";
 import './Chat.css';
 
 function Chat() {
-  const [socket, setSocket] = useState(null);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
   const [roomID, setRoomID] = useState('');
   const [matches, setMatches] = useState([]);
+  const [input, setInput] = useState('');
   const [onlineStatus, setOnlineStatus] = useState({});
   const { user } = useUser();
-  const userRef = useRef(user);
-
-  useEffect(() => {
-    userRef.current = user;
-  }, [user]);
-
-  useEffect(() => {
-    if (!user || !user.id) return; // userがnullまたはidがない場合は何もしない
-
-    const newSocket = io('http://localhost:4000', {
-      withCredentials: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 5000,
-      transports: ['websocket', 'polling'],
-    });
-
-    newSocket.on('connect', () => {
-      console.log('WebSocket connected for chat');
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('WebSocket disconnected from chat');
-    });
-
-    newSocket.on('chat message', (message) => {
-      console.log('Received chat message:', message);
-      setMessages(prevMessages => [...prevMessages, message]);
-    });
-
-    newSocket.on('user status', ({ userId, status }) => {
-      console.log(`User status updated: ${userId} is ${status}`);
-      setOnlineStatus(prevStatus => ({
-        ...prevStatus,
-        [userId]: status
-      }));
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      if (newSocket) {
-        newSocket.close();
-      }
-    };
-  }, [user]);
+  const socket = useWebSocket();
 
   useEffect(() => {
     if (user && user.id) {
-      console.log('Fetching matches');
       fetch(`http://localhost:4000/api/matches/${user.id}`)
         .then(response => response.json())
-        .then(data => setMatches(data))
+        .then(data => {
+          setMatches(data);
+
+          const matchIds = data.map(match => match.id);
+          fetch(`http://localhost:4000/api/users/onlineStatus`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ids: matchIds }),
+          })
+            .then(response => response.json())
+            .then(statuses => {
+              const statusMap = {};
+              (Array.isArray(statuses) ? statuses : [statuses]).forEach(({ id, status }) => {
+                statusMap[id] = status;
+              });
+              setOnlineStatus(statusMap);
+            })
+            .catch(error => console.error('Error fetching online status:', error));
+        })
         .catch(error => console.error('Error fetching matches:', error));
     }
   }, [user]);
-
-  const sendMessage = () => {
-    if (socket && socket.connected && roomID) {
-      const message = { from_user_id: user.id, to_user_id: roomID, message: input, sent_at: new Date().toISOString() };
-      console.log('Emitting chat message event');
-      socket.emit('chat message', roomID, message);
-      setInput('');
-    } else {
-      console.log('Socket is not connected or no room selected.');
-    }
-  };
-
+  
   useEffect(() => {
-    if (socket && roomID) {
-      console.log('Joining room', roomID);
-      socket.emit('joinRoom', roomID);
-      fetch(`http://localhost:4000/api/messages/${roomID}`)
-        .then(response => response.json())
-        .then(data => {
-          console.log("Fetched messages: ", data);
-          setMessages(data);
-        })
-        .catch(error => console.error('Error fetching messages:', error));
+    if (socket) {
+      socket.on('user status', ({ userId, status }) => {
+        setOnlineStatus(prevStatus => ({
+          ...prevStatus,
+          [userId]: status
+        }));
+      });
     }
-  }, [roomID, socket]);
 
-  // userがnullの場合は何も表示しない
-  if (!user || !user.id) {
-    return <div>Loading...</div>;
-  }
+    // クリーンアップ
+    return () => {
+      if (socket) {
+        socket.off('user status');
+      }
+    };
+  }, [socket]);
+  const { messages, sendMessage } = useChatRoom(socket, roomID);
+
+  const handleSendMessage = () => {
+    const message = { from_user_id: user.id, to_user_id: roomID, message: input, sent_at: new Date().toISOString() };
+    sendMessage(message);
+    setInput('');
+  };
 
   return (
     <div className="flex flex-col items-center">
@@ -139,7 +106,7 @@ function Chat() {
             onChange={(e) => setInput(e.target.value)}
             className="w-full p-2 border rounded mr-4"
           />
-          <button onClick={sendMessage} className="mt-4 w-60 h-9 rounded bg-pink-400 text-white">
+          <button onClick={handleSendMessage} className="mt-4 w-60 h-9 rounded bg-pink-400 text-white">
             Send
           </button>
         </div>

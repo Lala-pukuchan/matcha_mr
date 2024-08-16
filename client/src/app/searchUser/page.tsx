@@ -6,10 +6,15 @@ import AgeRangeSlider from "../components/ageRangeSlider";
 import DistanceRangeSlider from "../components/distanceRangeSlider";
 import FameRatingRangeSlider from "../components/fameRatingRangeSlider";
 import TagSelection from "../components/tagSelection";
+import useAuthCheck from "../hooks/useAuthCheck"; // フックのインポート
 
 export default function Home() {
+  // useAuthCheckフックを呼び出して認証状態をチェックし、必要に応じてリダイレクト
+  useAuthCheck(null, "/login");
+
   // get user from context
-  const { user, setUser } = useUser();
+  const { user } = useUser();
+
   // set user list
   const [users, setUserList] = useState([]);
   // set loading
@@ -21,16 +26,7 @@ export default function Home() {
 
   // check user
   useEffect(() => {
-    const checkUser = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setLoading(false);
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="));
-      if (!token) {
-        window.location.href = "/login";
-      }
-    };
+
     const fetchUsers = async () => {
       try {
         const response = await fetch(
@@ -116,11 +112,11 @@ export default function Home() {
       }
     };
 
-    checkUser();
     if (user) {
       fetchUsers();
       likedUsers();
       blockedUsers();
+      setLoading(false); // ローディング状態を解除
     }
   }, [user]);
 
@@ -144,9 +140,7 @@ export default function Home() {
         }
       );
       if (response.status === 200) {
-        console.log("response", response);
         const data = await response.json();
-        console.log("data: ", data);
         setUserList(data.filter((d) => d.id !== user.id));
       } else {
         const data = await response.json();

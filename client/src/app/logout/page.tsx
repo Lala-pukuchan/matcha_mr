@@ -2,41 +2,23 @@
 
 import { useState, useEffect } from "react";
 import { io } from 'socket.io-client';
+import useWebSocket from "../hooks/useWebSocket";
 
 export default function Logout() {
   const [message, setMessage] = useState("");
-  const [socket, setSocket] = useState(null);
+  const socket = useWebSocket(); 
 
   useEffect(() => {
-    const newSocket = io('http://localhost:4000', {
-      withCredentials: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 5000,
-      transports: ['websocket', 'polling'],
-    });
-
-    newSocket.on('connect', () => {
-      console.log('WebSocket connected for logout');
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('WebSocket disconnected from logout');
-    });
-
-    setSocket(newSocket);
-
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/logout`, {
       method: "POST",
       credentials: 'include',
     })
-      .then((res) => {
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
         if (data.message === "success") {
           console.log('Logout successful');
           if (socket && socket.connected) {
-            socket.emit('logout', data.userId); // サーバーにユーザーのログアウト状態を通知
+            socket.emit('logout', data.userId);
           }
           window.location.href = "/login";
         } else {
@@ -44,13 +26,7 @@ export default function Logout() {
           setMessage("Error logging out");
         }
       });
-
-    return () => {
-      if (newSocket) {
-        newSocket.close();
-      }
-    };
-  }, []);
+  }, [socket]); // socketが依存に追加されている
 
   return <div>{message}</div>;
 }

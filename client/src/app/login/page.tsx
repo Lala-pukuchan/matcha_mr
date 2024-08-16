@@ -2,8 +2,12 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import Link from "next/link";
+import useAuthCheck from "../hooks/useAuthCheck";
 
-export default function login() {
+export default function Login() {
+  // ログインページでは、すでにログインしているユーザーをマイアカウントページにリダイレクト
+  useAuthCheck("/myAccount", null);
+
   // set loading
   const [loading, setLoading] = useState(true);
   // set message
@@ -58,6 +62,7 @@ export default function login() {
       console.log("error: ", e);
     }
   }
+
   return (
     <div>
       <form onSubmit={onSubmit} className="container mx-auto w-screen">

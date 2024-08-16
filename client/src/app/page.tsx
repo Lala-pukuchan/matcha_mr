@@ -2,12 +2,15 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../../context/context";
 import UsersList from "./components/userList";
-import { connect } from "http2";
-import { connected } from "process";
+import useAuthCheck from "./hooks/useAuthCheck"; // カスタムフックのインポート
 
 export default function Home() {
   // get user from context
-  const { user, setUser } = useUser();
+  const { user } = useUser();
+
+  // カスタムフックを使用して認証状態をチェックし、必要に応じてリダイレクト
+  useAuthCheck(null, "/login");
+
   // set user list
   const [connectedUsers, setUserListConnected] = useState([]);
   const [users, setUserListClose] = useState([]);
@@ -21,25 +24,7 @@ export default function Home() {
   // set blocked users
   const [blockedUsersId, setBlockedUsersId] = useState([]);
 
-  // check user
   useEffect(() => {
-    const checkUser = async () => {
-      if (!user || !user.id) {
-        window.location.href = "/login";
-        return;
-      }
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setLoading(false);
-      const token = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("token="));
-      console.log("token: ", token);
-      if (!token) {
-        console.log("no token");
-        window.location.href = "/login";
-      }
-    };
-    
     const fetchConnectedUsers = async () => {
       try {
         const response = await fetch(
@@ -53,11 +38,10 @@ export default function Home() {
               id: user.id,
             }),
           }
-          );
-          if (response.ok) {
-            const data = await response.json();
-            setUserListConnected(data.filter((d) => d.id !== user.id));
-
+        );
+        if (response.ok) {
+          const data = await response.json();
+          setUserListConnected(data.filter((d) => d.id !== user.id));
         } else {
           setUserListConnected([]);
         }
@@ -209,8 +193,6 @@ export default function Home() {
       }
     };
 
-    checkUser();
-
     if (user) {
       fetchUsers();
       fetchConnectedUsers();
@@ -218,6 +200,7 @@ export default function Home() {
       fetchUsersFrequentlyLikedBack();
       likedUsers();
       blockedUsers();
+      setLoading(false);
     }
   }, [user]);
 

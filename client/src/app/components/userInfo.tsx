@@ -31,6 +31,13 @@ export default function UserInfo({ user }) {
     setCreatedTags();
   }, []);
 
+  // 日付のフォーマット関数
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', options);
+  };
+
   return (
     <div className="container mx-auto w-screen flex justify-center">
       <div className="flex flex-col m-10 space-y-4">
@@ -157,6 +164,8 @@ export default function UserInfo({ user }) {
             )}
           </div>
         </div>
+
+        {/* マッチング率の表示部分 */}
         <div className="grid gap-3 grid-cols-2">
           <div>
             <h2 className="font-bold">Match Ratio</h2>
@@ -169,6 +178,8 @@ export default function UserInfo({ user }) {
             )}
           </div>
         </div>
+
+        {/* 「Liked By Someone」「Matched With Someone」の表示部分 */}
         {user && user.liked ? (
           <div className="grid gap-3 grid-cols-2">
             <p className="font-bold">Liked By Someone</p>
@@ -181,6 +192,22 @@ export default function UserInfo({ user }) {
           <div className="grid gap-3 grid-cols-2">
             <p className="font-bold">Matched With Someone</p>
             <p>{user.matched}</p>
+          </div>
+        ) : (
+          ""
+        )}
+
+        {/* 最終ログイン時間または「ログイン中」の表示部分 */}
+        {user && user.status ? (
+          <div className="grid gap-3 grid-cols-2">
+            <p className="font-bold">Last connected</p>
+            <p>
+              {user.status === "online"
+                ? "online"
+                : user.last_active
+                ? formatDate(user.last_active)
+                : ""}
+            </p>
           </div>
         ) : (
           ""

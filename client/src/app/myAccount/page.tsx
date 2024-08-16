@@ -5,8 +5,11 @@ import { useUser } from "../../../context/context";
 import UserInfo from "../components/userInfo";
 import Link from "next/link";
 import Action from "../components/action";
+import useAuthCheck from "../hooks/useAuthCheck";
+import useWebSocket from "../hooks/useWebSocket";
 
 export default function MyAccount() {
+  useAuthCheck(null, "/login");
   // get user from context
   const [user, setUser] = useState([]);
   const userRef = useRef(user);
@@ -21,43 +24,7 @@ export default function MyAccount() {
 
   // set user list
   const [userList, setUserList] = useState([]);
-  const [socket, setSocket] = useState(null);
-
-  useEffect(() => {
-    // Socket.IOの初期化
-    const newSocket = io('http://localhost:4000', {
-      withCredentials: true,
-      reconnectionAttempts: 5,
-      reconnectionDelay: 5000,
-      transports: ['websocket', 'polling'],
-    });
-
-    newSocket.on('connect', () => {
-      console.log('WebSocket connected');
-    });
-
-    newSocket.on('disconnect', () => {
-      console.log('WebSocket disconnected');
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      if (newSocket) {
-        if (userRef.current && userRef.current.id) {
-          newSocket.emit('logout', userRef.current.id);
-        }
-        newSocket.close();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    if (socket && user && user.id) {
-      console.log('Emitting login event');
-      socket.emit('login', user.id);
-    }
-  }, [socket, user]);
+  const socket = useWebSocket(user);
 
   useEffect(() => {
     const fetchUser = async () => {

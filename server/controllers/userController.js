@@ -490,7 +490,7 @@ const myAccount =  async (req, res) => {
     let queryString = "SELECT * FROM user WHERE id = ?";
     let values = [claims.id];
     const userResult = await conn.query(queryString, values);
-    console.log('userResult:', userResult);
+    //console.log('userResult:', userResult);
     if (userResult.length > 0) {
       user = userResult[0];
       const tagQuery = "SELECT tag_id FROM usertag WHERE user_id = ?";
@@ -766,6 +766,51 @@ const searchUser = async (req, res) => {
   }
 };
 
+const onlineStatus = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    console.log("req.body: ", req.body);
+    const ids = req.body.ids;
+    console.log("ids: ", ids);
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ message: "Invalid input" });
+    }
+    const result = [];
+    for (const id of ids) {
+      const query = "SELECT id, status FROM user WHERE id = ?";
+      const [rows] = await conn.query(query, [id]);
+
+      if (!rows || rows.length === 0) {
+        console.log(`User with id ${id} not found.`);
+        continue;
+      }
+      const userStatus = {
+        id: rows.id,
+        status: rows.status,
+        online: rows.status === 'online'
+      };
+      result.push(userStatus);
+    }
+    console.log("result: ", result);
+    return res.json(result);
+  } catch (e) {
+    console.error('Error fetching online status: ', e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) await conn.end();
+  }
+};
+
+
+
+
+
+
+
+
+
 module.exports = {
   getUserInfo,
   getUser,
@@ -791,4 +836,5 @@ module.exports = {
   getFrequentlyLikedBack,
   getBlockedTo,
   searchUser,
+  onlineStatus,
 };

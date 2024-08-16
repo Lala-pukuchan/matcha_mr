@@ -1,5 +1,6 @@
 const moment = require('moment');
 const onlineUsers = new Map();
+const socketIdMap = new Map();
 
 function setupSocket(io, pool) {
   io.on('connection', (socket) => {
@@ -7,6 +8,8 @@ function setupSocket(io, pool) {
 
     socket.on('login', async (userId) => {
       console.log(`User ${userId} logged in with socket ${socket.id}`);
+      socketIdMap.set(userId, socket.id)
+      console.log('@@@@@login socket.id', socket.id)
       if (!onlineUsers.has(userId)) {
         onlineUsers.set(userId, new Set());
       }
@@ -49,6 +52,14 @@ function setupSocket(io, pool) {
       } finally {
         if (conn) conn.end();
       }
+
+      const onlineMatch = await getOnlineMatch(userId, pool);
+      console.log('444', onlineMatch)
+      for(match in onlineMatch) {
+        const socketID = socketIdMap.get(match.id)
+        console.log('5555',socketID, match.id)
+        io.to(socketID).emit('user disconnected')
+      }
     });
 
     socket.on('disconnect', async () => {
@@ -59,7 +70,7 @@ function setupSocket(io, pool) {
           userId = key;
           value.delete(socket.id);
           if (value.size === 0) {
-            onlineUsers.delete(key);
+            onlineUsers.delete(key);//
           }
           break;
         }
@@ -81,6 +92,16 @@ function setupSocket(io, pool) {
           if (conn) conn.end();
         }
       }
+
+      const onlineMatch = await getOnlineMatch(userId, pool);
+      console.log('333', userId, onlineMatch)
+      if (onlineMatch) {
+        onlineMatch.forEach((match)=> {
+          const socketID = socketIdMap.get(match['id'])
+          console.log('666',socketID, match['id'], match)
+          io.to(socketID).emit('user disconnected')
+        })
+        }
     });
 
     socket.on('joinRoom', (room) => {
@@ -132,4 +153,24 @@ function setupSocket(io, pool) {
   });
 }
 
+async function getOnlineMatch(id, pool)
+{
+    if (id) {
+      let conn;
+      try {
+        conn = await pool.getConnection();
+
+        const query = `WITH a AS (SELECT matched.* FROM matched JOIN user ON (user.id=matched.matched_user_id_first OR
+        user.id=matched.matched_user_id_second) WHERE user.id='${id}') SELECT user.id FROM a JOIN 
+        user ON (user.id=a.matched_user_id_first OR user.id=a.matched_user_id_second) WHERE NOT user.id='${id}' and user.status ='online'`;
+        console.log(query);
+        const res = await conn.query(query);
+        return res;
+      } catch (error) {
+        console.error('Error updating user status: ', error);
+      } finally {
+        if (conn) conn.end();
+      }
+    }
+};
 module.exports = { setupSocket };
