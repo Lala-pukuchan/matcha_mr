@@ -5,23 +5,15 @@ import UsersList from "./components/userList";
 import useAuthCheck from "./hooks/useAuthCheck"; // カスタムフックのインポート
 
 export default function Home() {
-  // get user from context
   const { user } = useUser();
-
-  // カスタムフックを使用して認証状態をチェックし、必要に応じてリダイレクト
   useAuthCheck(null, "/login");
 
-  // set user list
   const [connectedUsers, setUserListConnected] = useState([]);
   const [users, setUserListClose] = useState([]);
   const [usersCommonTags, setUsersCommonTags] = useState([]);
   const [usersFrequentlyLikedBack, setUsersFrequentlyLikedBack] = useState([]);
-
-  // set loading
   const [loading, setLoading] = useState(true);
-  // set liked users
   const [likedUsersId, setLikedUsersId] = useState([]);
-  // set blocked users
   const [blockedUsersId, setBlockedUsersId] = useState([]);
 
   useEffect(() => {
@@ -125,7 +117,7 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUsersFrequentlyLikedBack(data.filter((d) => d.id !== user.id));
+          setUsersFrequentlyLikedBack(data.filter((d) => d.id !== user?.id));
         } else {
           setUsersFrequentlyLikedBack([]);
         }
@@ -194,15 +186,19 @@ export default function Home() {
     };
 
     if (user) {
-      fetchUsers();
-      fetchConnectedUsers();
-      fetchUsersCommon();
-      fetchUsersFrequentlyLikedBack();
-      likedUsers();
-      blockedUsers();
-      setLoading(false);
-    }
+        fetchUsers();
+        fetchConnectedUsers();
+        fetchUsersCommon();
+        fetchUsersFrequentlyLikedBack();
+        likedUsers();
+        blockedUsers();
+        setLoading(false);
+      }
   }, [user]);
+
+  useEffect(() => {
+    console.log("Filtered data:", usersFrequentlyLikedBack);
+  }, [usersFrequentlyLikedBack]);
 
   if (loading) {
     return <div>Loading...</div>;

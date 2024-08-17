@@ -6,26 +6,21 @@ import AgeRangeSlider from "../components/ageRangeSlider";
 import DistanceRangeSlider from "../components/distanceRangeSlider";
 import FameRatingRangeSlider from "../components/fameRatingRangeSlider";
 import TagSelection from "../components/tagSelection";
-import useAuthCheck from "../hooks/useAuthCheck"; // フックのインポート
+import useAuthCheck from "../hooks/useAuthCheck"; 
 
 export default function Home() {
-  // useAuthCheckフックを呼び出して認証状態をチェックし、必要に応じてリダイレクト
-  useAuthCheck(null, "/login");
-
-  // get user from context
+  const isRedirecting = useAuthCheck(null, "/login");
   const { user } = useUser();
 
-  // set user list
   const [users, setUserList] = useState([]);
-  // set loading
   const [loading, setLoading] = useState(true);
-  // set liked users
   const [likedUsersId, setLikedUsersId] = useState([]);
-  // set blocked users
   const [blockedUsersId, setBlockedUsersId] = useState([]);
 
-  // check user
   useEffect(() => {
+    if (isRedirecting || !user) {
+      return;
+    }
 
     const fetchUsers = async () => {
       try {
@@ -116,11 +111,11 @@ export default function Home() {
       fetchUsers();
       likedUsers();
       blockedUsers();
-      setLoading(false); // ローディング状態を解除
+      setLoading(false);
     }
-  }, [user]);
+  }, [user, isRedirecting]);
 
-  if (loading) {
+  if (isRedirecting || loading) {
     return <div>Loading...</div>;
   }
 

@@ -593,7 +593,6 @@ const closeAccount = async (req, res) => {
         row.tagIds = tagIdsArray;
       }
     }
-    console.log("rows:", rows);
     return res.json(rows);
   } catch (e) {
     console.log(e);
@@ -695,12 +694,21 @@ const getCommonTags = async (req, res) => {
 };
 
 const getFrequentlyLikedBack = async (req, res) => {
-  // get users who have high match ratio
+  console.log("getFrequentlyLikedBack.req.body", req.body);
+  const { gender, preference } = req.body;
   let conn;
+  
   try {
     conn = await pool.getConnection();
-    const query = "SELECT * FROM user WHERE match_ratio > 95 ORDER BY match_ratio DESC";
-    const rows = await conn.query(query);
+    let query = `SELECT * FROM user WHERE match_ratio > 95 AND gender = ?`;
+    const queryParams = [preference];
+    if (preference !== '') {
+      query += ` AND preference IN (?, '')`;
+      queryParams.push(gender);
+    }
+    query += ` ORDER BY match_ratio DESC`;
+    const rows = await conn.query(query, queryParams);
+    console.log("rows:", rows);
     res.json(rows);
   } catch (e) {
     console.log(e);
@@ -709,6 +717,7 @@ const getFrequentlyLikedBack = async (req, res) => {
     if (conn) return conn.end();
   }
 };
+
 
 const getBlockedTo = async (req, res) => {
   let conn;
@@ -742,7 +751,6 @@ const searchUser = async (req, res) => {
     console.log("baseQuery: ", baseQuery);
     console.log("values: ", values);
     const rows = await conn.query(baseQuery, values);
-    console.log("rows: ", rows);
     // add tags
     if (rows.length > 0) {
       for (row of rows) {
@@ -770,9 +778,7 @@ const onlineStatus = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    console.log("req.body: ", req.body);
     const ids = req.body.ids;
-    console.log("ids: ", ids);
 
     if (!Array.isArray(ids) || ids.length === 0) {
       return res.status(400).json({ message: "Invalid input" });
@@ -793,7 +799,6 @@ const onlineStatus = async (req, res) => {
       };
       result.push(userStatus);
     }
-    console.log("result: ", result);
     return res.json(result);
   } catch (e) {
     console.error('Error fetching online status: ', e);
@@ -802,14 +807,6 @@ const onlineStatus = async (req, res) => {
     if (conn) await conn.end();
   }
 };
-
-
-
-
-
-
-
-
 
 module.exports = {
   getUserInfo,

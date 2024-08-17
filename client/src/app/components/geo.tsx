@@ -72,7 +72,6 @@ const locations = {
 export default function Geo({ lat, lon, isRealUser }) {
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
-
   useEffect(() => {
     if (isRealUser && lat && lon) {
       const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${process.env.NEXT_PUBLIC_GOOGLE_API_KEY}`;

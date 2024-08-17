@@ -9,24 +9,22 @@ import useAuthCheck from "../hooks/useAuthCheck";
 import useWebSocket from "../hooks/useWebSocket";
 
 export default function MyAccount() {
-  useAuthCheck(null, "/login");
-  // get user from context
+  const isRedirecting = useAuthCheck(null, "/login");
   const [user, setUser] = useState([]);
   const userRef = useRef(user);
 
-  // set loading
   const [loading, setLoading] = useState(true);
-
-  // viewed from users
   const [viewedFromUsers, setViewedFromUsers] = useState([]);
-  // liked from users
   const [likedFromUsers, setLikedFromUsers] = useState([]);
-
-  // set user list
   const [userList, setUserList] = useState([]);
+
   const socket = useWebSocket(user);
 
   useEffect(() => {
+    if (isRedirecting || !user) {
+      return;
+    }
+
     const fetchUser = async () => {
       try {
         const response = await fetch(
@@ -41,12 +39,11 @@ export default function MyAccount() {
         );
         if (response.ok) {
           const data = await response.json();
-          const userId = data.id;
           setUser(data);
 
-          if (userId) {
+          if (data.id) {
             try {
-              const userJson = JSON.stringify({ userId: userId });
+              const userJson = JSON.stringify({ userId: data.id });
               const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/viewed`,
                 {
@@ -63,13 +60,14 @@ export default function MyAccount() {
                   setViewedFromUsers(responseData);
                 }
               } else {
-                console.error("updating viewed is failed");
+                console.error("Failed to update viewed users");
               }
             } catch (e) {
               console.error(e);
             }
+
             try {
-              const userJson = JSON.stringify({ userId: userId });
+              const userJson = JSON.stringify({ userId: data.id });
               const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/liked`,
                 {
@@ -86,7 +84,7 @@ export default function MyAccount() {
                   setLikedFromUsers(responseData);
                 }
               } else {
-                console.error("updating liked is failed");
+                console.error("Failed to update liked users");
               }
             } catch (e) {
               console.error(e);
@@ -126,7 +124,12 @@ export default function MyAccount() {
 
     fetchUser();
     fetchUsers();
-  }, []);
+    setLoading(false);
+  }, [isRedirecting]);
+
+  if (isRedirecting || loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
