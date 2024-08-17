@@ -196,7 +196,7 @@ export default function Home() {
                   trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
                   value={distanceRange}
                   min={0}
-                  max={1000}
+                  max={10000}
                   onChange={setDistanceRange}
                   pearling
                   minDistance={1}

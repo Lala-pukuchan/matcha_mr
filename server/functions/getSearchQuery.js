@@ -77,7 +77,7 @@ async function getSearchQuery(data) {
   
   // Distance filter in HAVING clause
   let havingConditions = [];
-  if (data.min_distance && data.max_distance) {
+  if (data.min_distance != null && data.max_distance != null) {
     havingConditions.push("distance BETWEEN ? AND ?");
     values.push(parseInt(data.min_distance), parseInt(data.max_distance));
   }
