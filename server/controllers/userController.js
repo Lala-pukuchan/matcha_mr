@@ -553,7 +553,6 @@ const addNewTags = async (req, res) => {
 const closeAccount = async (req, res) => {
   // get users within 10km
   const distanceThreshold = 10;
-  console.log("close account; req.body:", req.body);
   let queryFields = [
     "(6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))) AS distance",
   ];
@@ -694,7 +693,6 @@ const getCommonTags = async (req, res) => {
 };
 
 const getFrequentlyLikedBack = async (req, res) => {
-  console.log("getFrequentlyLikedBack.req.body", req.body);
   const { gender, preference } = req.body;
   let conn;
   
@@ -708,7 +706,6 @@ const getFrequentlyLikedBack = async (req, res) => {
     }
     query += ` ORDER BY match_ratio DESC`;
     const rows = await conn.query(query, queryParams);
-    console.log("rows:", rows);
     res.json(rows);
   } catch (e) {
     console.log(e);
@@ -746,11 +743,11 @@ const searchUser = async (req, res) => {
   let conn;
   try {
     conn = await pool.getConnection();
-    console.log("req.body: ", req.body);
     const { baseQuery, values } = await getSearchQuery(req.body);
-    console.log("baseQuery: ", baseQuery);
-    console.log("values: ", values);
     const rows = await conn.query(baseQuery, values);
+    console.log('req.body:', req.body);
+    console.log('searchUser.baseQuery:', baseQuery);
+    console.log('searchUser.values:', values);
     // add tags
     if (rows.length > 0) {
       for (row of rows) {
@@ -766,6 +763,7 @@ const searchUser = async (req, res) => {
       ...row,
       common_tags_count: row.common_tags_count.toString(),
     }));
+    console.log('res.json(serializedRows):', serializedRows);
     return res.json(serializedRows);
   } catch (e) {
     console.log(e);

@@ -124,19 +124,31 @@ export default function Home() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    if (user) {
-      formData.append("user", JSON.stringify(user));
-    }
+  
+    const formData = {
+      user: JSON.stringify(user),
+      min_age: ageRange[0],
+      max_age: ageRange[1],
+      min_distance: distanceRange[0],
+      max_distance: distanceRange[1],
+      min_fame_rating: fameRatingRange[0],
+      max_fame_rating: fameRatingRange[1],
+      tags: selectedTags.map(tag => tag.value),
+    };
+  
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/searchUser`,
         {
           method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
           credentials: "include",
         }
       );
+  
       if (response.status === 200) {
         const data = await response.json();
         setUserList(data.filter((d) => d.id !== user.id));
@@ -149,7 +161,7 @@ export default function Home() {
       console.log("error: ", e);
       setUserList([]);
     }
-  }
+  }  
 
   return (
     <>

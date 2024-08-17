@@ -1,69 +1,92 @@
 async function getSearchQuery(data) {
-  const user = JSON.parse(data.user);
+  console.log("data", data);
+
+  let user;
+  try {
+    user = JSON.parse(data.user);
+  } catch (error) {
+    console.error("Invalid JSON format in data.user:", data.user);
+    throw new Error("Invalid user data");
+  }
+
   let baseQuery = `
     SELECT 
-    user.*,
-    COUNT(DISTINCT usertag.tag_id) AS common_tags_count,
-    (6371 * acos(cos(radians(?)) * cos(radians(user.latitude)) * cos(radians(user.longitude) - radians(?)) + sin(radians(?)) * sin(radians(user.latitude)))) AS distance
+      user.*,
+      COUNT(DISTINCT usertag.tag_id) AS common_tags_count,
+      (6371 * acos(
+        cos(radians(?)) * cos(radians(user.latitude)) * 
+        cos(radians(user.longitude) - radians(?)) + 
+        sin(radians(?)) * sin(radians(user.latitude))
+      )) AS distance
     FROM 
-    user
-    LEFT JOIN usertag ON user.id = usertag.user_id
-    `;
+      user
+    LEFT JOIN 
+      usertag ON user.id = usertag.user_id
+  `;
+  
   let values = [
     parseFloat(user.latitude),
     parseFloat(user.longitude),
     parseFloat(user.latitude),
   ];
 
-  // where
   let whereConditions = [];
-  if (user.gender) {
-    whereConditions.push(`(user.gender = ? OR user.preference = ? OR user.preference = '')`);
-    values.push(user.gender, user.gender);
-  }
-  if (user.preference && user.preference !== "") {
-    whereConditions.push(`(user.preference = ? OR user.preference = '')`);
-    values.push(user.preference);
-  } else {
-    whereConditions.push("(user.preference = '' OR user.preference IS NULL)");
+  
+  // Gender and Preference filter
+  if (user.gender && user.preference) {
+    whereConditions.push(`
+      (user.gender = ? AND user.preference = ?)
+    `);
+    values.push(user.preference, user.gender);
   }
 
-  if (data.ageMin && data.ageMax) {
-    whereConditions.push("user.age >= ? AND user.age <= ?");
-    values.push(parseInt(data.ageMin), parseInt(data.ageMax));
+  // Age range filter
+  if (data.min_age && data.max_age) {
+    whereConditions.push("user.age BETWEEN ? AND ?");
+    values.push(parseInt(data.min_age), parseInt(data.max_age));
   }
-  if (data.fameRatingMin && data.fameRatingMax) {
-    whereConditions.push("user.match_ratio >= ? AND user.match_ratio <= ?");
-    values.push(parseInt(data.fameRatingMin), parseInt(data.fameRatingMax));
+
+  // Fame rating filter
+  if (data.min_fame_rating && data.max_fame_rating) {
+    whereConditions.push("user.match_ratio BETWEEN ? AND ?");
+    values.push(parseInt(data.min_fame_rating), parseInt(data.max_fame_rating));
   }
-  if (data.tagIds && data.tagIds.length > 0) {
-    if (!Array.isArray(data.tagIds)) {
-      whereConditions.push(`usertag.tag_id = ?`);
-      values.push(data.tagIds);
-    } else {
-      let placeholders = data.tagIds.map(() => "?").join(",");
-      whereConditions.push(`usertag.tag_id IN (${placeholders})`);
-      values.push(...data.tagIds);
-    }
+
+  // Tag filter
+  if (data.tags && data.tags.length > 0) {
+    let placeholders = data.tags.map(() => "?").join(",");
+    whereConditions.push(`
+      user.id IN (
+        SELECT user_id 
+        FROM usertag 
+        WHERE tag_id IN (${placeholders}) 
+        GROUP BY user_id 
+        HAVING COUNT(DISTINCT tag_id) = ?
+      )
+    `);
+    values.push(...data.tags, data.tags.length);
   }
-  if (whereConditions.length >= 0) {
+
+  // Combine where conditions
+  if (whereConditions.length > 0) {
     baseQuery += " WHERE " + whereConditions.join(" AND ");
   }
   
-  // groupBy
+  // Group by user ID
   baseQuery += " GROUP BY user.id";
   
-  // having
+  // Distance filter in HAVING clause
   let havingConditions = [];
-  if (data.distanceMin && data.distanceMax) {
-    havingConditions.push(`distance >= ? AND distance <= ?`);
-    values.push(parseInt(data.distanceMin), parseInt(data.distanceMax));
+  if (data.min_distance && data.max_distance) {
+    havingConditions.push("distance BETWEEN ? AND ?");
+    values.push(parseInt(data.min_distance), parseInt(data.max_distance));
   }
+
   if (havingConditions.length > 0) {
     baseQuery += " HAVING " + havingConditions.join(" AND ");
   }
-  
-  // orderBy
+
+  // Order by clause
   let orderByClause = "";
   switch (data.sort) {
     case "age":
@@ -79,10 +102,11 @@ async function getSearchQuery(data) {
       orderByClause = " ORDER BY common_tags_count DESC";
       break;
     default:
+      orderByClause = " ORDER BY distance ASC"; // Default ordering by distance
       break;
   }
   baseQuery += orderByClause;
-  
+
   console.log("Final baseQuery", baseQuery);
   console.log("Final values", values);
   
