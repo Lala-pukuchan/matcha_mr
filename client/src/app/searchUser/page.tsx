@@ -1,12 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
+import Select from "react-select";
+import Slider from "react-slider";
 import { useUser } from "../../../context/context";
 import UsersList from "../components/userList";
-import AgeRangeSlider from "../components/ageRangeSlider";
-import DistanceRangeSlider from "../components/distanceRangeSlider";
-import FameRatingRangeSlider from "../components/fameRatingRangeSlider";
-import TagSelection from "../components/tagSelection";
-import useAuthCheck from "../hooks/useAuthCheck"; 
+import useAuthCheck from "../hooks/useAuthCheck";
 
 export default function Home() {
   const isRedirecting = useAuthCheck(null, "/login");
@@ -16,11 +14,32 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [likedUsersId, setLikedUsersId] = useState([]);
   const [blockedUsersId, setBlockedUsersId] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [ageRange, setAgeRange] = useState([18, 60]);
+  const [distanceRange, setDistanceRange] = useState([0, 100]);
+  const [fameRatingRange, setFameRatingRange] = useState([0, 100]);
 
   useEffect(() => {
     if (isRedirecting || !user) {
       return;
     }
+
+    const fetchTags = async () => {
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`);
+        if (response.ok) {
+          const data = await response.json();
+          setTags(data.map(tag => ({ value: tag.id, label: tag.name })));
+        } else {
+          console.error("Failed to fetch tags");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    fetchTags();
 
     const fetchUsers = async () => {
       try {
@@ -51,7 +70,6 @@ export default function Home() {
 
     const likedUsers = async () => {
       try {
-        const userJson = JSON.stringify({ userId: user.id });
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/likedTo`,
           {
@@ -59,19 +77,12 @@ export default function Home() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: userJson,
+            body: JSON.stringify({ userId: user.id }),
           }
         );
         if (response.ok) {
           const responseData = await response.json();
-          if (responseData) {
-            const likedUsersIdArray = responseData.map(
-              (item) => item.liked_to_user_id
-            );
-            setLikedUsersId(likedUsersIdArray);
-          }
-        } else {
-          console.error("updating liked is failed");
+          setLikedUsersId(responseData.map(item => item.liked_to_user_id));
         }
       } catch (e) {
         console.error(e);
@@ -80,7 +91,6 @@ export default function Home() {
 
     const blockedUsers = async () => {
       try {
-        const userJson = JSON.stringify({ userId: user.id });
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/blockedTo`,
           {
@@ -88,19 +98,12 @@ export default function Home() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: userJson,
+            body: JSON.stringify({ userId: user.id }),
           }
         );
         if (response.ok) {
           const responseData = await response.json();
-          if (responseData) {
-            const blockedUsersIdArray = responseData.map(
-              (item) => item.blocked_to_user_id
-            );
-            setBlockedUsersId(blockedUsersIdArray);
-          }
-        } else {
-          console.error("updating liked is failed");
+          setBlockedUsersId(responseData.map(item => item.blocked_to_user_id));
         }
       } catch (e) {
         console.error(e);
@@ -119,7 +122,7 @@ export default function Home() {
     return <div>Loading...</div>;
   }
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     if (user) {
@@ -157,72 +160,65 @@ export default function Home() {
             onSubmit={handleSubmit}
           >
             <h1 className="font-bold text-cyan-400">Filter By: </h1>
-            <div className="grid md:grid-cols-4 grid-cols-1 gap-4">
-              <div className="m-3">
-                <AgeRangeSlider />
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex flex-col">
+                <label>Age Range</label>
+                <Slider
+                  className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
+                  thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                  trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
+                  value={ageRange}
+                  min={18}
+                  max={100}
+                  onChange={setAgeRange}
+                  pearling
+                  minDistance={1}
+                />
+                <div>{`Min: ${ageRange[0]}, Max: ${ageRange[1]}`}</div>
               </div>
-              <div className="m-3">
-                <DistanceRangeSlider />
+              <div className="flex flex-col">
+                <label>Distance Range</label>
+                <Slider
+                  className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
+                  thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                  trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
+                  value={distanceRange}
+                  min={0}
+                  max={1000}
+                  onChange={setDistanceRange}
+                  pearling
+                  minDistance={1}
+                />
+                <div>{`Min: ${distanceRange[0]} km, Max: ${distanceRange[1]} km`}</div>
               </div>
-              <div className="m-3">
-                <FameRatingRangeSlider />
+              <div className="flex flex-col">
+                <label>Fame Rating</label>
+                <Slider
+                  className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
+                  thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                  trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
+                  value={fameRatingRange}
+                  min={0}
+                  max={100}
+                  onChange={setFameRatingRange}
+                  pearling
+                  minDistance={1}
+                />
+                <div>{`Min: ${fameRatingRange[0]}, Max: ${fameRatingRange[1]}`}</div>
               </div>
-              <div className="m-3">
-                <TagSelection user={user} />
-              </div>
-            </div>
-            <h1 className="font-bold text-cyan-400 mt-6">Sort By: </h1>
-            <div className="grid md:grid-cols-3 grid-cols-1 gap-4">
-              <div className="m-3">
-                <ul>
-                  <li>
-                    <input
-                      type="radio"
-                      id="age"
-                      name="sort"
-                      value="age"
-                    ></input>
-                    <label htmlFor="age" className="pl-2">
-                      Age
-                    </label>
-                  </li>
-                  <li>
-                    <input
-                      type="radio"
-                      id="distance"
-                      name="sort"
-                      value="distance"
-                    ></input>
-                    <label htmlFor="distance" className="pl-2">
-                      Distance
-                    </label>
-                  </li>
-                  <li>
-                    <input
-                      type="radio"
-                      id="fameRating"
-                      name="sort"
-                      value="fameRating"
-                    ></input>
-                    <label htmlFor="fameRating" className="pl-2">
-                      Matching Ratio
-                    </label>
-                  </li>
-                  <li>
-                    <input
-                      type="radio"
-                      id="tag"
-                      name="sort"
-                      value="tag"
-                    ></input>
-                    <label htmlFor="tag" className="pl-2">
-                      Tag (Sorted by selected tags)
-                    </label>
-                  </li>
-                </ul>
+              <div className="flex flex-col mt-4">
+                <label>Tags</label>
+                <Select
+                  isMulti
+                  name="tags"
+                  options={tags}
+                  className="basic-multi-select"
+                  classNamePrefix="select"
+                  onChange={setSelectedTags}
+                />
               </div>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between mt-4">
               <button
                 type="submit"
                 className="mt-4 w-60 h-9 rounded bg-pink-400 text-white"
