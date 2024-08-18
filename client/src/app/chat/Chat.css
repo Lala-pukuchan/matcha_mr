@@ -1,54 +1,139 @@
-/* Chat.css */
 .message-container {
-	display: flex;
-	flex-direction: column;
-	width: 100%;
-  }
-  
-  .my-message-wrapper, .other-message-wrapper {
-	display: flex;
-	flex-direction: column;
-	max-width: 50%;
-	margin: 5px 0;
-	position: relative;
-  }
-  
-  .my-message-wrapper {
-	align-self: flex-end;
-  }
-  
-  .other-message-wrapper {
-	align-self: flex-start;
-  }
-  
-  .my-message, .other-message {
-	padding: 10px;
-	border-radius: 10px;
-	word-wrap: break-word;
-	max-width: 100%; /* コンテナの幅まで表示 */
-  }
-  
-  .my-message {
-	background-color: #68d9ea;
-	align-self: flex-end;
-  }
-  
-  .other-message {
-	background-color: #daf8c4;
-	align-self: flex-start;
-  }
-  
-  .profile-picture {
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
-	object-fit: cover;
-  }
-  
-  .timestamp {
-	font-size: 0.75em;
-	color: #888;
-	margin-top: 5px;
-	text-align: right;
-  }
-  
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0 10px; /* モバイルで左右に少し余白を持たせる */
+    box-sizing: border-box;
+}
+
+.my-message-wrapper, .other-message-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 100%; /* デバイスの幅に合わせる */
+    margin: 5px 0;
+    position: relative;
+}
+
+.my-message-wrapper {
+    align-self: flex-end;
+}
+
+.other-message-wrapper {
+    align-self: flex-start;
+}
+
+.my-message, .other-message {
+    padding: 10px;
+    border-radius: 10px;
+    word-wrap: break-word;
+    width: 100%; /* 幅を100%にして親要素にフィットさせる */
+    box-sizing: border-box;
+}
+
+.my-message {
+    background-color: #68d9ea;
+    align-self: flex-end;
+}
+
+.other-message {
+    background-color: #daf8c4;
+    align-self: flex-start;
+}
+
+.profile-picture {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.timestamp {
+    font-size: 0.75em;
+    color: #888;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.message-input-container {
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.message-input-container.active {
+    display: flex;
+}
+
+.user-list-container {
+    display: flex;
+    justify-content: center;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    padding: 10px 0;
+    white-space: nowrap;
+}
+
+.user-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px; 
+}
+
+.user-icon img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-icon span {
+    font-size: 1em;
+    margin-top: 3px;
+    text-align: center;
+}
+
+.user-icon:hover {
+    transform: scale(1.1);
+}
+
+.chat-prompt {
+    font-size: 1.2em;
+    color: #555;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* チャット相手の情報を表示するコンテナ */
+.chat-partner-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.chat-partner-info img {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1px;
+}
+
+.chat-partner-info span {
+    font-size: 1.2em;
+    color: #333;
+    text-align: center;
+    margin-top: 1px;
+}
+
+.chat-prompt {
+    font-size: 1.2em;
+    color: #555;
+    text-align: center;
+    margin-bottom: 20px;
+}
