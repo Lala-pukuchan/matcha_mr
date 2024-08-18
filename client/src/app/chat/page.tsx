@@ -2,10 +2,12 @@
 import React, { useState, useEffect } from 'react';
 import { useUser } from "../../../context/context";
 import useWebSocket from "../hooks/useWebSocket";
+import useAuthCheck from "../hooks/useAuthCheck";
 import useChatRoom from "../hooks/useChatRoom";
 import './Chat.css';
 
 function Chat() {
+  useAuthCheck(null, "/login");
   const [roomID, setRoomID] = useState('');
   const [matches, setMatches] = useState([]);
   const [input, setInput] = useState('');

@@ -15,6 +15,7 @@ export default function MyAccount() {
   const [viewedFromUsers, setViewedFromUsers] = useState([]);
   const [likedFromUsers, setLikedFromUsers] = useState([]);
   const [userList, setUserList] = useState([]);
+  const token = document.cookie.split("; ").find((row) => row.startsWith("token="));
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -66,11 +67,16 @@ export default function MyAccount() {
       }
     };
 
-    fetchUser();
-    fetchUsers();
+    if (token) {
+      fetchUser();
+      fetchUsers();
+    }
+
   }, []);
 
-  const socket = useWebSocket(); // ユーザー情報がセットされた後にWebSocketを初期化
+  if (token) {
+    const socket = useWebSocket(); // ユーザー情報がセットされた後にWebSocketを初期化
+  }
 
   useEffect(() => {
     if (user.id) {
