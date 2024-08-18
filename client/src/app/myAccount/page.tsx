@@ -15,7 +15,7 @@ export default function MyAccount() {
   const [viewedFromUsers, setViewedFromUsers] = useState([]);
   const [likedFromUsers, setLikedFromUsers] = useState([]);
   const [userList, setUserList] = useState([]);
-  const token = document.cookie.split("; ").find((row) => row.startsWith("token="));
+  const token = typeof window !== "undefined" ? document.cookie.split("; ").find((row) => row.startsWith("token=")) : null;
 
   useEffect(() => {
     const fetchUser = async () => {
