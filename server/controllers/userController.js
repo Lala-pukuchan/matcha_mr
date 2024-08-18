@@ -640,7 +640,7 @@ const getCommonTags = async (req, res) => {
   // combine usertag and user tables
   const tagIds = req.body.tagIds;
   let query = `
-  SELECT DISTINCT u.*
+  SELECT u.*, COUNT(ut.tag_id) AS common_tag_count
   FROM user u
   JOIN usertag ut ON u.id = ut.user_id
 `;
@@ -669,6 +669,9 @@ const getCommonTags = async (req, res) => {
     query += " WHERE " + whereConditions.join(" AND ");
   }
 
+  // Group by user and order by common tag count
+  query += " GROUP BY u.id ORDER BY common_tag_count DESC";
+
   // get users
   let conn;
   try {
@@ -683,7 +686,12 @@ const getCommonTags = async (req, res) => {
         row.tagIds = tagIdsArray;
       }
     }
-    return res.json(rows);
+    // Convert BigInt to String to create json
+    const serializedRows = rows.map((row) => ({
+      ...row,
+      common_tag_count: row.common_tag_count.toString(),
+    }));
+    return res.json(serializedRows);
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
