@@ -24,7 +24,7 @@ export default function users() {
       const fetchUser = async () => {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/user`,
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users/userById`,
             {
               method: "POST",
               headers: {
@@ -54,7 +54,7 @@ export default function users() {
           try {
             const viewJson = JSON.stringify({ from: user.id, to: userId });
             const response = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/api/viewed`,
+              `${process.env.NEXT_PUBLIC_API_URL}/api/users/viewed`,
               {
                 method: "POST",
                 headers: {

@@ -2,38 +2,21 @@
 import { useState, useEffect } from "react";
 import { useUser } from "../../context/context";
 import UsersList from "./components/userList";
-import { connect } from "http2";
-import { connected } from "process";
+import useAuthCheck from "./hooks/useAuthCheck"; // カスタムフックのインポート
 
 export default function Home() {
-  // get user from context
-  const { user, setUser } = useUser();
-  // set user list
+  const { user } = useUser();
+  useAuthCheck(null, "/login");
+
   const [connectedUsers, setUserListConnected] = useState([]);
   const [users, setUserListClose] = useState([]);
   const [usersCommonTags, setUsersCommonTags] = useState([]);
   const [usersFrequentlyLikedBack, setUsersFrequentlyLikedBack] = useState([]);
-
-  // set loading
   const [loading, setLoading] = useState(true);
-  // set liked users
   const [likedUsersId, setLikedUsersId] = useState([]);
-  // set blocked users
   const [blockedUsersId, setBlockedUsersId] = useState([]);
 
-  // check user
   useEffect(() => {
-    const checkUser = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setLoading(false);
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("token="));
-      if (!token) {
-        window.location.href = "/login";
-      }
-    };
-
     const fetchConnectedUsers = async () => {
       try {
         const response = await fetch(
@@ -134,7 +117,7 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUsersFrequentlyLikedBack(data.filter((d) => d.id !== user.id));
+          setUsersFrequentlyLikedBack(data.filter((d) => d.id !== user?.id));
         } else {
           setUsersFrequentlyLikedBack([]);
         }
@@ -148,7 +131,7 @@ export default function Home() {
       try {
         const userJson = JSON.stringify({ userId: user.id });
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user/likedTo`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/likedTo`,
           {
             method: "POST",
             headers: {
@@ -177,7 +160,7 @@ export default function Home() {
       try {
         const userJson = JSON.stringify({ userId: user.id });
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/user/blockedTo`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/blockedTo`,
           {
             method: "POST",
             headers: {
@@ -202,17 +185,20 @@ export default function Home() {
       }
     };
 
-    checkUser();
-
     if (user) {
-      fetchUsers();
-      fetchConnectedUsers();
-      fetchUsersCommon();
-      fetchUsersFrequentlyLikedBack();
-      likedUsers();
-      blockedUsers();
-    }
+        fetchUsers();
+        fetchConnectedUsers();
+        fetchUsersCommon();
+        fetchUsersFrequentlyLikedBack();
+        likedUsers();
+        blockedUsers();
+        setLoading(false);
+      }
   }, [user]);
+
+  useEffect(() => {
+    console.log("Filtered data:", usersFrequentlyLikedBack);
+  }, [usersFrequentlyLikedBack]);
 
   if (loading) {
     return <div>Loading...</div>;

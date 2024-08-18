@@ -1,32 +1,26 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useUser } from "../../../context/context";
 import UserInfo from "../components/userInfo";
 import Link from "next/link";
 import Action from "../components/action";
+import useAuthCheck from "../hooks/useAuthCheck";
+import useWebSocket from "../hooks/useWebSocket";
 
-export default function myAccount() {
-  // get user from context
+export default function MyAccount() {
+  useAuthCheck(null, "/login");
   const [user, setUser] = useState([]);
-
-  // set loading
+  const userRef = useRef(user);
   const [loading, setLoading] = useState(true);
-
-  // viewed from users
   const [viewedFromUsers, setViewedFromUsers] = useState([]);
-  // liked from users
   const [likedFromUsers, setLikedFromUsers] = useState([]);
-
-  // set user list
   const [userList, setUserList] = useState([]);
 
-  // check user
   useEffect(() => {
-
     const fetchUser = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/myAccount`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/myAccount`,
           {
             method: "POST",
             headers: {
@@ -37,71 +31,22 @@ export default function myAccount() {
         );
         if (response.ok) {
           const data = await response.json();
-          const userId = data.id;
           setUser(data);
-
-          if (userId) {
-            try {
-              const userJson = JSON.stringify({ userId: userId });
-              const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/user/viewed`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: userJson,
-                }
-              );
-              console.log("response: ", response);
-              if (response.ok) {
-                const responseData = await response.json();
-                if (responseData) {
-                  setViewedFromUsers(responseData);
-                }
-              } else {
-                console.error("updating viewed is failed");
-              }
-            } catch (e) {
-              console.error(e);
-            }
-            try {
-              const userJson = JSON.stringify({ userId: userId });
-              const response = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/api/user/liked`,
-                {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: userJson,
-                }
-              );
-              if (response.ok) {
-                const responseData = await response.json();
-                if (responseData) {
-                  setLikedFromUsers(responseData);
-                }
-              } else {
-                console.error("updating liked is failed");
-              }
-            } catch (e) {
-              console.error(e);
-            }
-          }
         } else {
           setUser([]);
         }
       } catch (e) {
         setUser([]);
         console.error(e);
+      } finally {
+        setLoading(false);
       }
     };
 
     const fetchUsers = async () => {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/getUser`,
           {
             method: "POST",
             headers: {
@@ -125,9 +70,53 @@ export default function myAccount() {
     fetchUsers();
   }, []);
 
-  //if (loading) {
-  //  return <div>Loading...</div>;
-  //}
+  const socket = useWebSocket(); // ユーザー情報がセットされた後にWebSocketを初期化
+
+  useEffect(() => {
+    if (user.id) {
+      const fetchData = async () => {
+        try {
+          const userJson = JSON.stringify({ userId: user.id });
+          const viewedResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/viewed`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: userJson,
+            }
+          );
+          if (viewedResponse.ok) {
+            const responseData = await viewedResponse.json();
+            setViewedFromUsers(responseData);
+          }
+          const likedResponse = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/liked`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: userJson,
+            }
+          );
+          if (likedResponse.ok) {
+            const responseData = await likedResponse.json();
+            setLikedFromUsers(responseData);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      };
+      fetchData();
+    }
+  }, [user]);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <UserInfo user={user} />

@@ -2,8 +2,12 @@
 
 import { useEffect, useState, FormEvent } from "react";
 import Link from "next/link";
+import useAuthCheck from "../hooks/useAuthCheck";
 
-export default function login() {
+export default function Login() {
+  // ログインページでは、すでにログインしているユーザーをマイアカウントページにリダイレクト
+  useAuthCheck("/myAccount", null);
+
   // set loading
   const [loading, setLoading] = useState(true);
   // set message
@@ -41,7 +45,7 @@ export default function login() {
     const formData = new FormData(event.currentTarget);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/login`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
         {
           method: "POST",
           body: formData,
@@ -49,7 +53,7 @@ export default function login() {
         }
       );
       if (response.status === 200) {
-        window.location.href = "/";
+        window.location.href = "/myAccount";
       } else {
         const data = await response.json();
         setMessage(data.message);
@@ -58,6 +62,7 @@ export default function login() {
       console.log("error: ", e);
     }
   }
+
   return (
     <div>
       <form onSubmit={onSubmit} className="container mx-auto w-screen">

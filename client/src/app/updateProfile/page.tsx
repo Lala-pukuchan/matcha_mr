@@ -51,7 +51,7 @@ export default function updateProfile() {
     async function setCreatedTags() {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/tags`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`
         );
         if (response.status === 200) {
           const data = await response.json();
@@ -174,7 +174,7 @@ export default function updateProfile() {
     }
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/user/update`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/update`,
         {
           method: "POST",
           body: formData,

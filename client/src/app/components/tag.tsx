@@ -1,15 +1,13 @@
 import { useState, useEffect } from "react";
 
 export default function Tag({ user }) {
-  // set tags
   const [tags, setTags] = useState([]);
 
-  // set created tags
   useEffect(() => {
     async function setCreatedTags() {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/tags`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`
         );
         if (response.status === 200) {
           const data = await response.json();
@@ -26,19 +24,20 @@ export default function Tag({ user }) {
   }, []);
 
   return (
-    <div>
-      <ul>
-        {tags.map(
-          (tag, index) =>
-            user &&
-            user.tagIds &&
-            user.tagIds.includes(tag.id.toString()) && (
-              <li key={`${tag.id}-${index}`}>
-                <p>#{tag.name}</p>
-              </li>
-            )
-        )}
-      </ul>
+    <div className="flex flex-wrap gap-2 mt-2">
+      {tags.map(
+        (tag, index) =>
+          user &&
+          user.tagIds &&
+          user.tagIds.includes(tag.id.toString()) && (
+            <span
+              key={`${tag.id}-${index}`}
+              className="bg-gray-200 px-2 py-1 rounded text-sm"
+            >
+              #{tag.name}
+            </span>
+          )
+      )}
     </div>
   );
 }

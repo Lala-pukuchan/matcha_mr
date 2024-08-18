@@ -1,17 +1,15 @@
 "use client";
-import { useState, FormEvent } from "react";
+import React, { useState, FormEvent } from "react";
 import { validatePassword, validateName } from "../validations/validation";
 
-export default function signup() {
-  // set message
+export default function Signup() {
   const [message, setMessage] = useState("");
+  const [selectedGender, setSelectedGender] = useState("");
+  const [selectedPreGender, setSelectedPreGender] = useState("");
 
-  // submit login form
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
-    // prevent default form submission
     event.preventDefault();
 
-    // validate form data and submit
     const formData = new FormData(event.currentTarget);
     const validations = [
       {
@@ -34,9 +32,9 @@ export default function signup() {
           validateName(formData.get("username") as string, "username"),
       },
     ];
+
     for (const { validate } of validations) {
       const message = validate();
-      console.log("message: ", message);
       if (message !== "") {
         setMessage(message);
         return;
@@ -45,28 +43,28 @@ export default function signup() {
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/createUser`,
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/createUser`,
         {
           method: "POST",
           body: formData,
         }
       );
       if (response.status === 200) {
-        window.location.href =
-          "/login?message=Please enable your account via email";
+        window.location.href = "/login?message=Please enable your account via email";
       } else {
         const data = await response.json();
         setMessage(data.message);
       }
     } catch (e) {
-      console.log("error: ", e);
+      console.error("error: ", e);
+      setMessage("An error occurred. Please try again.");
     }
   }
 
   return (
-    <div>
-      <form onSubmit={onSubmit} className="container mx-auto w-screen">
-        <div className="flex flex-col m-10 space-y-4">
+    <div className="container mx-auto w-screen">
+      <form onSubmit={onSubmit} className="flex flex-col m-10 space-y-4">
+        <div>
           <label htmlFor="email">email</label>
           <input
             type="email"
@@ -76,6 +74,8 @@ export default function signup() {
             required
             className="bg-gray-100 p-3 rounded"
           />
+        </div>
+        <div>
           <label htmlFor="username">username</label>
           <input
             type="username"
@@ -85,6 +85,8 @@ export default function signup() {
             required
             className="bg-gray-100 p-3 rounded"
           />
+        </div>
+        <div>
           <label htmlFor="lastname">lastname</label>
           <input
             type="lastname"
@@ -94,6 +96,8 @@ export default function signup() {
             required
             className="bg-gray-100 p-3 rounded"
           />
+        </div>
+        <div>
           <label htmlFor="firstname">firstname</label>
           <input
             type="firstname"
@@ -103,23 +107,72 @@ export default function signup() {
             required
             className="bg-gray-100 p-3 rounded"
           />
-          <label htmlFor="password">password</label>
+        </div>
+        <div>
+          <label>Gender</label>
+          <div>
+            <label>
+              <input
+                type="radio"
+                name="gender"
+                value="male"
+                required
+              /> Male
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="gender"
+                value="female"
+                required
+              /> Female
+            </label>
+          </div>
+        </div>
+        <div>
+          <label>Gender You Like</label>
+          <div>
+            <label>
+              <input
+                type="radio"
+                name="preference"
+                value="male"
+                required
+              /> Male
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="preference"
+                value="female"
+                required
+              /> Female
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="preference"
+                value="no"
+                required
+              /> No specific
+            </label>
+          </div>
+        </div>
+        <div>
+          <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
             name="password"
-            placeholder="password"
+            placeholder="Password"
             required
             className="bg-gray-100 p-3 rounded"
           />
-          <button
-            type="submit"
-            className="w-40 h-9 rounded bg-pink-400 text-white"
-          >
-            SignUp
-          </button>
-          <div className="text-red-500">{message}</div>
         </div>
+        <button type="submit" className="w-40 h-9 rounded bg-pink-400 text-white">
+          Sign Up
+        </button>
+        <div className="text-red-500">{message}</div>
       </form>
     </div>
   );

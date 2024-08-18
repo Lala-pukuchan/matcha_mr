@@ -15,9 +15,9 @@ const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
     // update like
     let url = "";
     if (isClicked) {
-      url = `${process.env.NEXT_PUBLIC_API_URL}/api/unliked`;
+      url = `${process.env.NEXT_PUBLIC_API_URL}/api/users/unliked`;
     } else {
-      url = `${process.env.NEXT_PUBLIC_API_URL}/api/liked`;
+      url = `${process.env.NEXT_PUBLIC_API_URL}/api/users/liked`;
     }
     async function updateLike() {
       try {
@@ -56,7 +56,7 @@ const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
         viewBox="0 0 24 24"
         strokeWidth="1.5"
         stroke="currentColor"
-        className="w-6 h-6"
+        className="w-10 h-10"
         fill={isClicked ? "pink" : "none"}
         onClick={like}
         style={{ cursor: "pointer" }}
