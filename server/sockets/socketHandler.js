@@ -64,44 +64,36 @@ function setupSocket(io, pool) {
 
     socket.on('disconnect', async () => {
       console.log(`Client ${socket.id} disconnected`);
+
       let userId;
       for (let [key, value] of onlineUsers) {
         if (value.has(socket.id)) {
           userId = key;
           value.delete(socket.id);
           if (value.size === 0) {
-            onlineUsers.delete(key);//
+            onlineUsers.delete(key);
           }
           break;
         }
       }
 
       if (userId) {
-        let conn;
-        try {
-          conn = await pool.getConnection();
-
-          // Update the status to 'offline'
-          const query = 'UPDATE user SET status = ?, last_active = ? WHERE id = ?';
-          await conn.query(query, ['offline', new Date(), userId]);
-
-          io.emit('user status', { userId, status: 'offline' });
-        } catch (error) {
-          console.error('Error updating user status: ', error);
-        } finally {
-          if (conn) conn.end();
-        }
+        setTimeout(async () => {
+          if (!onlineUsers.has(userId)) {
+            let conn;
+            try {
+              conn = await pool.getConnection();
+              const query = 'UPDATE user SET status = ?, last_active = ? WHERE id = ?';
+              await conn.query(query, ['offline', new Date(), userId]);
+              io.emit('user status', { userId, status: 'offline' });
+            } catch (error) {
+              console.error('Error updating user status: ', error);
+            } finally {
+              if (conn) conn.end();
+            }
+          }
+        }, 5000);
       }
-
-      const onlineMatch = await getOnlineMatch(userId, pool);
-      console.log('333', userId, onlineMatch)
-      if (onlineMatch) {
-        onlineMatch.forEach((match)=> {
-          const socketID = socketIdMap.get(match['id'])
-          console.log('666',socketID, match['id'], match)
-          io.to(socketID).emit('user disconnected')
-        })
-        }
     });
 
     socket.on('joinRoom', (room) => {

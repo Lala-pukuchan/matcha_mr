@@ -52,15 +52,25 @@ function Chat() {
       });
     }
 
-    // クリーンアップ
     return () => {
       if (socket) {
         socket.off('user status');
       }
     };
   }, [socket]);
-  const { messages, sendMessage } = useChatRoom(socket, roomID);
 
+  const { messages, sendMessage } = useChatRoom(socket, roomID);
+  
+  useEffect(() => {
+    if (socket && roomID) {
+      socket.emit('joinRoom', roomID);
+  
+      return () => {
+        socket.emit('leaveRoom', roomID);
+      };
+    }
+  }, [socket, roomID]);
+  
   const handleSendMessage = () => {
     const message = { from_user_id: user.id, to_user_id: roomID, message: input, sent_at: new Date().toISOString() };
     sendMessage(message);
