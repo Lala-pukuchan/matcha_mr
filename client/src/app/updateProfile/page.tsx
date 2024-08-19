@@ -104,15 +104,21 @@ export default function updateProfile() {
         if (response.status === 200) {
           const newTag = await response.json();
           setTags([...tags, newTag]);
+          setMessage(""); // タグ作成成功時にはエラーメッセージをクリア
+        } else if (response.status === 400) {
+          // タグがすでに存在する場合のエラーハンドリング
+          setMessage("Tag is existing");
         } else {
           const data = await response.json();
           setMessage(data.message);
         }
       } catch (e) {
         console.error(e);
+        setMessage("An unexpected error occurred.");
       }
     }
   }
+
   const addTag = (event) => {
     event.preventDefault();
     createNewTag();
@@ -421,6 +427,10 @@ export default function updateProfile() {
                   Add
                 </button>
               </div>
+              {/* error message*/}
+              {message && (
+                <div className="text-red-500 mt-2">{message}</div>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-3">
@@ -579,7 +589,7 @@ export default function updateProfile() {
               className="bg-gray-100 p-3 rounded"
             />
           </div>
-          <button
+          <button　
             type="submit"
             className="w-40 h-9 rounded bg-pink-400 text-white"
           >

@@ -533,7 +533,7 @@ const addNewTags = async (req, res) => {
       values
     );
     if (existing.length > 0) {
-      return res.status(200).json({ message: "Tag is existing" });
+      return res.status(400).json({ message: "Tag is existing" });
     } else {
       const rows = await conn.query("INSERT INTO tag(name) VALUES (?)", values);
       const result = await conn.query(
