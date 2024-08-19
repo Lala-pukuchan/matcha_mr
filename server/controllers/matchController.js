@@ -22,7 +22,7 @@ const getMatches = async (req, res) => {
 };
 
 const getCommonTags = async (req, res) => {
-  const tagIds = req.body.tagIds;
+  let tagIds = req.body.tagIds;
   let query = `
   SELECT DISTINCT u.*
   FROM user u
@@ -32,6 +32,9 @@ const getCommonTags = async (req, res) => {
   let whereConditions = [];
   let queryParams = [];
   if (tagIds && tagIds.length > 0) {
+    if (!Array.isArray(tagIds)) {
+      tagIds = [tagIds];
+    }
     const placeholders = tagIds.map(() => "?").join(", ");
     whereConditions.push(`ut.tag_id IN (${placeholders})`);
     queryParams.push(...tagIds);
