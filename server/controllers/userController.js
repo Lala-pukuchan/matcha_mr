@@ -709,13 +709,20 @@ const getFrequentlyLikedBack = async (req, res) => {
   
   try {
     conn = await pool.getConnection();
-    let query = `SELECT * FROM user WHERE match_ratio > 95 AND gender = ?`;
-    const queryParams = [preference];
-    if (preference !== '') {
-      query += ` AND preference IN (?, '')`;
-      queryParams.push(gender);
+
+    let query = `SELECT * FROM user WHERE match_ratio > 95`;
+    let queryParams = [];
+    
+    if (preference && preference !== 'no') {
+      query += " AND gender = ?";
+      queryParams.push(preference);
     }
+    
+    query += ` AND preference IN (?, 'no')`;
+    queryParams.push(gender);
+    
     query += ` ORDER BY match_ratio DESC`;
+
     const rows = await conn.query(query, queryParams);
     res.json(rows);
   } catch (e) {
