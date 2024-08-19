@@ -1,11 +1,17 @@
 "use client";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useUser } from "../../../context/context";
+import { NotificationContext } from "../../../context/notification";
 
 export default function Nav() {
   const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
+  const { notifications = [], clearNotifications } = useContext(NotificationContext); // デフォルト値として空配列を使用
+
+  const handleChatClick = () => {
+    clearNotifications();
+  };
 
   return (
     <nav className="w-full bg-blue-100 border-b shadow-md">
@@ -34,7 +40,12 @@ export default function Nav() {
                 <Link href="/myAccount">MyAccount</Link>
               </li>
               <li>
-                <Link href="/chat">Chat</Link>
+                <Link href="/chat" onClick={handleChatClick}>
+                  Chat
+                  {notifications.length > 0 && (
+                    <span className="ml-2 bg-red-500 rounded-full h-3 w-3 inline-block"></span>
+                  )}
+                </Link>
               </li>
               <li>
                 <Link href="/logout">Logout</Link>

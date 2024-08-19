@@ -8,17 +8,15 @@ function setupSocket(io, pool) {
 
     socket.on('login', async (userId) => {
       console.log(`User ${userId} logged in with socket ${socket.id}`);
-      socketIdMap.set(userId, socket.id)
-      console.log('@@@@@login socket.id', socket.id)
+      socketIdMap.set(userId, socket.id);
       if (!onlineUsers.has(userId)) {
         onlineUsers.set(userId, new Set());
       }
       onlineUsers.get(userId).add(socket.id);
+
       let conn;
       try {
         conn = await pool.getConnection();
-        
-        // Update the status to 'online'
         const query = 'UPDATE user SET status = ?, last_active = ? WHERE id = ?';
         await conn.query(query, ['online', new Date(), userId]);
 
@@ -38,11 +36,10 @@ function setupSocket(io, pool) {
           onlineUsers.delete(userId);
         }
       }
+
       let conn;
       try {
         conn = await pool.getConnection();
-
-        // Update the status to 'offline'
         const query = 'UPDATE user SET status = ?, last_active = ? WHERE id = ?';
         await conn.query(query, ['offline', new Date(), userId]);
 
@@ -54,11 +51,9 @@ function setupSocket(io, pool) {
       }
 
       const onlineMatch = await getOnlineMatch(userId, pool);
-      console.log('444', onlineMatch)
-      for(match in onlineMatch) {
-        const socketID = socketIdMap.get(match.id)
-        console.log('5555',socketID, match.id)
-        io.to(socketID).emit('user disconnected')
+      for (const match of onlineMatch) {
+        const socketID = socketIdMap.get(match.id);
+        io.to(socketID).emit('user disconnected');
       }
     });
 
@@ -107,31 +102,26 @@ function setupSocket(io, pool) {
     });
 
     socket.on('chat message', async (room, message) => {
-      //console.log(`Received message in room ${room}: ${message.message}`);
-      //console.log("this is message: \n", message);
       io.to(room).emit('chat message', message);
 
-      // Save message to the database
       let conn;
       try {
         conn = await pool.getConnection();
-
-        // Identify the recipient
         const roomQuery = 'SELECT user_id_first, user_id_second FROM rooms WHERE room_id = ?';
-        const roomResult = await conn.query(roomQuery, [room]);
-        console.log("roomResult", roomResult);
+        const [roomResult] = await conn.query(roomQuery, [room]);
 
         if (!roomResult || roomResult.length === 0) {
           throw new Error('Room not found');
         }
 
-        const { user_id_first, user_id_second } = roomResult[0];
+        const { user_id_first, user_id_second } = roomResult;
         const toUserId = (message.from_user_id === user_id_first) ? user_id_second : user_id_first;
 
         const query = 'INSERT INTO messages (room_id, from_user_id, to_user_id, message, sent_at) VALUES (?, ?, ?, ?, ?)';
         const formattedDate = moment(message.sent_at).format('YYYY-MM-DD HH:mm:ss');
         const params = [room, message.from_user_id, toUserId, message.message, formattedDate];
         await conn.query(query, params);
+
         if (socketIdMap.has(toUserId)) {
           io.to(socketIdMap.get(toUserId)).emit('message received', { from_user_id: message.from_user_id });
         }
@@ -148,24 +138,21 @@ function setupSocket(io, pool) {
   });
 }
 
-async function getOnlineMatch(id, pool)
-{
-    if (id) {
-      let conn;
-      try {
-        conn = await pool.getConnection();
-
-        const query = `WITH a AS (SELECT matched.* FROM matched JOIN user ON (user.id=matched.matched_user_id_first OR
-        user.id=matched.matched_user_id_second) WHERE user.id='${id}') SELECT user.id FROM a JOIN 
-        user ON (user.id=a.matched_user_id_first OR user.id=a.matched_user_id_second) WHERE NOT user.id='${id}' and user.status ='online'`;
-        console.log(query);
-        const res = await conn.query(query);
-        return res;
-      } catch (error) {
-        console.error('Error updating user status: ', error);
-      } finally {
-        if (conn) conn.end();
-      }
+async function getOnlineMatch(id, pool) {
+  if (id) {
+    let conn;
+    try {
+      conn = await pool.getConnection();
+      const query = `WITH a AS (SELECT matched.* FROM matched JOIN user ON (user.id=matched.matched_user_id_first OR
+      user.id=matched.matched_user_id_second) WHERE user.id='${id}') SELECT user.id FROM a JOIN 
+      user ON (user.id=a.matched_user_id_first OR user.id=a.matched_user_id_second) WHERE NOT user.id='${id}' and user.status ='online'`;
+      const res = await conn.query(query);
+      return res;
+    } catch (error) {
+      console.error('Error updating user status: ', error);
+    } finally {
+      if (conn) conn.end();
     }
-};
+  }
+}
 module.exports = { setupSocket };
