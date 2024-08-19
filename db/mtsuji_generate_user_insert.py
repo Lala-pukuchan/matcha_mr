@@ -135,7 +135,7 @@ def generate_user(index):
 
     randomCoordinate = random.choice(coordinates)
     latitude, longitude = randomCoordinate
-    match_ratio = random.randint(0, 100)
+    match_ratio = 0
     fake_account = random.choice([0, 1])
     isRealUser = 0  # Set to 0 as per your schema
     status = "offline"  # Default value as per your schema
@@ -156,13 +156,13 @@ def generate_user(index):
         preference,
         biography,
         profilePic,
+        isRealUser,  # Moved isRealUser before pic1
+        status,      # Moved status before pic1
         *pics,
         longitude,
         latitude,
         match_ratio,
         fake_account,
-        isRealUser,
-        status,
         last_active
     )
     return values, tags
@@ -171,6 +171,7 @@ def generate_user(index):
 insert_user_statements = []
 insert_tag_statements = []
 
+id = 81;
 for i in range(1, 501):
     user_values, user_tags = generate_user(i)
     values_str = ", ".join([f"'{str(v)}'" if isinstance(v, str) or v is None else str(v) for v in user_values])
@@ -179,10 +180,11 @@ for i in range(1, 501):
     if user_tags:
         for tag in user_tags:
             tag_id = tags.index(tag) + 23  # Adjusting for the ID range
-            insert_tag_statements.append(f"INSERT INTO `usertag` (`user_id`, `tag_id`) VALUES ('{user_values[0]}', '{tag_id}');")
+            insert_tag_statements.append(f"({id}, '{user_values[0]}', '{tag_id}'),")
+            id += 1
 
 # すべてのINSERT文を出力
-print("INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `password`, `enabled`, `age`, `gender`, `preference`, `biography`, `profilePic`, `pic1`, `pic2`, `pic3`, `pic4`, `pic5`, `longitude`, `latitude`, `match_ratio`, `fake_account`, `isRealUser`, `status`, `last_active`) VALUES")
+print("INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `password`, `enabled`, `age`, `gender`, `preference`, `biography`, `profilePic`, `isRealUser`, `status`, `pic1`, `pic2`, `pic3`, `pic4`, `pic5`, `longitude`, `latitude`, `match_ratio`, `fake_account`, `last_active`) VALUES")
 print(",\n".join(insert_user_statements) + ";")
 
 for tag_statement in insert_tag_statements:
