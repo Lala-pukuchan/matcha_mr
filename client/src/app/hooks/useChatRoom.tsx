@@ -1,9 +1,7 @@
-import { useState, useEffect, useContext } from "react";
-import { NotificationContext } from "../../../context/notification";
+import { useState, useEffect } from "react";
 
 function useChatRoom(socket, roomID) {
   const [messages, setMessages] = useState([]);
-  const { addNotification } = useContext(NotificationContext);
 
   useEffect(() => {
     if (socket && roomID) {
@@ -25,17 +23,11 @@ function useChatRoom(socket, roomID) {
         setMessages(prevMessages => [...prevMessages, message]);
       });
 
-      socket.on('message received', (notification) => {
-        console.log('Message received from user', notification.from_user_id);
-        addNotification && addNotification(`Message received from user ${notification.from_user_id}`);
-      });
-
       return () => {
         socket.emit('leaveRoom', roomID);
-        socket.off('message received');
       };
     }
-  }, [socket, roomID, addNotification]);
+  }, [socket, roomID]);
 
   const sendMessage = (message) => {
     if (socket && roomID) {

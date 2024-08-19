@@ -1,10 +1,12 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useContext } from "react";
 import { io } from 'socket.io-client';
 import { useUser } from "../../../context/context";
+import { NotificationContext } from "../../../context/notification"; // NotificationContextをインポート
 
 function useWebSocket() {
   const [socket, setSocket] = useState(null);
   const { user } = useUser();
+  const { addNotification } = useContext(NotificationContext); // NotificationContextを使用
   const userRef = useRef(user);
 
   useEffect(() => {
@@ -50,6 +52,13 @@ function useWebSocket() {
         }
       });
 
+      newSocket.on('message received', (notification) => {
+        console.log('Message received from user', notification.from_user_id);
+        if (userRef.current && userRef.current.id !== notification.from_user_id) {
+          addNotification && addNotification('New message received');
+        }
+      });
+
       setSocket(newSocket);
     }
 
@@ -59,21 +68,8 @@ function useWebSocket() {
         socket.close();
       }
     };
-  }, [socket]);
-
-  useEffect(() => {
-    if (socket) {
-      socket.on('user status', ({ userId, status }) => {
-        console.log(`User ${userId} is now ${status}`);
-      });
-    }
-
-    return () => {
-      if (socket) {
-        socket.off('user status');
-      }
-    };
-  }, [socket]);
+  }, [socket, addNotification]);
+  
 
   return socket;
 }
