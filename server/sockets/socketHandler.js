@@ -107,8 +107,8 @@ function setupSocket(io, pool) {
     });
 
     socket.on('chat message', async (room, message) => {
-      console.log(`Received message in room ${room}: ${message.message}`);
-      console.log("this is message: \n", message);
+      //console.log(`Received message in room ${room}: ${message.message}`);
+      //console.log("this is message: \n", message);
       io.to(room).emit('chat message', message);
 
       // Save message to the database
@@ -132,6 +132,9 @@ function setupSocket(io, pool) {
         const formattedDate = moment(message.sent_at).format('YYYY-MM-DD HH:mm:ss');
         const params = [room, message.from_user_id, toUserId, message.message, formattedDate];
         await conn.query(query, params);
+        if (socketIdMap.has(toUserId)) {
+          io.to(socketIdMap.get(toUserId)).emit('message received', { from_user_id: message.from_user_id });
+        }
       } catch (error) {
         console.error('Error saving message to database: ', error);
       } finally {
