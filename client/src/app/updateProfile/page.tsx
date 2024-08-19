@@ -92,7 +92,7 @@ export default function updateProfile() {
       const newTagJson = JSON.stringify({ name: inputTag });
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/tag`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/user/tags`,
           {
             method: "POST",
             headers: {
