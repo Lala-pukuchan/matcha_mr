@@ -638,7 +638,7 @@ const insertConnected = async (req, res) => {
 
 const getCommonTags = async (req, res) => {
   // combine usertag and user tables
-  const tagIds = req.body.tagIds;
+  let tagIds = req.body.tagIds;
   let query = `
   SELECT u.*, COUNT(ut.tag_id) AS common_tag_count
   FROM user u

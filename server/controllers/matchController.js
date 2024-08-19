@@ -22,7 +22,7 @@ const getMatches = async (req, res) => {
 };
 
 const getCommonTags = async (req, res) => {
-  const tagIds = req.body.tagIds;
+  let tagIds = req.body.tagIds;
   let query = `
   SELECT DISTINCT u.*
   FROM user u
