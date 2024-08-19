@@ -117,9 +117,10 @@ function Chat() {
           </div>
         )}
 
-        <div className={`message-input-container ${roomID ? 'active' : ''}`}>
-          <div className="message-container mb-4">
-            {messages.map((message, index) => (
+      <div className={`message-input-container ${roomID ? 'active' : ''}`}>
+        <div className="message-container mb-4">
+          {Array.isArray(messages) && messages.length > 0 ? (
+            messages.map((message, index) => (
               <div key={index} className={message.from_user_id === user.id ? 'my-message-wrapper' : 'other-message-wrapper'}>
                 <div className={message.from_user_id === user.id ? 'my-message' : 'other-message'}>
                   {message.message}
@@ -128,23 +129,26 @@ function Chat() {
                   {new Date(message.sent_at).toLocaleString('ja-JP', { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' })}
                 </div>
               </div>
-            ))}
-          </div>
-          {roomID && (
-            <div className="flex items-center justify-between">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                className="w-full p-2 border rounded mr-4"
-                placeholder="Type a message..."
-              />
-              <button onClick={handleSendMessage} className="mt-4 w-60 h-9 rounded bg-pink-400 text-white">
-                Send
-              </button>
-            </div>
+            ))
+          ) : (
+            <div>No messages to display</div>
           )}
         </div>
+        {roomID && (
+          <div className="flex items-center justify-between">
+            <input
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              className="w-full p-2 border rounded mr-4"
+              placeholder="Type a message..."
+            />
+            <button onClick={handleSendMessage} className="mt-4 w-60 h-9 rounded bg-pink-400 text-white">
+              Send
+            </button>
+          </div>
+        )}
+      </div>
       </div>
     </div>
   );
