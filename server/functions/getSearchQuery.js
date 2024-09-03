@@ -82,6 +82,12 @@ async function getSearchQuery(data) {
     values.push(parseInt(data.min_distance), parseInt(data.max_distance));
   }
 
+  // Add min_common_tag_count filter
+  if (data.min_common_tag_count != null) {
+    havingConditions.push("common_tags_count >= ?");
+    values.push(parseInt(data.min_common_tag_count));
+  }
+
   if (havingConditions.length > 0) {
     baseQuery += " HAVING " + havingConditions.join(" AND ");
   }

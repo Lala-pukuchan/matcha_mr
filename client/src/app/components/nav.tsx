@@ -34,6 +34,9 @@ export default function Nav() {
                 <Link href="/">Home</Link>
               </li>
               <li>
+                <Link href="/recommendUser">RecommendUser</Link>
+              </li>
+              <li>
                 <Link href="/searchUser">SearchUser</Link>
               </li>
               <li>
