@@ -20,6 +20,11 @@ export default function Home() {
   const [distanceRange, setDistanceRange] = useState([0, 100]);
   const [fameRatingRange, setFameRatingRange] = useState([0, 100]);
 
+  const [showAgeRange, setShowAgeRange] = useState(false);
+  const [showDistanceRange, setShowDistanceRange] = useState(false);
+  const [showFameRating, setShowFameRating] = useState(false);
+  const [showTags, setShowTags] = useState(false);
+
   useEffect(() => {
     if (isRedirecting || !user) {
       return;
@@ -124,18 +129,16 @@ export default function Home() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-  
+
     const formData = {
       user: JSON.stringify(user),
-      min_age: ageRange[0],
-      max_age: ageRange[1],
-      min_distance: distanceRange[0],
-      max_distance: distanceRange[1],
-      min_fame_rating: fameRatingRange[0],
-      max_fame_rating: fameRatingRange[1],
-      tags: selectedTags.map(tag => tag.value),
+      // Conditionally add properties based on the selection
+      ...(showAgeRange && { min_age: ageRange[0], max_age: ageRange[1] }),
+      ...(showDistanceRange && { min_distance: distanceRange[0], max_distance: distanceRange[1] }),
+      ...(showFameRating && { min_fame_rating: fameRatingRange[0], max_fame_rating: fameRatingRange[1] }),
+      ...(showTags && { tags: selectedTags.map(tag => tag.value) }),
     };
-  
+
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/users/searchUser`,
@@ -148,7 +151,7 @@ export default function Home() {
           credentials: "include",
         }
       );
-  
+
       if (response.status === 200) {
         const data = await response.json();
         setUserList(data.filter((d) => d.id !== user.id));
@@ -161,7 +164,7 @@ export default function Home() {
       console.log("error: ", e);
       setUserList([]);
     }
-  }  
+  }
 
   return (
     <>
@@ -173,62 +176,105 @@ export default function Home() {
           >
             <h1 className="font-bold text-cyan-400">Filter By: </h1>
             <div className="grid grid-cols-1 gap-4">
-              <div className="flex flex-col">
-                <label>Age Range</label>
-                <Slider
-                  className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
-                  thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
-                  trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
-                  value={ageRange}
-                  min={18}
-                  max={100}
-                  onChange={setAgeRange}
-                  pearling
-                  minDistance={1}
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="ageRange"
+                  checked={showAgeRange}
+                  onChange={() => setShowAgeRange(!showAgeRange)}
                 />
-                <div>{`Min: ${ageRange[0]}, Max: ${ageRange[1]}`}</div>
+                <label htmlFor="ageRange" className="ml-2">Age Range</label>
               </div>
-              <div className="flex flex-col">
-                <label>Distance Range</label>
-                <Slider
-                  className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
-                  thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
-                  trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
-                  value={distanceRange}
-                  min={0}
-                  max={10000}
-                  onChange={setDistanceRange}
-                  pearling
-                  minDistance={1}
+              {showAgeRange && (
+                <div className="flex flex-col">
+                  <Slider
+                    className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
+                    thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                    trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
+                    value={ageRange}
+                    min={18}
+                    max={100}
+                    onChange={setAgeRange}
+                    pearling
+                    minDistance={1}
+                  />
+                  <div>{`Min: ${ageRange[0]}, Max: ${ageRange[1]}`}</div>
+                </div>
+              )}
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="distanceRange"
+                  checked={showDistanceRange}
+                  onChange={() => setShowDistanceRange(!showDistanceRange)}
                 />
-                <div>{`Min: ${distanceRange[0]} km, Max: ${distanceRange[1]} km`}</div>
+                <label htmlFor="distanceRange" className="ml-2">Distance Range</label>
               </div>
-              <div className="flex flex-col">
-                <label>Fame Rating</label>
-                <Slider
-                  className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
-                  thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
-                  trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
-                  value={fameRatingRange}
-                  min={0}
-                  max={100}
-                  onChange={setFameRatingRange}
-                  pearling
-                  minDistance={1}
+              {showDistanceRange && (
+                <div className="flex flex-col">
+                  <Slider
+                    className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
+                    thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                    trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
+                    value={distanceRange}
+                    min={0}
+                    max={10000}
+                    onChange={setDistanceRange}
+                    pearling
+                    minDistance={1}
+                  />
+                  <div>{`Min: ${distanceRange[0]} km, Max: ${distanceRange[1]} km`}</div>
+                </div>
+              )}
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="fameRating"
+                  checked={showFameRating}
+                  onChange={() => setShowFameRating(!showFameRating)}
                 />
-                <div>{`Min: ${fameRatingRange[0]}, Max: ${fameRatingRange[1]}`}</div>
+                <label htmlFor="fameRating" className="ml-2">Fame Rating</label>
               </div>
-              <div className="flex flex-col mt-4">
-                <label>Tags</label>
-                <Select
-                  isMulti
-                  name="tags"
-                  options={tags}
-                  className="basic-multi-select"
-                  classNamePrefix="select"
-                  onChange={setSelectedTags}
+              {showFameRating && (
+                <div className="flex flex-col">
+                  <Slider
+                    className="w-full h-4 mt-4 bg-gray-200 rounded-lg relative"
+                    thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
+                    trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
+                    value={fameRatingRange}
+                    min={0}
+                    max={100}
+                    onChange={setFameRatingRange}
+                    pearling
+                    minDistance={1}
+                  />
+                  <div>{`Min: ${fameRatingRange[0]}, Max: ${fameRatingRange[1]}`}</div>
+                </div>
+              )}
+
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="tags"
+                  checked={showTags}
+                  onChange={() => setShowTags(!showTags)}
                 />
+                <label htmlFor="tags" className="ml-2">Tags</label>
               </div>
+              {showTags && (
+                <div className="flex flex-col mt-4">
+                  <Select
+                    isMulti
+                    name="tags"
+                    options={tags}
+                    className="basic-multi-select"
+                    classNamePrefix="select"
+                    onChange={setSelectedTags}
+                  />
+                </div>
+              )}
             </div>
             <div className="flex items-center justify-between mt-4">
               <button
