@@ -186,6 +186,29 @@ const resetPassword = async (req, res) => {
   }
 };
 
+const updatePassword = async (req, res) => {
+  let conn;
+  try {
+    console.log(req.body);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt);
+    const values = [hashedPassword, req.body.username];
+    conn = await pool.getConnection();
+    const result = await conn.query("UPDATE user SET password = ? WHERE username = ?", values);
+
+    if (result.affectedRows > 0) {
+      return res.status(200).json({ message: "Password is updated successfully." });
+    } else {
+      return res.status(404).json({ message: "User not found or password not updated." });
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) conn.end();
+  }
+};
+
 const generatePassword = (length) => {
   const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+~`|}{[]:;?><,./-=";
   let password = "";
@@ -201,4 +224,5 @@ module.exports = {
   login,
   logout,
   resetPassword,
+  updatePassword,
 };
