@@ -11,6 +11,7 @@ export default function Home() {
   const { user } = useUser();
 
   const [users, setUserList] = useState([]);
+  const [sortedUsers, setSortedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedUsersId, setLikedUsersId] = useState([]);
   const [blockedUsersId, setBlockedUsersId] = useState([]);
@@ -24,6 +25,9 @@ export default function Home() {
   const [showDistanceRange, setShowDistanceRange] = useState(false);
   const [showFameRating, setShowFameRating] = useState(false);
   const [showTags, setShowTags] = useState(false);
+
+  const [sortOption, setSortOption] = useState("");
+  const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
     if (isRedirecting || !user) {
@@ -47,18 +51,34 @@ export default function Home() {
     fetchTags();
 
     const fetchUsers = async () => {
+
+      const formData = {
+        user: JSON.stringify(user),
+      };
+
       try {
+        //const response = await fetch(
+        //  `${process.env.NEXT_PUBLIC_API_URL}/api/users/getUser`,
+        //  {
+        //    method: "POST",
+        //    headers: {
+        //      "Content-Type": "application/json",
+        //    },
+        //    body: JSON.stringify({
+        //      gender: user.gender,
+        //      preference: user.preference,
+        //    }),
+        //  }
+        //);
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/users/getUser`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/searchUser`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              gender: user.gender,
-              preference: user.preference,
-            }),
+            body: JSON.stringify(formData),
+            credentials: "include",
           }
         );
         if (response.ok) {
@@ -122,6 +142,24 @@ export default function Home() {
       setLoading(false);
     }
   }, [user, isRedirecting]);
+
+  useEffect(() => {
+    console.log('called');
+    console.log(users);
+    const sorted = [...users].sort((a, b) => {
+      if (sortOption === "age") {
+        return sortOrder === "asc" ? a.age - b.age : b.age - a.age;
+      } else if (sortOption === "location") {
+        return sortOrder === "asc" ? a.distance - b.distance : b.distance - a.distance;
+      } else if (sortOption === "fameRating") {
+        return sortOrder === "asc" ? a.match_ratio - b.match_ratio : b.match_ratio - a.match_ratio;
+      } else if (sortOption === "commonTags") {
+        return sortOrder === "asc" ? a.common_tags_count - b.common_tags_count : b.common_tags_count - a.common_tags_count;
+      }
+      return 0;
+    });
+    setSortedUsers(sorted);
+  }, [sortOption, sortOrder, users]);
 
   if (isRedirecting || loading) {
     return <div>Loading...</div>;
@@ -287,9 +325,70 @@ export default function Home() {
           </form>
         </div>
       </div>
+      <div className="flex justify-center">
+        <div className="w-full max-w-5xl">
+          <form className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+            <h1 className="font-bold text-cyan-400">Sort By: </h1>
+            <div className="grid grid-cols-1 gap-4">
+              <div className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  id="age"
+                  value="age"
+                  onChange={(e) => setSortOption(e.target.value)}
+                />
+                <label htmlFor="age" className="ml-2">Age</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  id="distance"
+                  value="location"
+                  onChange={(e) => setSortOption(e.target.value)}
+                />
+                <label htmlFor="distance" className="ml-2">Distance</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  id="fameRatingSort"
+                  value="fameRating"
+                  onChange={(e) => setSortOption(e.target.value)}
+                />
+                <label htmlFor="fameRatingSort" className="ml-2">Fame Rating</label>
+              </div>
+              <div className="flex items-center">
+                <input
+                  type="radio"
+                  name="sortOption"
+                  id="common_tag_count"
+                  value="commonTags"
+                  onChange={(e) => setSortOption(e.target.value)}
+                />
+                <label htmlFor="common_tag_count" className="ml-2">Common Tag Count</label>
+              </div>
+            </div>
+            <div className="flex items-center mt-4">
+              <label htmlFor="sortOrder" className="mr-2">Order:</label>
+              <select
+                id="sortOrder"
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="ml-2"
+              >
+                <option value="asc">Ascending</option>
+                <option value="desc">Descending</option>
+              </select>
+            </div>
+          </form>
+        </div>
+      </div>
       <div className="container mx-auto w-screen flex justify-center">
         <UsersList
-          users={users}
+          users={sortedUsers}
           operationUserId={user.id}
           likedUsersId={likedUsersId}
           blockedUsersId={blockedUsersId}

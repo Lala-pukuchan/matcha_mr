@@ -12,7 +12,7 @@ async function getSearchQuery(data) {
   let baseQuery = `
     SELECT 
       user.*,
-      COUNT(DISTINCT usertag.tag_id) AS common_tags_count,
+      COUNT(DISTINCT common_tags.tag_id) AS common_tags_count,
       (6371 * acos(
         cos(radians(?)) * cos(radians(user.latitude)) * 
         cos(radians(user.longitude) - radians(?)) + 
@@ -22,12 +22,15 @@ async function getSearchQuery(data) {
       user
     LEFT JOIN 
       usertag ON user.id = usertag.user_id
+    LEFT JOIN 
+      usertag AS common_tags ON usertag.tag_id = common_tags.tag_id AND common_tags.user_id = ?
   `;
   
   let values = [
     parseFloat(user.latitude),
     parseFloat(user.longitude),
     parseFloat(user.latitude),
+    user.id // Add the current user's ID to the values array
   ];
 
   let whereConditions = [];
@@ -73,7 +76,7 @@ async function getSearchQuery(data) {
   }
   
   // Group by user ID
-  baseQuery += " GROUP BY user.id";
+  baseQuery += " GROUP BY user.id, distance";
   
   // Distance filter in HAVING clause
   let havingConditions = [];
@@ -116,7 +119,7 @@ async function getSearchQuery(data) {
   console.log("Final baseQuery", baseQuery);
   console.log("Final values", values);
   
-  return { baseQuery, values };
+  return { baseQuery, values, distance: 'distance', common_tags_count: 'common_tags_count' };
 }
 
 module.exports = getSearchQuery;
