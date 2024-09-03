@@ -223,7 +223,7 @@ export default function Home() {
           />
         </div>
       </div>
-      <div>
+      {/*<div>
         <hr />
         <div className="container mx-auto w-screen flex justify-center">
           <h1 className="text-pink-400 font-bold">User Close To You</h1>
@@ -269,7 +269,7 @@ export default function Home() {
             link="/users"
           />
         </div>
-      </div>
+      </div>*/}
     </>
   );
 }

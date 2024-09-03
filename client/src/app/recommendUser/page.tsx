@@ -10,21 +10,23 @@ export default function Home() {
   const isRedirecting = useAuthCheck(null, "/login");
   const { user } = useUser();
 
-  const [users, setUserList] = useState([]);
+  const [users, setUsers] = useState([]);
   const [sortedUsers, setSortedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [likedUsersId, setLikedUsersId] = useState([]);
   const [blockedUsersId, setBlockedUsersId] = useState([]);
   const [tags, setTags] = useState([]);
   const [selectedTags, setSelectedTags] = useState([]);
-  const [ageRange, setAgeRange] = useState([18, 60]);
+  const [ageRange, setAgeRange] = useState([]);
   const [distanceRange, setDistanceRange] = useState([0, 100]);
-  const [fameRatingRange, setFameRatingRange] = useState([0, 100]);
+  const [fameRatingRange, setFameRatingRange] = useState([20, 100]);
 
   const [showAgeRange, setShowAgeRange] = useState(false);
   const [showDistanceRange, setShowDistanceRange] = useState(false);
   const [showFameRating, setShowFameRating] = useState(false);
   const [showTags, setShowTags] = useState(false);
+  const [minAge, setMinAge] = useState(18);
+  const [maxAge, setMaxAge] = useState(60);
 
   const [sortOption, setSortOption] = useState("");
   const [sortOrder, setSortOrder] = useState("asc");
@@ -51,25 +53,24 @@ export default function Home() {
     fetchTags();
 
     const fetchUsers = async () => {
-
-      const formData = {
-        user: JSON.stringify(user),
-      };
-
       try {
-        //const response = await fetch(
-        //  `${process.env.NEXT_PUBLIC_API_URL}/api/users/getUser`,
-        //  {
-        //    method: "POST",
-        //    headers: {
-        //      "Content-Type": "application/json",
-        //    },
-        //    body: JSON.stringify({
-        //      gender: user.gender,
-        //      preference: user.preference,
-        //    }),
-        //  }
-        //);
+        const min_age = Math.max(18, user.age - 10);
+        const max_age = Math.min(100, user.age + 10);
+        setAgeRange([min_age, max_age]);
+        setMinAge(min_age);
+        setMaxAge(max_age);
+
+        const formData = {
+          user: JSON.stringify(user),
+          min_age: min_age,
+          max_age: max_age,
+          min_distance: 0,
+          max_distance: 1000,
+          min_fame_rating: 20,
+          max_fame_rating: 100,
+          min_common_tag_count: 1,
+        };
+
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/searchUser`,
           {
@@ -83,12 +84,12 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUserList(data.filter((d) => d.id !== user.id));
+          setUsers(data.filter((d) => d.id !== user.id));
         } else {
-          setUserList([]);
+          setUsers([]);
         }
       } catch (e) {
-        setUserList([]);
+        setUsers([]);
         console.error(e);
       }
     };
@@ -144,8 +145,6 @@ export default function Home() {
   }, [user, isRedirecting]);
 
   useEffect(() => {
-    console.log('called');
-    console.log(users);
     const sorted = [...users].sort((a, b) => {
       if (sortOption === "age") {
         return sortOrder === "asc" ? a.age - b.age : b.age - a.age;
@@ -161,20 +160,19 @@ export default function Home() {
     setSortedUsers(sorted);
   }, [sortOption, sortOrder, users]);
 
-  if (isRedirecting || loading) {
-    return <div>Loading...</div>;
-  }
-
   async function handleSubmit(event) {
     event.preventDefault();
 
     const formData = {
       user: JSON.stringify(user),
-      // Conditionally add properties based on the selection
-      ...(showAgeRange && { min_age: ageRange[0], max_age: ageRange[1] }),
-      ...(showDistanceRange && { min_distance: distanceRange[0], max_distance: distanceRange[1] }),
-      ...(showFameRating && { min_fame_rating: fameRatingRange[0], max_fame_rating: fameRatingRange[1] }),
-      ...(showTags && { tags: selectedTags.map(tag => tag.value) }),
+      min_age: showAgeRange ? ageRange[0] : minAge,
+      max_age: showAgeRange ? ageRange[1] : maxAge,
+      min_distance: showDistanceRange ? distanceRange[0] : 0,
+      max_distance: showDistanceRange ? distanceRange[1] : 1000,
+      min_fame_rating: showFameRating ? fameRatingRange[0] : 20,
+      max_fame_rating: showFameRating ? fameRatingRange[1] : 100,
+      min_common_tag_count: 1,
+      ...(showTags && { tags: selectedTags.map((tag: { value: string }) => tag.value) }),
     };
 
     try {
@@ -192,16 +190,20 @@ export default function Home() {
 
       if (response.status === 200) {
         const data = await response.json();
-        setUserList(data.filter((d) => d.id !== user.id));
+        setUsers(data.filter((d) => d.id !== user.id));
       } else {
         const data = await response.json();
         console.log("message", data.message);
-        setUserList([]);
+        setUsers([]);
       }
     } catch (e) {
       console.log("error: ", e);
-      setUserList([]);
+      setUsers([]);
     }
+  }
+
+  if (isRedirecting || loading) {
+    return <div>Loading...</div>;
   }
 
   return (
@@ -230,8 +232,8 @@ export default function Home() {
                     thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
                     trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
                     value={ageRange}
-                    min={18}
-                    max={100}
+                    min={minAge}
+                    max={maxAge}
                     onChange={setAgeRange}
                     pearling
                     minDistance={1}
@@ -257,7 +259,7 @@ export default function Home() {
                     trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
                     value={distanceRange}
                     min={0}
-                    max={10000}
+                    max={100}
                     onChange={setDistanceRange}
                     pearling
                     minDistance={1}
@@ -282,7 +284,7 @@ export default function Home() {
                     thumbClassName="w-6 h-6 bg-blue-500 rounded-full absolute cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-75"
                     trackClassName="bg-gradient-to-r from-blue-400 to-blue-200 h-2 rounded-lg"
                     value={fameRatingRange}
-                    min={0}
+                    min={20}
                     max={100}
                     onChange={setFameRatingRange}
                     pearling
