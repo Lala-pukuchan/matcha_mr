@@ -131,6 +131,9 @@ export default function MyAccount() {
           <Link className="text-cyan-400" href="/updateProfile">
             Update your profile?
           </Link>
+          <Link className="text-cyan-400" href={`/updatePassword?username=${user.username}`}>
+            Update your password?
+          </Link>
           <div className="grid grid-cols-2">
             <div>
               <h2 className="text-pink-400">Viewed By</h2>
