@@ -1,16 +1,26 @@
 "use client";
 import Link from "next/link";
-import { useState, useContext } from "react";
-import { useUser } from "../../../context/context";
-import { NotificationContext } from "../../../context/notification";
+import NotificationBell from './notificationBell';
+import { useUser } from '../../../context/context';
+import { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchNotifications, clearNotifications } from '../store/notificationSlice';
+import { RootState } from '../store/store';
 
 export default function Nav() {
   const { user } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-  const { notifications = [], clearNotifications } = useContext(NotificationContext); // デフォルト値として空配列を使用
+  const dispatch = useDispatch();
+  const notifications = useSelector((state: RootState) => state.notifications.notifications);
+
+  useEffect(() => {
+    if (user && user.id) {
+      dispatch(fetchNotifications(user.id));
+    }
+  }, [user, dispatch]);
 
   const handleChatClick = () => {
-    clearNotifications();
+    dispatch(clearNotifications());
   };
 
   return (
@@ -49,6 +59,9 @@ export default function Nav() {
                     <span className="ml-2 bg-red-500 rounded-full h-3 w-3 inline-block"></span>
                   )}
                 </Link>
+              </li>
+              <li>
+                <NotificationBell />
               </li>
               <li>
                 <Link href="/logout">Logout</Link>

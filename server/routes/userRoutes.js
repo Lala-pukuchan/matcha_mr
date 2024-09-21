@@ -6,6 +6,7 @@ const upload = require('../middlewares/uploadMiddleware');
 router.get('/userinfo', userController.getUserInfo);
 router.post('/getUser', userController.getUser);
 router.post('/userById', userController.getUserById);
+router.post('/getUserNameById', userController.getUserNameById);
 router.post('/user/update', upload.fields([
   { name: 'profilePicture', maxCount: 1 },
   { name: 'picture1', maxCount: 1 },

@@ -7,6 +7,8 @@ import ReportFakeAccount from "./reportFakeAccount";
 import Block from "./block";
 import useWebSocket from "../hooks/useWebSocket";
 import { useState, useEffect } from "react";
+import { useDispatch } from 'react-redux';
+import { addNotification } from '../store/notificationSlice';
 
 export default function UsersList({
   users,
@@ -17,6 +19,7 @@ export default function UsersList({
 }) {
   const [onlineStatus, setOnlineStatus] = useState({});
   const socket = useWebSocket();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (users && users.length > 0) {
@@ -56,6 +59,29 @@ export default function UsersList({
       }
     };
   }, [socket]);
+
+  const handleUnmatch = async (userId) => {
+    try {
+      console.log("handleUnmatch! userId: ", userId);
+      const response = await fetch('http://localhost:4000/api/unmatch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId1: operationUserId, userId2: userId }),
+      });
+
+      if (response.ok) {
+        dispatch(addNotification({
+          id: new Date().getTime().toString(),
+          type: 'unmatch',
+          message: 'You have unmatched with a user',
+          fromUser: userId,
+          timestamp: new Date().toISOString(),
+        }));
+      }
+    } catch (error) {
+      console.error('Error unmatching user:', error);
+    }
+  };
 
   return (
     <div className="flex flex-col m-10 space-y-4">

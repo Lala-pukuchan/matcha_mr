@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useEffect, useContext } from 'react';
-import { useUser } from "../../../context/context";
-import { NotificationContext } from "../../../context/notification";
-import useWebSocket from "../hooks/useWebSocket";
-import useAuthCheck from "../hooks/useAuthCheck";
-import useChatRoom from "../hooks/useChatRoom";
+import { useUser } from '../../../context/context';
+import { NotificationContext } from '../../../context/notification';
+import useWebSocket from '../hooks/useWebSocket';
+import useAuthCheck from '../hooks/useAuthCheck';
+import useChatRoom from '../hooks/useChatRoom';
 import './Chat.css';
 
 function Chat() {
@@ -56,7 +56,7 @@ function Chat() {
         })
         .catch(error => console.error('Error fetching matches:', error));
     }
-  }, [user]); // `user`が変わった時のみ実行
+  }, [user]);
 
   // ソケットからのオンラインステータス更新をリッスンする処理
   useEffect(() => {
@@ -104,7 +104,6 @@ function Chat() {
   return (
     <div className="flex flex-col items-center">
       <div className="chat-container bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-
         <div className="chat-prompt">
           Click on a user to start a chat
         </div>

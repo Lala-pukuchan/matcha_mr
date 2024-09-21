@@ -137,3 +137,17 @@
     text-align: center;
     margin-bottom: 20px;
 }
+
+.notification-item {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .notification-item.unread {
+    font-weight: bold;
+    color: black;
+  }
+  
+  .notification-item.read {
+    color: gray;
+  }

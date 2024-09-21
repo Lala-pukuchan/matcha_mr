@@ -1,13 +1,19 @@
+"use client";
+import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState, useRef, useContext } from "react";
 import { io } from 'socket.io-client';
 import { useUser } from "../../../context/context";
 import { NotificationContext } from "../../../context/notification"; // NotificationContextをインポート
+import { useDispatch } from 'react-redux';
+import { addNotification } from '../store/notificationSlice';
+
 
 function useWebSocket() {
   const [socket, setSocket] = useState(null);
   const { user } = useUser();
-  const { addNotification } = useContext(NotificationContext); // NotificationContextを使用
+  //const { addNotification: addContextNotification } = useContext(NotificationContext); // NotificationContextを使用
   const userRef = useRef(user);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     userRef.current = user;
@@ -31,11 +37,20 @@ function useWebSocket() {
         }
       });
 
-      newSocket.on('disconnect', () => {
-        console.log('WebSocket disconnected');
+      newSocket.on('disconnect', (reason) => {
+        console.log('WebSocket disconnected. reason: ', reason);
+        if (reason === 'transport close' || reason === 'io client disconnect') {
+          console.log("reason is: ", reason);
+          setTimeout(() => {
+            if (!newSocket.connected) {
+              newSocket.emit('login');
+            }
+          }, 5000);
+        }
         disconnectTimeoutRef.current = setTimeout(() => {
           if (userRef.current && userRef.current.id) {
             console.log('User is now offline due to disconnect');
+            console.log("offline: userRef.current.id: ", userRef.current.id);
             newSocket.emit('logout', userRef.current.id);
           }
         }, 5000);
@@ -48,14 +63,81 @@ function useWebSocket() {
           disconnectTimeoutRef.current = null;
         }
         if (userRef.current && userRef.current.id) {
+          console.log("reconnect: userRef.current.id: ", userRef.current.id);
+          newSocket.connect();
           newSocket.emit('login', userRef.current.id);
         }
       });
 
-      newSocket.on('message received', (notification) => {
+      newSocket.on('message received', async (notification) => {
         console.log('Message received from user', notification.from_user_id);
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
-          addNotification && addNotification('New message received');
+          try {
+            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: notification.from_user_id }),
+            });
+            const data = await response.json();
+            const username = data.username;
+      
+            const newNotification = {
+              id: notification.id || uuidv4(),
+              userId: userRef.current.id,
+              type: 'message',
+              message: `New message received from ${username}`,
+              fromUser: notification.from_user_id,
+              timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+              checked: false,
+            };
+      
+            dispatch(addNotification(newNotification));
+      
+            // データベースに通知を保存
+            await fetch('http://localhost:4000/api/notifications/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newNotification),
+            });
+          } catch (error) {
+            console.error('Error fetching username:', error);
+          }
+        }
+      });
+
+      newSocket.on('like received', (notification) => {
+        if (userRef.current && userRef.current.id !== notification.from_user_id) {
+          dispatch(addNotification({
+            id: notification.id,
+            type: 'like',
+            message: 'You received a like',
+            fromUser: notification.from_user_id,
+            timestamp: new Date().toISOString(),
+          }));
+        }
+      });
+
+      newSocket.on('unlike received', (notification) => {
+        if (userRef.current && userRef.current.id !== notification.from_user_id) {
+          dispatch(addNotification({
+            id: notification.id,
+            type: 'unlike',
+            message: 'You received an unlike',
+            fromUser: notification.from_user_id,
+            timestamp: new Date().toISOString(),
+          }));
+        }
+      });
+
+      newSocket.on('match received', (notification) => {
+        if (userRef.current && userRef.current.id !== notification.from_user_id) {
+          dispatch(addNotification({
+            id: notification.id,
+            type: 'match',
+            message: 'You have a new match',
+            fromUser: notification.from_user_id,
+            timestamp: new Date().toISOString(),
+          }));
         }
       });
 
@@ -68,8 +150,7 @@ function useWebSocket() {
         socket.close();
       }
     };
-  }, [socket, addNotification]);
-  
+  }, [socket, dispatch]);
 
   return socket;
 }

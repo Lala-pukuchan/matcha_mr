@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "../../context/context";
 import UsersList from "./components/userList";
 import useAuthCheck from "./hooks/useAuthCheck"; // カスタムフックのインポート
+import { metadata } from "./matadata";
 
 export default function Home() {
   const { user } = useUser();

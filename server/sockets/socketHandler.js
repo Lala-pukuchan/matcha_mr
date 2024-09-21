@@ -57,8 +57,11 @@ function setupSocket(io, pool) {
       }
     });
 
-    socket.on('disconnect', async () => {
+    socket.on('disconnect', async (reason) => {
+      console.log("disconnect!!! : socket.id: ", socket.id);
+      console.log("reason is: ", reason);
       console.log(`Client ${socket.id} disconnected`);
+      console.log("socket.connected: ", socket.connected);
 
       let userId;
       for (let [key, value] of onlineUsers) {
@@ -130,6 +133,29 @@ function setupSocket(io, pool) {
       } finally {
         if (conn) conn.end();
       }
+    });
+    socket.on('like', async (data) => {
+      const { fromUserId, toUserId } = data;
+      io.to(toUserId).emit('like received', {
+        id: new Date().getTime().toString(),
+        from_user_id: fromUserId,
+      });
+    });
+  
+    socket.on('unlike', async (data) => {
+      const { fromUserId, toUserId } = data;
+      io.to(toUserId).emit('unlike received', {
+        id: new Date().getTime().toString(),
+        from_user_id: fromUserId,
+      });
+    });
+  
+    socket.on('match', async (data) => {
+      const { fromUserId, toUserId } = data;
+      io.to(toUserId).emit('match received', {
+        id: new Date().getTime().toString(),
+        from_user_id: fromUserId,
+      });
     });
 
     socket.on('error', (error) => {

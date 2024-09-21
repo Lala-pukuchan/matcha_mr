@@ -21,7 +21,6 @@ router.get('/matches/:userId', async (req, res) => {
   } finally {
     if (conn) conn.end();
   }
-  console.log("userId:", userId);
 });
 
 router.get('/messages/:roomID', async (req, res) => {

@@ -122,6 +122,26 @@ const getUserById = async (req, res) => {
   }
 }
 
+const getUserNameById = async (req, res) => {
+  let conn;
+  try {
+    const { userId } = req.body;
+    conn = await pool.getConnection();
+    const query = "SELECT username FROM user WHERE id = ?";
+    const rows = await conn.query(query, [userId]);
+
+    if (!rows || rows.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.json({ username: rows[0].username });
+  } catch (e) {
+    console.error('Error fetching username: ', e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) await conn.end();
+  }
+};
+
 const updateUser = async (req, res) => {
   let updateFields = [];
   let values = [];
@@ -408,6 +428,10 @@ const insertUnliked = async (req, res) => {
     await conn.query("DELETE FROM liked WHERE from_user_id = ? AND liked_to_user_id = ?", values);
     values.push(values[0], values[1]);
     await conn.query("DELETE FROM matched WHERE (matched_user_id_first = ? AND matched_user_id_second = ?) OR (matched_user_id_second = ? AND matched_user_id_first = ?)", values);
+
+    // チャットルームの削除
+    await conn.query("DELETE FROM rooms WHERE (user_id_first = ? AND user_id_second = ?) OR (user_id_first = ? AND user_id_second = ?)", values);
+
     const likeResult = await conn.query("SELECT * FROM liked WHERE from_user_id = ?", [req.body.from]);
     const matchResult = await conn.query("SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?", [req.body.from, req.body.from]);
 
@@ -828,6 +852,7 @@ module.exports = {
   getUserInfo,
   getUser,
   getUserById,
+  getUserNameById,
   updateUser,
   enableUser,
   reportUser,
