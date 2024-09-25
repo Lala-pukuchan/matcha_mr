@@ -10,7 +10,7 @@ const moment = require('moment');
 const fs = require("fs");
 const getJwt = require("../functions/getJwt");
 const getSearchQuery = require("../functions/getSearchQuery");
-
+const socketIdMap = require("../sockets/socketHandler");
 
 const getUserInfo = async (req, res) => {
   let token;
@@ -352,6 +352,7 @@ const insertLiked = async (req, res) => {
         await conn.query("INSERT INTO matched (matched_user_id_first, matched_user_id_second) VALUES (?, ?)", [req.body.to, req.body.from]);
         await conn.query("INSERT INTO rooms (user_id_first, user_id_second) VALUES (?, ?)", [req.body.from, req.body.to]);
       }
+
       const likeResult = await conn.query("SELECT * FROM liked WHERE from_user_id = ?", [req.body.from]);
       const matchResult = await conn.query("SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?", [req.body.from, req.body.from]);
 

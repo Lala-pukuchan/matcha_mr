@@ -1,6 +1,8 @@
 const moment = require('moment');
+const { v4: uuidv4 } = require('uuid');
 const onlineUsers = new Map();
 const socketIdMap = new Map();
+const {saveNotification, deleteNotification} = require('../controllers/notificationController');
 
 function setupSocket(io, pool) {
   io.on('connection', (socket) => {
@@ -136,18 +138,64 @@ function setupSocket(io, pool) {
     });
     socket.on('like', async (data) => {
       const { fromUserId, toUserId } = data;
-      io.to(toUserId).emit('like received', {
-        id: new Date().getTime().toString(),
-        from_user_id: fromUserId,
-      });
+      console.log(`Like event received from ${fromUserId} to ${toUserId}`); // デバッグ用ログ
+      if (socketIdMap.has(toUserId)) {
+        io.to(socketIdMap.get(toUserId)).emit('like received', {
+          //id: new Date().getTime().toString(),
+          id: uuidv4(),
+          from_user_id: fromUserId,
+        });
+      }
+
+      try {
+        // 既存のunlike通知を削除
+        await deleteNotification(toUserId, fromUserId, 'unlike');
+
+        // 新しいlike通知を保存
+        const notification = {
+          id: uuidv4(),
+          userId: toUserId,
+          type: 'like',
+          message: 'You received a like',
+          fromUser: fromUserId,
+          timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          checked: false,
+        };
+        await saveNotification(notification);
+      } catch (error) {
+        console.error('Error handling like event: ', error);
+      }
     });
   
     socket.on('unlike', async (data) => {
       const { fromUserId, toUserId } = data;
-      io.to(toUserId).emit('unlike received', {
-        id: new Date().getTime().toString(),
-        from_user_id: fromUserId,
-      });
+      console.log(`Unlike event received from ${fromUserId} to ${toUserId}`); // デバッグ用ログ
+      if (socketIdMap.has(toUserId)) {
+        io.to(socketIdMap.get(toUserId)).emit('unlike received', {
+          //id: new Date().getTime().toString(),
+          id: uuidv4(),
+          from_user_id: fromUserId,
+        });
+      }
+
+      try {
+        // 既存のlike通知を削除
+        await deleteNotification(toUserId, fromUserId, 'like');
+
+        // 新しいunlike通知を保存
+        const notification = {
+          id: uuidv4(),
+          userId: toUserId,
+          type: 'unlike',
+          message: 'You received an unlike',
+          fromUser: fromUserId,
+          timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          checked: false,
+        };
+        await saveNotification(notification);
+      } catch (error) {
+        console.error('Error handling unlike event: ', error);
+      }
     });
   
     socket.on('match', async (data) => {
@@ -181,4 +229,4 @@ async function getOnlineMatch(id, pool) {
     }
   }
 }
-module.exports = { setupSocket };
+module.exports = { setupSocket, socketIdMap };

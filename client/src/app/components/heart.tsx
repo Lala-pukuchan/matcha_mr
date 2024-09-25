@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
+import useWebSocket from "../hooks/useWebSocket";
+import { useDispatch } from "react-redux";
 
 const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
-  // update state
   const [isClicked, setIsClicked] = useState(alreadyLiked);
   const [errorMessage, setErrorMessage] = useState("");
+  const socket = useWebSocket();
+  const dispatch = useDispatch();
 
-  // update like
   useEffect(() => {
     setIsClicked(alreadyLiked);
   }, [alreadyLiked]);
 
   const like = () => {
-
-    // update like
     let url = "";
     if (isClicked) {
       url = `${process.env.NEXT_PUBLIC_API_URL}/api/users/unliked`;
@@ -34,16 +34,21 @@ const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
         });
         if (response.ok) {
           const responseData = await response.json();
-          // update state
           setIsClicked(!isClicked);
+
+          // WebSocketを通じて通知を送信
+          if (!isClicked) {
+            socket.emit('like', { fromUserId: likeFromUserId, toUserId: likeToUserId });
+          } else {
+            socket.emit('unlike', { fromUserId: likeFromUserId, toUserId: likeToUserId });
+          }
         } else {
           console.error("updating liked is failed");
-          setErrorMessage(
-            "update your profile picture"
-          );
+          setErrorMessage("update your profile picture");
         }
       } catch (e) {
         console.error(e);
+        setErrorMessage("An error occurred while updating the like status.");
       }
     }
     updateLike();

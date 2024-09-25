@@ -105,27 +105,75 @@ function useWebSocket() {
         }
       });
 
-      newSocket.on('like received', (notification) => {
+      newSocket.on('like received', async (notification) => {
+        console.log("like received:::::::::::", notification);
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
-          dispatch(addNotification({
-            id: notification.id,
-            type: 'like',
-            message: 'You received a like',
-            fromUser: notification.from_user_id,
-            timestamp: new Date().toISOString(),
-          }));
+          try {
+            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: notification.from_user_id }),
+            });
+            const data = await response.json();
+            const username = data.username;
+      
+            const newNotification = {
+              id: notification.id || uuidv4(),
+              userId: userRef.current.id,
+              type: 'like',
+              message: `You received a like from ${username}`,
+              fromUser: notification.from_user_id,
+              timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+              checked: false,
+            };
+      
+            dispatch(addNotification(newNotification));
+      
+            // データベースに通知を保存
+            await fetch('http://localhost:4000/api/notifications/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newNotification),
+            });
+          } catch (error) {
+            console.error('Error fetching username:', error);
+          }
         }
       });
 
-      newSocket.on('unlike received', (notification) => {
+      newSocket.on('unlike received', async (notification) => {
+        console.log("unlike received:::::::::::", notification);
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
-          dispatch(addNotification({
-            id: notification.id,
-            type: 'unlike',
-            message: 'You received an unlike',
-            fromUser: notification.from_user_id,
-            timestamp: new Date().toISOString(),
-          }));
+          try {
+            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: notification.from_user_id }),
+            });
+            const data = await response.json();
+            const username = data.username;
+      
+            const newNotification = {
+              id: notification.id || uuidv4(),
+              userId: userRef.current.id,
+              type: 'unlike',
+              message: `You received a unlike from ${username}`,
+              fromUser: notification.from_user_id,
+              timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+              checked: false,
+            };
+      
+            dispatch(addNotification(newNotification));
+      
+            // データベースに通知を保存
+            await fetch('http://localhost:4000/api/notifications/save', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(newNotification),
+            });
+          } catch (error) {
+            console.error('Error fetching username:', error);
+          }
         }
       });
 

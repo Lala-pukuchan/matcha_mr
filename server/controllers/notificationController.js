@@ -16,6 +16,20 @@ const saveNotification = async (req, res) => {
   }
 };
 
+const deleteNotification = async (userId, fromUserId, type) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const query = 'DELETE FROM notifications WHERE user_id = ? AND from_user_id = ? AND type = ?';
+    await conn.query(query, [userId, fromUserId, type]);
+  } catch (error) {
+    console.error('Error deleting notification:', error);
+    throw error;
+  } finally {
+    if (conn) conn.end();
+  }
+};
+
 const getNotifications = async (req, res) => {
   const userId = req.params.userId;
   let conn;
@@ -51,6 +65,7 @@ const markAsRead = async (req, res) => {
 
 module.exports = {
   saveNotification,
+  deleteNotification,
   getNotifications,
   markAsRead,
 };
