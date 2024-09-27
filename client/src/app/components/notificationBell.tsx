@@ -10,23 +10,28 @@ const NotificationBell = () => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser(); 
+
   useEffect(() => {
     if (isOpen) {
       // 全ての通知を既読にする
-      notifications.forEach(async (notification) => {
-        if (!notification.checked) {
-          await fetch(`http://localhost:4000/api/notifications/markAsRead/${notification.id}`, {
-            method: 'POST',
-          });
-          dispatch(markAsRead(notification.id));
+      const markAllAsRead = async () => {
+        for (const notification of notifications) {
+          console.log("notification.id\t", notification.id);
+          if (!notification.checked) {
+            await fetch(`http://localhost:4000/api/notifications/markAsRead/${notification.id}`, {
+              method: 'POST',
+            });
+            dispatch(markAsRead(notification.id));
+          }
         }
-      });
+      };
+      markAllAsRead();
     }
   }, [isOpen, notifications, dispatch]);
 
   useEffect(() => {
     if (user && user.id) {
-      // ページを更新したときに通知を取得する
+      // ページを更新したときに通知を取得
       dispatch(fetchNotifications(user.id) as any);
     }
   }, [dispatch, user]);

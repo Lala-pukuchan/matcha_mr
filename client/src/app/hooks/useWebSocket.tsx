@@ -80,7 +80,7 @@ function useWebSocket() {
             const username = data.username;
       
             const newNotification = {
-              id: notification.id || uuidv4(),
+              id: notification.id,
               userId: userRef.current.id,
               type: 'message',
               message: `New message received from ${username}`,
@@ -88,15 +88,10 @@ function useWebSocket() {
               timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
               checked: false,
             };
+            console.log("newNotification.id", newNotification.id);
       
             dispatch(addNotification(newNotification));
       
-            // データベースに通知を保存
-            await fetch('http://localhost:4000/api/notifications/save', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(newNotification),
-            });
           } catch (error) {
             console.error('Error fetching username:', error);
           }
@@ -115,7 +110,7 @@ function useWebSocket() {
             const username = data.username;
       
             const newNotification = {
-              id: notification.id || uuidv4(),
+              id: notification.id,
               userId: userRef.current.id,
               type: 'like',
               message: `You received a like from ${username}`,
@@ -123,6 +118,7 @@ function useWebSocket() {
               timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
               checked: false,
             };
+            console.log("newNotification.id", newNotification.id);
       
             dispatch(addNotification(newNotification));
       
@@ -144,7 +140,7 @@ function useWebSocket() {
             const username = data.username;
       
             const newNotification = {
-              id: notification.id || uuidv4(),
+              id: notification.id,
               userId: userRef.current.id,
               type: 'viewed',
               message: `Your profile was viewed by ${username}`,
@@ -173,7 +169,7 @@ function useWebSocket() {
             const username = data.username;
       
             const newNotification = {
-              id: notification.id || uuidv4(),
+              id: notification.id,
               userId: userRef.current.id,
               type: 'unlike',
               message: `You received a unlike from ${username}`,
@@ -202,7 +198,7 @@ function useWebSocket() {
             const username = data.username;
       
             const newNotification = {
-              id: notification.id || uuidv4(),
+              id: notification.id,
               userId: userRef.current.id,
               type: 'match',
               message: `You have a new match with ${username}`,

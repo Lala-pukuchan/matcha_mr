@@ -50,6 +50,7 @@ const getNotifications = async (req, res) => {
 
 const markAsRead = async (req, res) => {
   const { notificationId } = req.params;
+  console.log("notificationId:::", notificationId);
   let conn;
   try {
     conn = await pool.getConnection();
@@ -63,6 +64,7 @@ const markAsRead = async (req, res) => {
     if (conn) conn.end();
   }
 };
+
 const deleteAndSaveNotification = async (notification) => {
   const { userId, fromUser, type } = notification;
   console.log("nofitication.id:::", notification.id);

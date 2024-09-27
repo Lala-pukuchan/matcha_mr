@@ -140,42 +140,53 @@ function setupSocket(io, pool) {
 
         const { user_id_first, user_id_second } = roomResult;
         const toUserId = (message.from_user_id === user_id_first) ? user_id_second : user_id_first;
-
+        const fromUserId = (message.from_user_id === user_id_first) ? user_id_first : user_id_second;
         const query = 'INSERT INTO messages (room_id, from_user_id, to_user_id, message, sent_at) VALUES (?, ?, ?, ?, ?)';
         const formattedDate = moment(message.sent_at).format('YYYY-MM-DD HH:mm:ss');
         const params = [room, message.from_user_id, toUserId, message.message, formattedDate];
         await conn.query(query, params);
 
+        const notificationId = uuidv4();
         if (socketIdMap.has(toUserId)) {
-          io.to(socketIdMap.get(toUserId)).emit('message received', { from_user_id: message.from_user_id });
+          io.to(socketIdMap.get(toUserId)).emit('message received', {
+            id: notificationId,
+            from_user_id: message.from_user_id,
+          });
         }
+        await deleteNotification(toUserId, fromUserId, 'message');
+
+        const userName = await getUserNameById(fromUserId);
+        const notification = {
+          id: notificationId,
+          userId: toUserId,
+          type: 'message',
+          message: `New message received from ${userName}`,
+          fromUser: fromUserId,
+          timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          checked: false,
+        };
+        await saveNotification(notification);
       } catch (error) {
-        console.error('Error saving message to database: ', error);
-      } finally {
-        if (conn) conn.end();
+        console.error('Error handling message event: ', error);
       }
     });
+
     socket.on('like', async (data) => {
-      console.log("data", data);
       const { fromUserId, toUserId } = data;
-      console.log(`Like event received from ${fromUserId} to ${toUserId}`); // デバッグ用ログ
+      const notificationId = uuidv4();
       if (socketIdMap.has(toUserId)) {
         io.to(socketIdMap.get(toUserId)).emit('like received', {
-          //id: new Date().getTime().toString(),
-          id: uuidv4(),
+          id: notificationId,
           from_user_id: fromUserId,
         });
       }
 
       try {
-        // 既存のunlike通知を削除
         await deleteNotification(toUserId, fromUserId, 'unlike');
 
-        // 新しいlike通知を保存
         const userName = await getUserNameById(fromUserId);
-        console.log(`Fetched username:;;;;;;like; ${userName}`); // デバッグ用ログ
         const notification = {
-          id: uuidv4(),
+          id: notificationId,
           userId: toUserId,
           type: 'like',
           message: `You received a like from ${userName}`,
@@ -191,24 +202,20 @@ function setupSocket(io, pool) {
   
     socket.on('unlike', async (data) => {
       const { fromUserId, toUserId } = data;
-      console.log(`Unlike event received from ${fromUserId} to ${toUserId}`); // デバッグ用ログ
+      const notificationId = uuidv4();
       if (socketIdMap.has(toUserId)) {
         io.to(socketIdMap.get(toUserId)).emit('unlike received', {
-          //id: new Date().getTime().toString(),
-          id: uuidv4(),
+          id: notificationId,
           from_user_id: fromUserId,
         });
       }
 
       try {
-        // 既存のlike通知を削除
         await deleteNotification(toUserId, fromUserId, 'like');
 
-        // 新しいunlike通知を保存
         const userName = await getUserNameById(fromUserId);
-        console.log(`Fetched username::::: unlike::${userName}`); // デバッグ用ログ
         const notification = {
-          id: uuidv4(),
+          id: notificationId,
           userId: toUserId,
           type: 'unlike',
           message: `You received an unlike from ${userName}`,
