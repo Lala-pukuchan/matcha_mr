@@ -57,7 +57,6 @@ function useWebSocket() {
       });
 
       newSocket.on('reconnect', (attempt) => {
-        console.log('WebSocket reconnected: ', attempt);
         if (disconnectTimeoutRef.current) {
           clearTimeout(disconnectTimeoutRef.current);
           disconnectTimeoutRef.current = null;
@@ -70,7 +69,6 @@ function useWebSocket() {
       });
 
       newSocket.on('message received', async (notification) => {
-        console.log('Message received from user', notification.from_user_id);
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
             const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
@@ -106,7 +104,6 @@ function useWebSocket() {
       });
 
       newSocket.on('like received', async (notification) => {
-        console.log("like received:::::::::::", notification);
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
             const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
@@ -129,12 +126,35 @@ function useWebSocket() {
       
             dispatch(addNotification(newNotification));
       
-            // データベースに通知を保存
-            await fetch('http://localhost:4000/api/notifications/save', {
+          } catch (error) {
+            console.error('Error fetching username:', error);
+          }
+        }
+      });
+
+      newSocket.on('viewed received', async (notification) => {
+        if (userRef.current && userRef.current.id !== notification.from_user_id) {
+          try {
+            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(newNotification),
+              body: JSON.stringify({ userId: notification.from_user_id }),
             });
+            const data = await response.json();
+            const username = data.username;
+      
+            const newNotification = {
+              id: notification.id || uuidv4(),
+              userId: userRef.current.id,
+              type: 'viewed',
+              message: `Your profile was viewed by ${username}`,
+              fromUser: notification.from_user_id,
+              timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+              checked: false,
+            };
+      
+            dispatch(addNotification(newNotification));
+      
           } catch (error) {
             console.error('Error fetching username:', error);
           }
@@ -142,7 +162,6 @@ function useWebSocket() {
       });
 
       newSocket.on('unlike received', async (notification) => {
-        console.log("unlike received:::::::::::", notification);
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
             const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
@@ -164,28 +183,39 @@ function useWebSocket() {
             };
       
             dispatch(addNotification(newNotification));
-      
-            // データベースに通知を保存
-            await fetch('http://localhost:4000/api/notifications/save', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(newNotification),
-            });
+
           } catch (error) {
             console.error('Error fetching username:', error);
           }
         }
       });
 
-      newSocket.on('match received', (notification) => {
+      newSocket.on('match received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
-          dispatch(addNotification({
-            id: notification.id,
-            type: 'match',
-            message: 'You have a new match',
-            fromUser: notification.from_user_id,
-            timestamp: new Date().toISOString(),
-          }));
+          try {
+            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId: notification.from_user_id }),
+            });
+            const data = await response.json();
+            const username = data.username;
+      
+            const newNotification = {
+              id: notification.id || uuidv4(),
+              userId: userRef.current.id,
+              type: 'match',
+              message: `You have a new match with ${username}`,
+              fromUser: notification.from_user_id,
+              timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+              checked: false,
+            };
+      
+            dispatch(addNotification(newNotification));
+      
+          } catch (error) {
+            console.error('Error fetching username:', error);
+          }
         }
       });
 

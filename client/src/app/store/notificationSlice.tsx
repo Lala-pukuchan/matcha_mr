@@ -34,16 +34,18 @@ const notificationSlice = createSlice({
   name: 'notifications',
   initialState,
   reducers: {
-    addNotification: (state, action: PayloadAction<Notification>) => {
-      console.log('Adding notification to state', action.payload);
-      state.notifications.unshift({ ...action.payload, checked: false });
-      if (state.notifications.length > 10) {
-        state.notifications.pop();
-      }
+    addNotification: (state, action) => {
+      // 同じ種類の未読通知を削除
+      state.notifications = state.notifications.filter(notification => 
+        !(notification.type === action.payload.type && 
+          notification.fromUser === action.payload.fromUser && 
+          !notification.checked)
+      ).concat(action.payload);
       state.unreadCount = state.notifications.filter(notification => !notification.checked).length;
     },
     clearNotifications: (state) => {
       state.notifications = [];
+      state.unreadCount = 0;
     },
     markAsRead: (state, action: PayloadAction<string>) => {
       const notification = state.notifications.find(n => n.id === action.payload);
@@ -53,6 +55,10 @@ const notificationSlice = createSlice({
       }
       state.unreadCount = state.notifications.filter(notification => !notification.checked).length;
     },
+    removeNotification: (state, action) => {
+      state.notifications = state.notifications.filter(notification => notification.id !== action.payload);
+      state.unreadCount = state.notifications.filter(notification => !notification.checked).length;
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchNotifications.fulfilled, (state, action) => {

@@ -307,13 +307,23 @@ const reportUser = async (req, res) => {
 };
 
 const insertViewed = async (req, res) => {
-  console.log("req.body: ", req.body);
+  console.log("insertViewed");
   let conn;
   try {
     conn = await pool.getConnection();
+    await conn.beginTransaction();
+
+    // 既存の訪問履歴を削除
+    await conn.query("DELETE FROM viewed WHERE from_user_id = ? AND viewed_to_user_id = ?", [req.body.from, req.body.to]);
+
+    // 新たな訪問記録を作成
     await conn.query("INSERT INTO viewed (from_user_id, viewed_to_user_id, viewed_at) VALUES (?, ?, NOW())", [req.body.from, req.body.to]);
+
+    await conn.commit();
+    return res.json({ message: "success" });
   } catch (e) {
     console.log(e);
+    if (conn) await conn.rollback();
     return res.status(500).json({ message: "Internal server error" });
   } finally {
     if (conn) conn.end();
@@ -350,9 +360,14 @@ const insertLiked = async (req, res) => {
       const reverseLiked = await conn.query("SELECT * FROM liked WHERE liked_to_user_id = ? AND from_user_id = ?", values);
       if (reverseLiked.length > 0) {
         await conn.query("INSERT INTO matched (matched_user_id_first, matched_user_id_second) VALUES (?, ?)", [req.body.to, req.body.from]);
-        await conn.query("INSERT INTO rooms (user_id_first, user_id_second) VALUES (?, ?)", [req.body.from, req.body.to]);
       }
-
+      const existingRoom = await conn.query(
+        "SELECT * FROM rooms WHERE (user_id_first = ? AND user_id_second = ?) OR (user_id_first = ? AND user_id_second = ?)",
+        [req.body.from, req.body.to, req.body.to, req.body.from]
+      );
+      if (existingRoom.length === 0) {
+        await conn.query("INSERT INTO rooms (user_id_first, user_id_second) VALUES (?, ?)", [req.body.from, req.body.to]);
+    }
       const likeResult = await conn.query("SELECT * FROM liked WHERE from_user_id = ?", [req.body.from]);
       const matchResult = await conn.query("SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?", [req.body.from, req.body.from]);
 

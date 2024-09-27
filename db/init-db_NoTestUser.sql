@@ -325,7 +325,7 @@ CREATE TABLE `viewed` (
   `id` int(11) NOT NULL,
   `from_user_id` varchar(256) NOT NULL,
   `viewed_to_user_id` varchar(256) NOT NULL,
-  `viewed_at` date NOT NULL DEFAULT current_timestamp()
+  `viewed_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --

@@ -2,7 +2,26 @@ const moment = require('moment');
 const { v4: uuidv4 } = require('uuid');
 const onlineUsers = new Map();
 const socketIdMap = new Map();
-const {saveNotification, deleteNotification} = require('../controllers/notificationController');
+const {saveNotification, deleteNotification, deleteAndSaveNotification} = require('../controllers/notificationController');
+const pool = require('../services/dbService');
+
+async function getUserNameById(userId) {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const query = 'SELECT username FROM user WHERE id = ?';
+    const rows = await conn.query(query, [userId]);
+    if (rows.length > 0) {
+      return rows[0].username;
+    }
+    return null;
+  } catch (error) {
+    console.error('Error fetching username: ', error);
+    return null;
+  } finally {
+    if (conn) conn.end();
+  }
+}
 
 function setupSocket(io, pool) {
   io.on('connection', (socket) => {
@@ -137,6 +156,7 @@ function setupSocket(io, pool) {
       }
     });
     socket.on('like', async (data) => {
+      console.log("data", data);
       const { fromUserId, toUserId } = data;
       console.log(`Like event received from ${fromUserId} to ${toUserId}`); // デバッグ用ログ
       if (socketIdMap.has(toUserId)) {
@@ -152,11 +172,13 @@ function setupSocket(io, pool) {
         await deleteNotification(toUserId, fromUserId, 'unlike');
 
         // 新しいlike通知を保存
+        const userName = await getUserNameById(fromUserId);
+        console.log(`Fetched username:;;;;;;like; ${userName}`); // デバッグ用ログ
         const notification = {
           id: uuidv4(),
           userId: toUserId,
           type: 'like',
-          message: 'You received a like',
+          message: `You received a like from ${userName}`,
           fromUser: fromUserId,
           timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
           checked: false,
@@ -183,11 +205,13 @@ function setupSocket(io, pool) {
         await deleteNotification(toUserId, fromUserId, 'like');
 
         // 新しいunlike通知を保存
+        const userName = await getUserNameById(fromUserId);
+        console.log(`Fetched username::::: unlike::${userName}`); // デバッグ用ログ
         const notification = {
           id: uuidv4(),
           userId: toUserId,
           type: 'unlike',
-          message: 'You received an unlike',
+          message: `You received an unlike from ${userName}`,
           fromUser: fromUserId,
           timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
           checked: false,
@@ -197,7 +221,31 @@ function setupSocket(io, pool) {
         console.error('Error handling unlike event: ', error);
       }
     });
-  
+    socket.on('viewed', async (data) => {
+      const { fromUserId, toUserId } = data;
+      if (socketIdMap.has(toUserId)) {
+        io.to(socketIdMap.get(toUserId)).emit('viewed received', {
+          id: uuidv4(),
+          from_user_id: fromUserId,
+        });
+      }
+      try {
+        const userName = await getUserNameById(fromUserId);
+        const notification = {
+          id: uuidv4(),
+          userId: toUserId,
+          type: 'viewed',
+          message: `Your profile was viewed by ${userName}`,
+          fromUser: fromUserId,
+          timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          checked: false,
+        };
+        await deleteAndSaveNotification(notification);
+      } catch (error) {
+        console.error('Error handling viewed event: ', error);
+      }
+    });
+
     socket.on('match', async (data) => {
       const { fromUserId, toUserId } = data;
       io.to(toUserId).emit('match received', {
