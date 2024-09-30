@@ -274,7 +274,7 @@ function setupSocket(io, pool) {
           timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
           checked: false,
         };
-        await saveNotification(notification);
+        await deleteAndSaveNotification(notification);
       } catch (error) {
         console.error('Error handling match event: ', error);
       }
