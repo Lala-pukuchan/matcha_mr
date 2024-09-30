@@ -53,12 +53,7 @@ export default function Nav() {
                 <Link href="/myAccount">MyAccount</Link>
               </li>
               <li>
-                <Link href="/chat" onClick={handleChatClick}>
-                  Chat
-                  {notifications.length > 0 && (
-                    <span className="ml-2 bg-red-500 rounded-full h-3 w-3 inline-block"></span>
-                  )}
-                </Link>
+                <Link href="/chat">Chat</Link>
               </li>
               <li>
                 <NotificationBell />

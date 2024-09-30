@@ -31,6 +31,7 @@ router.get('/tags',userController.getTags);
 router.post('/user/tags', userController.addNewTags);
 router.post('/close', userController.closeAccount);
 router.post('/connected', userController.insertConnected);
+router.post('/checkMatched', userController.checkMatched);
 router.post('/commonTags', userController.getCommonTags);
 router.post('/frequentlyLikedBack', userController.getFrequentlyLikedBack);
 router.post('/blockedTo', userController.getBlockedTo);

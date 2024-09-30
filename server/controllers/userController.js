@@ -410,6 +410,7 @@ const insertBlocked = async (req, res) => {
 
 const getConnectedUsers = async (req, res) => {
   let conn;
+  console.log("getConnectedUsers");
   try {
     conn = await pool.getConnection();
     const matchResult = await conn.query("SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?", [req.body.id, req.body.id]);
@@ -431,6 +432,30 @@ const getConnectedUsers = async (req, res) => {
   } catch (e) {
     console.log(e);
     return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) conn.end();
+  }
+};
+
+const checkMatched = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { from, to } = req.body;
+    const query = `
+      SELECT * FROM matched 
+      WHERE (matched_user_id_first = ? AND matched_user_id_second = ?) 
+      OR (matched_user_id_first = ? AND matched_user_id_second = ?)
+    `;
+    const rows = await conn.query(query, [from, to, to, from]);
+    if (rows.length > 0) {
+      return res.json({ matched: true });
+    } else {
+      return res.json({ matched: false });
+    }
+  } catch (error) {
+    console.error('Error checking match status: ', error);
+    return res.status(500).json({ message: 'Internal server error' });
   } finally {
     if (conn) conn.end();
   }
@@ -877,6 +902,7 @@ module.exports = {
   insertLiked,
   insertBlocked,
   getConnectedUsers,
+  checkMatched,
   insertUnliked,
   getLikedUsers,
   getLikedToUsers,

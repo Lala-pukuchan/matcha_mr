@@ -255,12 +255,30 @@ function setupSocket(io, pool) {
 
     socket.on('match', async (data) => {
       const { fromUserId, toUserId } = data;
-      io.to(toUserId).emit('match received', {
-        id: new Date().getTime().toString(),
-        from_user_id: fromUserId,
-      });
-    });
+      const notificationId = uuidv4();
+      if (socketIdMap.has(toUserId)) {
+        io.to(socketIdMap.get(toUserId)).emit('match received', {
+          id: notificationId,
+          from_user_id: fromUserId,
+        });
+      }
 
+      try {
+        const userName = await getUserNameById(fromUserId);
+        const notification = {
+          id: notificationId,
+          userId: toUserId,
+          type: 'match',
+          message: `You have a new match with ${userName}`,
+          fromUser: fromUserId,
+          timestamp: new Date().toISOString().slice(0, 19).replace('T', ' '),
+          checked: false,
+        };
+        await saveNotification(notification);
+      } catch (error) {
+        console.error('Error handling match event: ', error);
+      }
+    });
     socket.on('error', (error) => {
       console.error('Socket.io error: ', error);
     });
