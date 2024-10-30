@@ -73,13 +73,6 @@ def generate_user(index):
     biography = f"Hi, I'm {firstname} {lastname}, welcome to my profile!".replace("'", "''")
     pics = [""] * 5
     coordinates = [
-        [48.87531185129365, 2.298280405983636],
-        [51.50989693654328, -0.10874003178788273],
-        [52.51725134473067, 13.402719508063884],
-        [52.22540600497236, 21.011485576035128],
-        [45.07957378609001, 15.063145528115063],
-        [35.841207715466766, 139.82935561320951],
-        [2.336185, 48.885884],
         [45.764043, 4.835659],
         [43.296482, 5.369780],
         [43.710173, 7.261953],
@@ -171,7 +164,6 @@ def generate_user(index):
 insert_user_statements = []
 insert_tag_statements = []
 
-id = 81;
 for i in range(1, 501):
     user_values, user_tags = generate_user(i)
     values_str = ", ".join([f"'{str(v)}'" if isinstance(v, str) or v is None else str(v) for v in user_values])
@@ -180,12 +172,10 @@ for i in range(1, 501):
     if user_tags:
         for tag in user_tags:
             tag_id = tags.index(tag) + 23  # Adjusting for the ID range
-            insert_tag_statements.append(f"({id}, '{user_values[0]}', '{tag_id}'),")
-            id += 1
+            insert_tag_statements.append(f"('{user_values[0]}', '{tag_id}')")
 
 # すべてのINSERT文を出力
 print("INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `password`, `enabled`, `age`, `gender`, `preference`, `biography`, `profilePic`, `isRealUser`, `status`, `pic1`, `pic2`, `pic3`, `pic4`, `pic5`, `longitude`, `latitude`, `match_ratio`, `fake_account`, `last_active`) VALUES")
 print(",\n".join(insert_user_statements) + ";")
-
-for tag_statement in insert_tag_statements:
-    print(tag_statement)
+print("INSERT INTO `usertag` (`user_id`, `tag_id`) VALUES")
+print(",\n".join(insert_tag_statements) + ";")
