@@ -18,12 +18,20 @@ export default function UsersList({
   link,
 }) {
   const [onlineStatus, setOnlineStatus] = useState({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [displayedUsers, setDisplayedUsers] = useState([]);
+  const usersPerPage = 4;
   const socket = useWebSocket();
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (users && users.length > 0) {
-      const userIds = users.map((user) => user.id);
+    const startIndex = (currentPage - 1) * usersPerPage;
+    const endIndex = startIndex + usersPerPage;
+    const currentUsers = users.slice(startIndex, endIndex);
+    setDisplayedUsers(currentUsers);
+
+    if (currentUsers.length > 0) {
+      const userIds = currentUsers.map((user) => user.id);
       fetch(`http://localhost:4000/api/users/onlineStatus`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,7 +49,7 @@ export default function UsersList({
         })
         .catch((error) => console.error("Error fetching online status:", error));
     }
-  }, [users]);
+  }, [users, currentPage]);
 
   useEffect(() => {
     if (socket) {
@@ -58,7 +66,7 @@ export default function UsersList({
         socket.off("user status");
       }
     };
-  }, [socket]);
+  }, [socket, displayedUsers]);
 
   const handleUnmatch = async (userId) => {
     try {
@@ -83,10 +91,22 @@ export default function UsersList({
     }
   };
 
+  const handleNextPage = () => {
+    if (currentPage * usersPerPage < users.length) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
   return (
     <div className="flex flex-col m-10 space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
-        {users
+        {displayedUsers
           .filter((user) => !blockedUsersId.includes(user.id))
           .map((user) => (
             <div key={user.id} className="flex flex-col items-center m-1">
@@ -133,6 +153,22 @@ export default function UsersList({
               <Tag user={user} />
             </div>
           ))}
+      </div>
+      <div className="flex justify-between mt-4">
+        <button
+          onClick={handlePreviousPage}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+        >
+          Previous
+        </button>
+        <button
+          onClick={handleNextPage}
+          disabled={currentPage * usersPerPage >= users.length}
+          className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
