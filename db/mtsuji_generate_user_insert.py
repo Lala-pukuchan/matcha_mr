@@ -37,7 +37,7 @@ def assign_tags(gender, preference):
         selected_tags += random.sample(male_tags + neutral_tags, random.randint(0, 5))
     elif gender == "female" and preference == "female":
         selected_tags += random.sample(female_tags + neutral_tags, random.randint(0, 5))
-    elif preference == "":
+    elif preference == "no":
         selected_tags += random.sample(male_tags + female_tags + neutral_tags, random.randint(0, 5))
     else:
         selected_tags += random.sample(neutral_tags, random.randint(0, 5))
@@ -58,7 +58,7 @@ def generate_user(index):
 
     orientation_chance = random.randint(1, 100)
     if orientation_chance <= 10:
-        preference = ""  # 10% chance of bisexual
+        preference = "no"  # 10% chance of bisexual
     elif orientation_chance <= 20:
         preference = gender  # 10% chance of same-sex preference
     else:

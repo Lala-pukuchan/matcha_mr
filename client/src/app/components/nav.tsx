@@ -26,8 +26,8 @@ export default function Nav() {
   return (
     <nav className="w-full bg-blue-100 border-b shadow-md">
       <div className="container mx-auto flex items-center justify-between p-4">
-        <Link href="/" className={"flex items-center space-x-2"}>
-          <img src="/logo.png" alt="Logo" className="h-16 w-48" object-contain/>
+      <Link href="/" className="flex items-center space-x-2">
+          <img src="/logo.png" alt="Logo" className="h-16 w-48" />
         </Link>
         <button
           className="block md:hidden text-gray-800 focus:outline-none"
