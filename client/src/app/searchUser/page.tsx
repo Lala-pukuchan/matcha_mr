@@ -9,7 +9,6 @@ import useAuthCheck from "../hooks/useAuthCheck";
 export default function Home() {
   const isRedirecting = useAuthCheck(null, "/login");
   const { user } = useUser();
-
   const [users, setUserList] = useState([]);
   const [sortedUsers, setSortedUsers] = useState([]);
   const [loading, setLoading] = useState(true);

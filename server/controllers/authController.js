@@ -19,16 +19,16 @@ const createUser = async (req, res) => {
       const gender = req.body.gender;
       const preference = req.body.preference;
       const isRealUser = 1;
-      let profilePic;
-      if (gender === "male") {
-        const randomNumber = Math.floor(Math.random() * 12) + 1;
-        profilePic = `http://localhost:4000/uploads/${randomNumber}_boy.png`;
-      } else if (gender === "female") {
-        const randomNumber = Math.floor(Math.random() * 12) + 1;
-        profilePic = `http://localhost:4000/uploads/${randomNumber}_girl.png`;
-      } else {
-        profilePic = "";
-      }
+      //let profilePic;
+      // if (gender === "male") {
+      //   const randomNumber = Math.floor(Math.random() * 12) + 1;
+      //   profilePic = `http://localhost:4000/uploads/${randomNumber}_boy.png`;
+      // } else if (gender === "female") {
+      //   const randomNumber = Math.floor(Math.random() * 12) + 1;
+      //   profilePic = `http://localhost:4000/uploads/${randomNumber}_girl.png`;
+      // } else {
+      //   profilePic = "";
+      // }
       const insertValues = [
         userId,
         req.body.email,
@@ -38,11 +38,10 @@ const createUser = async (req, res) => {
         hashedPassword,
         req.body.gender,
         preference,
-        profilePic,
         isRealUser,
       ];
       const result = await conn.query(
-        "INSERT INTO user(id, email, username, lastname, firstname, password, gender, preference, profilePic, isRealUser) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO user(id, email, username, lastname, firstname, password, gender, preference, isRealUser) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
         insertValues
       );
 

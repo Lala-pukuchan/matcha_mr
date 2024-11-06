@@ -5,10 +5,10 @@ import Tag from "./tag";
 import MatchRatio from "./matchRatio";
 import ReportFakeAccount from "./reportFakeAccount";
 import Block from "./block";
-import useWebSocket from "../hooks/useWebSocket";
 import { useState, useEffect } from "react";
 import { useDispatch } from 'react-redux';
 import { addNotification } from '../store/notificationSlice';
+import useWebSocket from '../hooks/useWebSocket';
 
 export default function UsersList({
   users,
@@ -20,35 +20,46 @@ export default function UsersList({
   const [onlineStatus, setOnlineStatus] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [displayedUsers, setDisplayedUsers] = useState([]);
-  const usersPerPage = 4;
-  const socket = useWebSocket();
+  const usersPerPage = 8;
   const dispatch = useDispatch();
+  const socket = useWebSocket();
 
   useEffect(() => {
     const startIndex = (currentPage - 1) * usersPerPage;
     const endIndex = startIndex + usersPerPage;
     const currentUsers = users.slice(startIndex, endIndex);
     setDisplayedUsers(currentUsers);
-
+    console.log("current user status: ", currentUsers.map((user) => user.status));
     if (currentUsers.length > 0) {
-      const userIds = currentUsers.map((user) => user.id);
-      fetch(`http://localhost:4000/api/users/onlineStatus`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: userIds }),
-      })
-        .then((response) => response.json())
-        .then((statuses) => {
-          const statusMap = {};
-          (Array.isArray(statuses) ? statuses : [statuses]).forEach(
-            ({ id, status }) => {
-              statusMap[id] = status;
-            }
-          );
-          setOnlineStatus(statusMap);
-        })
-        .catch((error) => console.error("Error fetching online status:", error));
+      setOnlineStatus(prevStatus => {
+        const isStatusChanged = currentUsers.some(user => user.status !== prevStatus[user.id]);
+        return isStatusChanged ? currentUsers.reduce((acc, user) => ({ ...acc, [user.id]: user.status }), {}) : prevStatus;
+      });
     }
+    //if (currentUsers.length > 0) {
+    //  const userIds = currentUsers.map((user) => user.id);
+    //  fetch(`http://localhost:4000/api/users/onlineStatus`, {
+    //    method: "POST",
+    //    headers: { "Content-Type": "application/json" },
+    //    body: JSON.stringify({ ids: userIds }),
+    //  })
+    //    .then((response) => response.json())
+    //    .then((statuses) => {
+    //      const statusMap = {};
+    //      (Array.isArray(statuses) ? statuses : [statuses]).forEach(
+    //        ({ id, status }) => {
+    //          statusMap[id] = status;
+    //        }
+    //      );
+    //      setOnlineStatus(prevStatus => {
+    //        const isStatusChanged = Object.keys(statusMap).some(
+    //          key => statusMap[key] !== prevStatus[key]
+    //        );
+    //        return isStatusChanged ? statusMap : prevStatus;
+    //      });
+    //    })
+    //    .catch((error) => console.error("Error fetching online status:", error));
+    //}
   }, [users, currentPage]);
 
   useEffect(() => {

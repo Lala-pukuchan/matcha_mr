@@ -9,7 +9,6 @@ import useAuthCheck from "../hooks/useAuthCheck";
 export default function Home() {
   const isRedirecting = useAuthCheck(null, "/login");
   const { user } = useUser();
-
   const [users, setUsers] = useState([]);
   const [sortedUsers, setSortedUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -84,6 +83,7 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
+
           setUsers(data.filter((d) => d.id !== user.id));
         } else {
           setUsers([]);
