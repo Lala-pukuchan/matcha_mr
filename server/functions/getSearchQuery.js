@@ -1,5 +1,5 @@
 async function getSearchQuery(data) {
-  console.log("data", data);
+  //console.log("data", data);
 
   let user;
   try {
@@ -37,10 +37,17 @@ async function getSearchQuery(data) {
   
   // Gender and Preference filter
   if (user.gender && user.preference) {
-    whereConditions.push(`
-      (user.gender = ? AND user.preference = ?)
-    `);
-    values.push(user.preference, user.gender);
+    if (user.preference === 'no') {
+      whereConditions.push(`
+        (user.preference = 'no' OR user.preference = ?)
+      `);
+      values.push(user.gender);
+    } else {
+      whereConditions.push(`
+        (user.gender = ? AND user.preference = ?)
+      `);
+      values.push(user.preference, user.gender);
+    }
   }
 
   // Age range filter
@@ -116,8 +123,8 @@ async function getSearchQuery(data) {
   }
   baseQuery += orderByClause;
 
-  console.log("Final baseQuery", baseQuery);
-  console.log("Final values", values);
+  //console.log("Final baseQuery", baseQuery);
+  //console.log("Final values", values);
   
   return { baseQuery, values, distance: 'distance', common_tags_count: 'common_tags_count' };
 }

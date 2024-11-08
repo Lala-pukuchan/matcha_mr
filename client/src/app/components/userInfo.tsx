@@ -111,7 +111,7 @@ export default function UserInfo({ user }) {
 
         <div className="grid gap-4 grid-cols-2 mx-auto w-full">
           <p className="font-bold">Match Ratio</p>
-          {user && user.match_ratio ? (
+          {user && user.match_ratio !== null && user.match_ratio !== undefined ? (
             <MatchRatio matchRatio={user.match_ratio} />
           ) : (
             ""

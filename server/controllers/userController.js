@@ -14,6 +14,7 @@ const socketIdMap = require("../sockets/socketHandler");
 
 const getUserInfo = async (req, res) => {
   let token;
+  //console.log("getUserInfo called");
   try {
     token = req.cookies.token;
     if (!token) {
@@ -242,7 +243,8 @@ const updateUser = async (req, res) => {
     await conn.query("DELETE FROM usertag WHERE user_id = ?", [userId]);
     const tagIds = req.body.tags;
     if (tagIds) {
-      for (const tagId of tagIds) {
+      const tagIdsArray = Array.isArray(tagIds) ? tagIds : [tagIds];
+      for (const tagId of tagIdsArray) {
         await conn.query("INSERT INTO usertag(user_id, tag_id) VALUES (?, ?)", [userId, tagId]);
       }
     }
@@ -827,10 +829,8 @@ const searchUser = async (req, res) => {
   try {
     conn = await pool.getConnection();
     const { baseQuery, values } = await getSearchQuery(req.body);
+
     const rows = await conn.query(baseQuery, values);
-    console.log('req.body:', req.body);
-    console.log('searchUser.baseQuery:', baseQuery);
-    console.log('searchUser.values:', values);
     // add tags
     if (rows.length > 0) {
       for (row of rows) {

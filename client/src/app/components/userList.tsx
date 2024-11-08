@@ -29,55 +29,32 @@ export default function UsersList({
     const endIndex = startIndex + usersPerPage;
     const currentUsers = users.slice(startIndex, endIndex);
     setDisplayedUsers(currentUsers);
-    console.log("current user status: ", currentUsers.map((user) => user.status));
-    if (currentUsers.length > 0) {
-      setOnlineStatus(prevStatus => {
-        const isStatusChanged = currentUsers.some(user => user.status !== prevStatus[user.id]);
-        return isStatusChanged ? currentUsers.reduce((acc, user) => ({ ...acc, [user.id]: user.status }), {}) : prevStatus;
-      });
-    }
-    //if (currentUsers.length > 0) {
-    //  const userIds = currentUsers.map((user) => user.id);
-    //  fetch(`http://localhost:4000/api/users/onlineStatus`, {
-    //    method: "POST",
-    //    headers: { "Content-Type": "application/json" },
-    //    body: JSON.stringify({ ids: userIds }),
-    //  })
-    //    .then((response) => response.json())
-    //    .then((statuses) => {
-    //      const statusMap = {};
-    //      (Array.isArray(statuses) ? statuses : [statuses]).forEach(
-    //        ({ id, status }) => {
-    //          statusMap[id] = status;
-    //        }
-    //      );
-    //      setOnlineStatus(prevStatus => {
-    //        const isStatusChanged = Object.keys(statusMap).some(
-    //          key => statusMap[key] !== prevStatus[key]
-    //        );
-    //        return isStatusChanged ? statusMap : prevStatus;
-    //      });
-    //    })
-    //    .catch((error) => console.error("Error fetching online status:", error));
-    //}
+
+    // 初期化時にusersのstatusを使用してonlineStatusを設定
+    const initialStatus = currentUsers.reduce((acc, user) => {
+      acc[user.id] = user.status;
+      return acc;
+    }, {});
+    setOnlineStatus(initialStatus);
+
   }, [users, currentPage]);
 
   useEffect(() => {
     if (socket) {
-      socket.on("user status", ({ userId, status }) => {
+      const handleUserStatus = ({ userId, status }) => {
         setOnlineStatus((prevStatus) => ({
           ...prevStatus,
           [userId]: status,
         }));
-      });
+      };
+      socket.off("user status", handleUserStatus);
+      socket.on("user status", handleUserStatus);
+      return () => {
+        socket.off("user status", handleUserStatus);
+      };
     }
+  }, [socket]); 
 
-    return () => {
-      if (socket) {
-        socket.off("user status");
-      }
-    };
-  }, [socket, displayedUsers]);
 
   const handleUnmatch = async (userId) => {
     try {
@@ -137,7 +114,7 @@ export default function UsersList({
                   <Link href={`${link}?userID=${user.id}`}>
                     <span>{user.username} ({user.age})</span>
                   </Link>
-                  {onlineStatus[user.id] === "online" && (
+                  {(onlineStatus[user.id] || user.status) === "online" && (
                     <span className="ml-2 h-3 w-3 bg-green-500 rounded-full"></span>
                   )}
                 </div>

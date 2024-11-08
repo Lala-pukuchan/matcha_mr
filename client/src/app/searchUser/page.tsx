@@ -135,7 +135,7 @@ export default function Home() {
     };
 
     if (user) {
-      fetchUsers();
+      //fetchUsers();
       likedUsers();
       blockedUsers();
       setLoading(false);
