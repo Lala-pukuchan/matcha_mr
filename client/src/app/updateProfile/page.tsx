@@ -265,8 +265,8 @@ export default function updateProfile() {
               id="age"
               name="age"
               placeholder="age"
-              min={0}
-              max={120}
+              min={18}
+              max={100}
               required
               defaultValue={user ? user.age : ""}
               className="bg-gray-100 p-3 rounded"

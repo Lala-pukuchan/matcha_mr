@@ -44,7 +44,7 @@ async function getSearchQuery(data) {
       values.push(user.gender);
     } else {
       whereConditions.push(`
-        (user.gender = ? AND user.preference = ?)
+        (user.gender = ? AND (user.preference = ? OR user.preference = 'no'))
       `);
       values.push(user.preference, user.gender);
     }
