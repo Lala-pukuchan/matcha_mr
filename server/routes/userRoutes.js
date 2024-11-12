@@ -37,6 +37,6 @@ router.post('/frequentlyLikedBack', userController.getFrequentlyLikedBack);
 router.post('/blockedTo', userController.getBlockedTo);
 router.post('/searchUser', upload.none(), userController.searchUser);
 router.post('/onlineStatus', userController.onlineStatus);
-
+router.post('/checkLikedStatus', userController.checkLikedStatus);
 //close, connected, commonTags, frequestlyLikedBack, blockedto, 
 module.exports = router;

@@ -69,7 +69,7 @@ def generate_user(index):
     email = f"{username.lower()}@example.com"
     password = hashlib.sha256(f"password{index}".encode()).hexdigest()
     enabled = random.choice([0, 1])
-    age = random.randint(18, 100)
+    age = random.randint(18, 65)
     biography = f"Hi, I'm {firstname} {lastname}, welcome to my profile!".replace("'", "''")
     pics = [""] * 5
     coordinates = [

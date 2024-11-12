@@ -16,9 +16,9 @@ export default function MyAccount() {
   const [likedFromUsers, setLikedFromUsers] = useState([]);
   const [userList, setUserList] = useState([]);
   const token = typeof window !== "undefined" ? document.cookie.split("; ").find((row) => row.startsWith("token=")) : null;
-
   useEffect(() => {
     const fetchUser = async () => {
+      console.log("fetchUser called");
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/myAccount`,
@@ -33,6 +33,7 @@ export default function MyAccount() {
         if (response.ok) {
           const data = await response.json();
           setUser(data);
+          console.log("user: ", user);
         } else {
           setUser([]);
         }
@@ -45,6 +46,8 @@ export default function MyAccount() {
     };
 
     const fetchUsers = async () => {
+      console.log("fetchUsers called");
+      console.log("user: ", user);
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/getUser`,
@@ -53,6 +56,10 @@ export default function MyAccount() {
             headers: {
               "Content-Type": "application/json",
             },
+            body: JSON.stringify({
+              gender: user.gender,
+              preference: user.preference,
+            }),
           }
         );
         if (response.ok) {

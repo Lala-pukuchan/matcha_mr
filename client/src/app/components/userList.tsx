@@ -1,7 +1,6 @@
 import Link from "next/link";
 import Heart from "./heart";
 import Geo from "./geo";
-import Tag from "./tag";
 import MatchRatio from "./matchRatio";
 import ReportFakeAccount from "./reportFakeAccount";
 import Block from "./block";
@@ -20,6 +19,8 @@ export default function UsersList({
   const [onlineStatus, setOnlineStatus] = useState({});
   const [currentPage, setCurrentPage] = useState(1);
   const [displayedUsers, setDisplayedUsers] = useState([]);
+  const [userTags, setUserTags] = useState({});
+  const [loadingTags, setLoadingTags] = useState(true);
   const usersPerPage = 8;
   const dispatch = useDispatch();
   const socket = useWebSocket();
@@ -30,13 +31,35 @@ export default function UsersList({
     const currentUsers = users.slice(startIndex, endIndex);
     setDisplayedUsers(currentUsers);
 
-    // 初期化時にusersのstatusを使用してonlineStatusを設定
     const initialStatus = currentUsers.reduce((acc, user) => {
       acc[user.id] = user.status;
       return acc;
     }, {});
     setOnlineStatus(initialStatus);
 
+    const fetchTagsForUsers = async () => {
+      try {
+        const tagsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`);
+        const tagsData = await tagsResponse.json();
+        const tagsMap = tagsData.reduce((acc, tag) => {
+          acc[tag.id] = tag.name;
+          return acc;
+        }, {});
+
+        const userTagsMap = {};
+        for (const user of currentUsers) {
+          const userTagIds = user.tagIds || [];
+          userTagsMap[user.id] = userTagIds.map(tagId => tagsMap[tagId]);
+        }
+        setUserTags(userTagsMap);
+        setLoadingTags(false);
+      } catch (error) {
+        console.error("Error fetching tags:", error);
+        setLoadingTags(false);
+      }
+    };
+
+    fetchTagsForUsers();
   }, [users, currentPage]);
 
   useEffect(() => {
@@ -53,12 +76,10 @@ export default function UsersList({
         socket.off("user status", handleUserStatus);
       };
     }
-  }, [socket]); 
-
+  }, [socket]);
 
   const handleUnmatch = async (userId) => {
     try {
-      console.log("handleUnmatch! userId: ", userId);
       const response = await fetch('http://localhost:4000/api/unmatch', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -90,6 +111,10 @@ export default function UsersList({
       setCurrentPage((prevPage) => prevPage - 1);
     }
   };
+
+  if (loadingTags) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col m-10 space-y-4">
@@ -138,7 +163,13 @@ export default function UsersList({
                 <MatchRatio matchRatio={user.match_ratio} />
                 <Geo lat={user.latitude} lon={user.longitude} isRealUser={user.isRealUser} />
               </div>
-              <Tag user={user} />
+              <div className="flex flex-wrap gap-2 mt-2">
+                {userTags[user.id] && userTags[user.id].map((tag, index) => (
+                  <span key={`${user.id}-${index}`} className="bg-gray-200 px-2 py-1 rounded text-sm">
+                    #{tag}
+                  </span>
+                ))}
+              </div>
             </div>
           ))}
       </div>

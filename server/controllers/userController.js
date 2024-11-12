@@ -510,6 +510,32 @@ const getLikedUsers = async (req, res) => {
   }
 };
 
+const checkLikedStatus = async (req, res) => {
+  let conn;
+  try {
+    conn = await pool.getConnection();
+    const { from, to } = req.body;
+
+    // Check if the user has liked the profile
+    const likedQuery = "SELECT * FROM liked WHERE from_user_id = ? AND liked_to_user_id = ?";
+    const likedResult = await conn.query(likedQuery, [from, to]);
+
+    // Check if the profile has liked the user
+    const likedByQuery = "SELECT * FROM liked WHERE from_user_id = ? AND liked_to_user_id = ?";
+    const likedByResult = await conn.query(likedByQuery, [to, from]);
+
+    const likedByUser = likedResult.length > 0;
+    const likedByOther = likedByResult.length > 0;
+
+    return res.json({ likedByUser, likedByOther });
+  } catch (e) {
+    console.error('Error checking like status: ', e);
+    return res.status(500).json({ message: "Internal server error" });
+  } finally {
+    if (conn) conn.end();
+  }
+};
+
 const getLikedToUsers = async (req, res) => {
   let conn;
   try {
@@ -905,6 +931,7 @@ module.exports = {
   checkMatched,
   insertUnliked,
   getLikedUsers,
+  checkLikedStatus,
   getLikedToUsers,
   getBlockedToUsers,
   myAccount,
