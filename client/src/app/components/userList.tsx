@@ -27,7 +27,7 @@ export default function UsersList({
   const [displayedUsers, setDisplayedUsers] = useState<Array<{ id: string; status: string; tagIds?: string[]; profilePic?: string; username: string; age: number; match_ratio: number; latitude: number; longitude: number; isRealUser: boolean; fake_account: boolean }>>([]);
   const [userTags, setUserTags] = useState<Record<string, string[]>>({});
   const [loadingTags, setLoadingTags] = useState(true);
-  const usersPerPage = 8;
+  const usersPerPage = 4;
   const dispatch = useDispatch();
   const socket = useWebSocket();
 
