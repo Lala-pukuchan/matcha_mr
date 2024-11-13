@@ -7,6 +7,8 @@ import useAuthCheck from '../hooks/useAuthCheck';
 import useChatRoom from '../hooks/useChatRoom';
 import './Chat.css';
 
+
+
 function Chat() {
   useAuthCheck("", "/login");
   const [roomID, setRoomID] = useState('');
@@ -23,7 +25,7 @@ function Chat() {
     // clearNotifications && clearNotifications();
     
     if (user && user.id) {
-      fetch(`http://localhost:4000/api/matches/${user.id}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/matches/${user.id}`)
         .then(response => response.json())
         .then(data => {
           // 前回のmatchesと異なる場合にのみ更新
@@ -33,7 +35,7 @@ function Chat() {
 
           const matchIds = data.map((match: { id: number }) => match.id);
           if (matchIds.length > 0) {
-            fetch(`http://localhost:4000/api/users/onlineStatus`, {
+            fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/onlineStatus`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ ids: matchIds }),
@@ -102,6 +104,12 @@ function Chat() {
     setRoomID(match.room_id);
     setCurrentChatPartner(match);
   };
+  useEffect(() => {
+    const messageContainer = document.querySelector('.message-container');
+    if (messageContainer) {
+      messageContainer.scrollTop = messageContainer.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <div className="flex flex-col items-center">

@@ -15,14 +15,21 @@ const NotificationBell = () => {
     if (isOpen) {
       // 全ての通知を既読にする
       const markAllAsRead = async () => {
-        for (const notification of notifications) {
-          console.log("notification.id\t", notification.id);
-          if (!notification.checked) {
-            await fetch(`http://localhost:4000/api/notifications/markAsRead/${notification.id}`, {
-              method: 'POST',
-            });
-            dispatch(markAsRead(notification.id));
+        try {
+          for (const notification of notifications) {
+            if (!notification.checked) {
+              const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/markAsRead/${notification.id}`, {
+                method: 'POST',
+              });
+              if (!response.ok) {
+                throw new Error('Failed to mark notification as read');
+              }
+              dispatch(markAsRead(notification.id));
+            }
           }
+        } catch (error) {
+          console.error('Error marking notifications as read:', error);
+          alert('Failed to mark notifications as read. Please try again later.');
         }
       };
       markAllAsRead();

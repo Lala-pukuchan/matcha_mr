@@ -1,4 +1,6 @@
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
 
 // Define the async function
 async function getJwt(row, tagIdsArray) {

@@ -16,7 +16,7 @@ EXPOSE 3000
 # start app
 CMD ["npm", "run", "dev"]
 
-##productionモードで起動するときに使用
+###productionモードで起動するときに使用
 ## base image
 #FROM node:18-alpine
 #

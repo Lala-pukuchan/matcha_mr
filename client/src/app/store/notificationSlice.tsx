@@ -24,7 +24,7 @@ export const fetchNotifications = createAsyncThunk(
   'notifications/fetchNotifications',
   async (userId: string) => {
     console.log(`Fetching notifications from API for user ${userId}`);
-    const response = await fetch(`http://localhost:4000/api/notifications/${userId}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${userId}`);
     const data = await response.json();
     return data;
   }

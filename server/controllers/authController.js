@@ -4,6 +4,8 @@ const jwt = require('jsonwebtoken');
 const { v4: uuidv4 } = require('uuid');
 const transporter = require('../services/emailService');
 const getJwt = require("../functions/getJwt");
+require('dotenv').config();
+
 
 const createUser = async (req, res) => {
   let conn;
@@ -60,7 +62,7 @@ const createUser = async (req, res) => {
         to: req.body.email,
         subject: "Enable Your Account",
         html: `
-        <p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="http://localhost:${process.env.PORT}/api/users/enable?token=${token}">here</a>.</p>
+        <p>Hello ${req.body.username}</p><br><p>To enable your account, please click <a href="${process.env.NEXT_PUBLIC_API_URL}/api/users/enable?token=${token}">here</a>.</p>
         `,
       };
       transporter.sendMail(mailSetting, (error, info) => {

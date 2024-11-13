@@ -22,7 +22,7 @@ function useWebSocket() {
 
   useEffect(() => {
     if (!socket) {
-      const newSocket = io('http://localhost:4000', {
+      const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
         withCredentials: true,
         reconnectionAttempts: 5,
         reconnectionDelay: 5000,
@@ -70,7 +70,7 @@ function useWebSocket() {
       newSocket.on('message received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
-            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: notification.from_user_id }),
@@ -100,7 +100,7 @@ function useWebSocket() {
       newSocket.on('like received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
-            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: notification.from_user_id }),
@@ -130,7 +130,7 @@ function useWebSocket() {
       newSocket.on('viewed received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
-            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: notification.from_user_id }),
@@ -159,7 +159,7 @@ function useWebSocket() {
       newSocket.on('unlike received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
-            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: notification.from_user_id }),
@@ -188,7 +188,7 @@ function useWebSocket() {
       newSocket.on('match received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
-            const response = await fetch('http://localhost:4000/api/users/getUserNameById', {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ userId: notification.from_user_id }),

@@ -12,7 +12,7 @@ const saveNotification = async (notification) => {
     console.error('Error saving notification:', error);
     throw error;
   } finally {
-    if (conn) conn.end();
+    if (conn) conn.release();
   }
 };
 
@@ -27,7 +27,7 @@ const deleteNotification = async (userId, fromUserId, type) => {
     console.error('Error deleting notification:', error);
     throw error;
   } finally {
-    if (conn) conn.end();
+    if (conn) conn.release();
   }
 };
 
@@ -44,7 +44,7 @@ const getNotifications = async (req, res) => {
     console.error('Error fetching notifications:', error);
     res.status(500).json({ message: 'Internal server error' });
   } finally {
-    if (conn) conn.end();
+    if (conn) conn.release();
   }
 };
 
@@ -61,7 +61,7 @@ const markAsRead = async (req, res) => {
     console.error('Error marking notification as read:', error);
     res.status(500).json({ message: 'Internal server error' });
   } finally {
-    if (conn) conn.end();
+    if (conn) conn.release();
   }
 };
 
@@ -99,7 +99,7 @@ const deleteAndSaveNotification = async (notification) => {
         throw error;
       }
     } finally {
-      if (conn) conn.end();
+      if (conn) conn.release();
     }
   }
 };

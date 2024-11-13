@@ -86,7 +86,7 @@ export default function UsersList({
 
   const handleUnmatch = async (userId: string) => {
     try {
-      const response = await fetch('http://localhost:4000/api/unmatch', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/unmatch`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId1: operationUserId, userId2: userId }),

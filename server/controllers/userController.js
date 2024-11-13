@@ -1,3 +1,4 @@
+require('dotenv').config();
 const multer = require('multer');
 const upload = multer({ dest: "uploads/" });
 module.exports = upload;
@@ -196,37 +197,37 @@ const updateUser = async (req, res) => {
       const { originalname, path } = req.files["profilePicture"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("profilePic = ?");
-      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
+      values.push(`${process.env.NEXT_PUBLIC_API_URL}/uploads/` + originalname);
     }
     if (req.files["picture1"]) {
       const { originalname, path } = req.files["picture1"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic1 = ?");
-      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
+      values.push(`${process.env.NEXT_PUBLIC_API_URL}/uploads/` + originalname);
     }
     if (req.files["picture2"]) {
       const { originalname, path } = req.files["picture2"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic2 = ?");
-      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
+      values.push(`${process.env.NEXT_PUBLIC_API_URL}/uploads/` + originalname);
     }
     if (req.files["picture3"]) {
       const { originalname, path } = req.files["picture3"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic3 = ?");
-      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
+      values.push(`${process.env.NEXT_PUBLIC_API_URL}/uploads/` + originalname);
     }
     if (req.files["picture4"]) {
       const { originalname, path } = req.files["picture4"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic4 = ?");
-      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
+      values.push(`${process.env.NEXT_PUBLIC_API_URL}/uploads/` + originalname);
     }
     if (req.files["picture5"]) {
       const { originalname, path } = req.files["picture5"][0];
       fs.renameSync(path, directory + originalname);
       updateFields.push("pic5 = ?");
-      values.push(`http://localhost:${process.env.PORT}/uploads/` + originalname);
+      values.push(`${process.env.NEXT_PUBLIC_API_URL}/uploads/` + originalname);
     }
   }
 

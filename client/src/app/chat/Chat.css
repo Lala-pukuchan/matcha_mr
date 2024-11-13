@@ -2,12 +2,15 @@
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-width: 400px;
+    max-width: 600px; /* メッセージボックスの幅を調整 */
     margin: 0 auto;
     padding: 0 10px; /* モバイルで左右に少し余白を持たせる */
     box-sizing: border-box;
+    overflow-y: auto; /* 縦方向のスクロールを有効にする */
+    max-height: 300px; /* 必要に応じて高さを調整 */
+    border-radius: 10px; /* 四隅を丸くする */
+    background-color: rgba(173, 216, 230, 0.8); /* nav.tsxの背景色と同じ */
 }
-
 .my-message-wrapper, .other-message-wrapper {
     display: flex;
     flex-direction: column;

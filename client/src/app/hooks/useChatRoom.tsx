@@ -7,7 +7,7 @@ function useChatRoom(socket: any, roomID: string) {
     if (socket && roomID) {
       socket.emit('joinRoom', roomID);
 
-      fetch(`http://localhost:4000/api/messages/${roomID}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/messages/${roomID}`)
         .then(response => {
           if (!response.ok) {
             throw new Error('Network response was not ok');

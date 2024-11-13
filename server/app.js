@@ -7,7 +7,7 @@ require('dotenv').config();
 
 // Middleware
 const corsOptions = {
-  origin: ["http://localhost:1080", "http://localhost:3000"],
+  origin: [`${process.env.FRONT_URL}`, `${process.env.NEXT_PUBLIC_FRONT_URL}`],
   credentials: true,
   methods: ["GET", "POST"],
   transport: ["websocket"],
