@@ -2,7 +2,7 @@
 
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-import { NotificationProvider } from "../../context/notification";
+//import { NotificationProvider } from "../../context/notification";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Nav from "./components/nav";
@@ -22,11 +22,11 @@ export default function RootLayout({
       <body>
         <Provider store={store}>
           <UserProvider>
-            <NotificationProvider>
+            {/* <NotificationProvider> */}
               {!isLoginPage && <Nav />}  
               {children}
               <Footer />
-            </NotificationProvider>
+            {/* </NotificationProvider> */}
           </UserProvider>
         </Provider>
       </body>

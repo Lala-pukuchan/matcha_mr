@@ -1,4 +1,4 @@
-export default function Action({ userList, targetUsers }) {
+export default function Action({ userList, targetUsers }: { userList: any[]; targetUsers: any[] }) {
   return (
     <div>
       <ul>

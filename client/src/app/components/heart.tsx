@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import useWebSocket from "../hooks/useWebSocket";
 import { useDispatch } from "react-redux";
 
-const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
+const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }: { likeFromUserId: string; likeToUserId: string; alreadyLiked: boolean }) => {
   const [isClicked, setIsClicked] = useState(alreadyLiked);
   const [errorMessage, setErrorMessage] = useState("");
   const socket = useWebSocket();
@@ -38,7 +38,9 @@ const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
 
           // WebSocketを通じて通知を送信
           if (!isClicked) {
-            socket.emit('like', { fromUserId: likeFromUserId, toUserId: likeToUserId });
+            if (socket) {
+              socket.emit('like', { fromUserId: likeFromUserId, toUserId: likeToUserId });
+            }
 
             // マッチングを確認
             const matchResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/checkMatched`, {
@@ -50,10 +52,14 @@ const Heart = ({ likeFromUserId, likeToUserId, alreadyLiked }) => {
             });
             const matchData = await matchResponse.json();
             if (matchData.matched) {
-              socket.emit('match', { fromUserId: likeFromUserId, toUserId: likeToUserId });
+              if (socket) {
+                socket.emit('match', { fromUserId: likeFromUserId, toUserId: likeToUserId });
+              }
             }
           } else {
-            socket.emit('unlike', { fromUserId: likeFromUserId, toUserId: likeToUserId });
+            if (socket) {
+              socket.emit('unlike', { fromUserId: likeFromUserId, toUserId: likeToUserId });
+            }
           }
         } else {
           console.error("updating liked is failed");

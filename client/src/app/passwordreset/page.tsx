@@ -1,7 +1,7 @@
 "use client";
 import { useState, FormEvent } from "react";
 
-export default function passwordreset() {
+export default function Passwordreset() {
   // set message
   const [message, setMessage] = useState("");
 

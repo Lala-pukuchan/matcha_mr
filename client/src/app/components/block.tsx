@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const Block = ({ blockedFromUserId, blockedToUserId }) => {
+const Block = ({ blockedFromUserId, blockedToUserId }: { blockedFromUserId: string; blockedToUserId: string }) => {
   const [isClicked, setIsClicked] = useState(false);
 
   const block = () => {

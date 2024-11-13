@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 // 座標に対応する国名と都市名のマップを定義
-const locations = {
+const locations: { [key: string]: { country: string; city: string } } = {
   "48.875312,2.298280": { country: "France", city: "Paris" },
   "51.509897,-0.108740": { country: "UK", city: "London" },
   "52.517251,13.402720": { country: "Germany", city: "Berlin" },
@@ -69,7 +69,7 @@ const locations = {
   "48.896120,2.319370": { country: "France", city: "Paris" }//42Paris
 };
 
-export default function Geo({ lat, lon, isRealUser }) {
+export default function Geo({ lat, lon, isRealUser }: { lat: number; lon: number; isRealUser: boolean }) {
   const [country, setCountry] = useState("");
   const [city, setCity] = useState("");
   useEffect(() => {
@@ -82,13 +82,11 @@ export default function Geo({ lat, lon, isRealUser }) {
             if (data.status === "OK") {
               const addressComponents = data.results[0].address_components;
 
-              const country = addressComponents.find((component) =>
+              const country = addressComponents.find((component: { types: string[]; long_name: string }) =>
                 component.types.includes("country")
               );
-              const city = addressComponents.find(
-                (component) =>
-                  component.types.includes("locality") ||
-                  component.types.includes("administrative_area_level_1")
+              const city = addressComponents.find((component: { types: string[]; long_name: string }) =>
+                component.types.includes("locality") || component.types.includes("administrative_area_level_1")
               );
               setCountry(country.long_name);
               setCity(city.long_name);

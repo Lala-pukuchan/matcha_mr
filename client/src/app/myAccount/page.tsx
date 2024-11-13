@@ -8,14 +8,41 @@ import useAuthCheck from "../hooks/useAuthCheck";
 import useWebSocket from "../hooks/useWebSocket";
 
 export default function MyAccount() {
-  useAuthCheck(null, "/login");
-  const [user, setUser] = useState([]);
+  useAuthCheck("", "/login");
+  const [user, setUser] = useState<{ 
+    id: number; 
+    status: string; 
+    last_active: string; 
+    tagIds: number[]; 
+    profilePic: string; 
+    pic1: string; 
+    pic2: string; 
+    pic3: string; 
+    pic4: string; 
+    pic5: string; 
+    lastname: string; 
+    firstname: string; 
+    username: string;
+    age: number; 
+    gender: string; 
+    preference: string; 
+    isRealUser: boolean; 
+    biography: string;
+    latitude: number;
+    longitude: number;
+    match_ratio: number;
+    fake_account: boolean;
+    liked: string;
+    matched: string;
+  } | null>(null);
+
   const userRef = useRef(user);
   const [loading, setLoading] = useState(true);
   const [viewedFromUsers, setViewedFromUsers] = useState([]);
   const [likedFromUsers, setLikedFromUsers] = useState([]);
   const [userList, setUserList] = useState([]);
   const token = typeof window !== "undefined" ? document.cookie.split("; ").find((row) => row.startsWith("token=")) : null;
+  const socket = useWebSocket(); 
   useEffect(() => {
     const fetchUser = async () => {
       console.log("fetchUser called");
@@ -30,15 +57,20 @@ export default function MyAccount() {
             credentials: "include",
           }
         );
-        if (response.ok) {
-          const data = await response.json();
-          setUser(data);
-          console.log("user: ", user);
-        } else {
-          setUser([]);
-        }
+    if (response.ok) {
+      const data = await response.json();
+      const userData = {
+        ...data,
+        latitude: parseFloat(data.latitude),
+        longitude: parseFloat(data.longitude),
+      };
+      setUser(userData);
+      console.log("user: ", userData);
+    } else {
+      setUser(null);
+    }
       } catch (e) {
-        setUser([]);
+        setUser(null);
         console.error(e);
       } finally {
         setLoading(false);
@@ -57,8 +89,8 @@ export default function MyAccount() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              gender: user.gender,
-              preference: user.preference,
+              gender: user?.gender,
+              preference: user?.preference,
             }),
           }
         );
@@ -81,12 +113,12 @@ export default function MyAccount() {
 
   }, []);
 
-  if (token) {
-    const socket = useWebSocket(); // ユーザー情報がセットされた後にWebSocketを初期化
-  }
+  //if (token) {
+  //  const socket = useWebSocket(); // ユーザー情報がセットされた後にWebSocketを初期化
+  //}
 
   useEffect(() => {
-    if (user.id) {
+    if (user && user.id) {
       const fetchData = async () => {
         try {
           const userJson = JSON.stringify({ userId: user.id });
@@ -132,15 +164,27 @@ export default function MyAccount() {
 
   return (
     <>
-      <UserInfo user={user} />
+      <div>
+      {user ? (
+        <UserInfo user={{
+            ...user,
+            latitude: user.latitude.toString(),
+            longitude: user.longitude.toString(),
+        }} />
+      ) : (
+        <p>Loading user information...</p>
+      )}
+    </div>
       <div className="container mx-auto w-screen flex justify-center">
         <div className="flex flex-col m-10 space-y-4">
           <Link className="text-cyan-400" href="/updateProfile">
             Update your profile?
           </Link>
-          <Link className="text-cyan-400" href={`/updatePassword?username=${user.username}`}>
-            Update your password?
-          </Link>
+          {user && (
+            <Link className="text-cyan-400" href={`/updatePassword?username=${user.username}`}>
+              Update your password?
+            </Link>
+          )}
           <div className="grid grid-cols-2">
             <div>
               <h2 className="text-pink-400">Viewed By</h2>

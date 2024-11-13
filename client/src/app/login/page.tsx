@@ -6,7 +6,7 @@ import useAuthCheck from "../hooks/useAuthCheck";
 
 export default function Login() {
   // ログインページでは、すでにログインしているユーザーをマイアカウントページにリダイレクト
-  useAuthCheck("/myAccount", null);
+  useAuthCheck("/myAccount", "");
 
   // set loading
   const [loading, setLoading] = useState(true);
@@ -96,7 +96,7 @@ export default function Login() {
             <Link href="signup">Create an account?</Link>
           </div>
           <div className="text-cyan-400">
-            <Link href="passwordreset">Forget Password?</Link>
+            <Link href="Passwordreset">Forget Password?</Link>
           </div>
         </div>
       </form>

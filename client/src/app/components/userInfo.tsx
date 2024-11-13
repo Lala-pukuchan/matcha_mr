@@ -5,7 +5,7 @@ import Geo from "./geo";
 import Tag from "./tag";
 import MatchRatio from "./matchRatio";
 
-export default function UserInfo({ user }) {
+export default function UserInfo({ user }: { user: { id: number; status: string; last_active: string; tagIds: number[], profilePic: string, pic1: string, pic2: string, pic3: string, pic4: string, pic5: string, lastname: string, firstname: string, username: string, age: number, gender: string, preference: string, biography: string, latitude: string, longitude: string, match_ratio: number, liked: string, matched: string, isRealUser: boolean } }) {
   const [message, setMessage] = useState("");
   const [onlineStatus, setOnlineStatus] = useState(user.status || "offline");
   const [lastActive, setLastActive] = useState(user.last_active);
@@ -32,7 +32,7 @@ export default function UserInfo({ user }) {
     };
   }, [socket, user]);
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string) => {
     const options = {
       year: "numeric",
       month: "long",
@@ -41,7 +41,13 @@ export default function UserInfo({ user }) {
       minute: "numeric",
     };
     const date = new Date(dateString);
-    return date.toLocaleString("en-US", options);
+    return date.toLocaleString("en-US",  {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    });
   };
 
   return (
@@ -100,8 +106,8 @@ export default function UserInfo({ user }) {
           <p className="font-bold">Location</p>
           {user && user.latitude && user.longitude ? (
             <Geo
-              lat={user.latitude}
-              lon={user.longitude}
+            lat={parseFloat(user.latitude)}
+            lon={parseFloat(user.longitude)}
               isRealUser={user.isRealUser}
             />
           ) : (

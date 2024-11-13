@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const ReportFakeAccount = ({ reportedUserId, alreadyReported }) => {
+const ReportFakeAccount = ({ reportedUserId, alreadyReported }: { reportedUserId: number; alreadyReported: boolean }) => {
   // update state
   const [isClicked, setIsClicked] = useState(alreadyReported);
 

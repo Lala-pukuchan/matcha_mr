@@ -5,11 +5,11 @@ import { useUser } from "../../../context/context";
 import useWebSocket from "../hooks/useWebSocket";
 import { useDispatch } from "react-redux";
 
-export default function users() {
+export default function Users() {
   const socket = useWebSocket();
   const dispatch = useDispatch();
   // displaid user information
-  const [displayedUser, setDisplayedUser] = useState([]);
+  const [displayedUser, setDisplayedUser] = useState<User | null>(null);
   // operating user information
   const { user, setUser } = useUser();
   // set loading
@@ -18,6 +18,34 @@ export default function users() {
   const [likedByUser, setLikedByUser] = useState(false);
   const [likedByOther, setLikedByOther] = useState(false);
 
+  interface User {
+    id: number;
+    status: string;
+    last_active: string;
+    tagIds: number[];
+    profilePic: string;
+    pic1: string;
+    pic2: string;
+    pic3: string;
+    pic4: string;
+    pic5: string;
+    lastname: string;
+    firstname: string;
+    username: string;
+    age: number;
+    match_ratio: number;
+    latitude: string;
+    longitude: string;
+    distance: number;
+    common_tags_count: number;
+    fake_account: boolean;
+    isRealUser: boolean;
+    gender: string;
+    preference: string;
+    biography: string;
+    liked: string;
+    matched: string;
+  }
 
   useEffect(() => {
     let viewUserId = "";
@@ -46,10 +74,10 @@ export default function users() {
             const data = await response.json();
             setDisplayedUser(data);
           } else {
-            setDisplayedUser([]);
+            setDisplayedUser(null);
           }
         } catch (e) {
-          setDisplayedUser([]);
+          setDisplayedUser(null);
           console.error(e);
         }
       };
@@ -150,7 +178,11 @@ export default function users() {
   return (
     <div className="container mx-auto flex justify-center px-4 md:px-0">
       <div className="flex flex-col space-y-6 max-w-md md:max-w-lg">
+      {displayedUser ? (
         <UserInfo user={displayedUser} />
+      ) : (
+        <p>user not found</p>
+      )}
         {matched && (
           <div className="grid gap-4 grid-cols-2 mx-auto w-full">
             <p className="font-bold">Match Status</p>

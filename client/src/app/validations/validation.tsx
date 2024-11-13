@@ -48,7 +48,7 @@ export function validateName(name: string, type: string) {
   return "";
 }
 
-export function isValidLatitude(lat) {
+export function isValidLatitude(lat: number) {
   if (isFinite(lat) && Math.abs(lat) <= 90) {
     return "";
   } else {
@@ -56,7 +56,7 @@ export function isValidLatitude(lat) {
   }
 }
 
-export function isValidLongitude(lng) {
+export function isValidLongitude(lng: number) {
   if (isFinite(lng) && Math.abs(lng) <= 180) {
     return "";
   } else {

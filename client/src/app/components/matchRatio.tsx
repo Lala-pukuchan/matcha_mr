@@ -1,4 +1,4 @@
-export default function MatchRatio({ matchRatio }) {
+export default function MatchRatio({ matchRatio }: { matchRatio: number }) {
   return (
     <div>
       <svg

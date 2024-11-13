@@ -1,15 +1,18 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
-const UserContext = createContext({
+const UserContext = createContext<{
+  user: any;
+  setUser: React.Dispatch<React.SetStateAction<any>>;
+}>({
   user: null,
   setUser: () => {},
 });
 
 export const useUser = () => useContext(UserContext);
 
-export const UserProvider = ({ children }) => {
+export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {

@@ -6,7 +6,7 @@ import useWebSocket from "../hooks/useWebSocket";
 import useAuthCheck from "../hooks/useAuthCheck";
 
 export default function Logout() {
-  const isRedirecting = useAuthCheck(null, "/login");
+  const isRedirecting = useAuthCheck("", "/login");
   const [message, setMessage] = useState("");
   const socket = useWebSocket(); 
 

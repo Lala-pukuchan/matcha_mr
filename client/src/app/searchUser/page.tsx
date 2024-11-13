@@ -5,18 +5,32 @@ import Slider from "react-slider";
 import { useUser } from "../../../context/context";
 import UsersList from "../components/userList";
 import useAuthCheck from "../hooks/useAuthCheck";
-
+interface User {
+  id: string; 
+  status: string;
+  tagIds?: string[];
+  profilePic?: string;
+  username: string;
+  age: number;
+  match_ratio: number;
+  latitude: number;
+  longitude: number;
+  isRealUser: boolean;
+  fake_account: boolean;
+  distance: number;
+  common_tags_count: number;
+}
 export default function Home() {
-  const isRedirecting = useAuthCheck(null, "/login");
+  const isRedirecting = useAuthCheck("", "/login");
   const { user } = useUser();
-  const [users, setUserList] = useState([]);
-  const [sortedUsers, setSortedUsers] = useState([]);
+  const [users, setUserList] = useState<User[]>([]);
+  const [sortedUsers, setSortedUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [likedUsersId, setLikedUsersId] = useState([]);
-  const [blockedUsersId, setBlockedUsersId] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [ageRange, setAgeRange] = useState([18, 60]);
+  const [likedUsersId, setLikedUsersId] = useState<number[]>([]);
+  const [blockedUsersId, setBlockedUsersId] = useState<number[]>([]);
+  const [tags, setTags] = useState<{ value: number; label: string }[]>([]);
+  const [selectedTags, setSelectedTags] = useState<{ value: number; label: string }[]>([]);
+  const [ageRange, setAgeRange] = useState<[number, number]>([18, 60]);
   const [distanceRange, setDistanceRange] = useState([0, 100]);
   const [fameRatingRange, setFameRatingRange] = useState([0, 100]);
 
@@ -38,7 +52,7 @@ export default function Home() {
         const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`);
         if (response.ok) {
           const data = await response.json();
-          setTags(data.map(tag => ({ value: tag.id, label: tag.name })));
+          setTags(data.map((tag: { id: number; name: string }) => ({ value: tag.id, label: tag.name })));
         } else {
           console.error("Failed to fetch tags");
         }
@@ -82,7 +96,7 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUserList(data.filter((d) => d.id !== user.id));
+          setUserList(data.filter((d: { id: number }) => d.id !== user.id));
         } else {
           setUserList([]);
         }
@@ -106,7 +120,7 @@ export default function Home() {
         );
         if (response.ok) {
           const responseData = await response.json();
-          setLikedUsersId(responseData.map(item => item.liked_to_user_id));
+          setLikedUsersId(responseData.map((item: { liked_to_user_id: number }) => item.liked_to_user_id));
         }
       } catch (e) {
         console.error(e);
@@ -127,7 +141,7 @@ export default function Home() {
         );
         if (response.ok) {
           const responseData = await response.json();
-          setBlockedUsersId(responseData.map(item => item.blocked_to_user_id));
+          setBlockedUsersId(responseData.map((item: { blocked_to_user_id: number }) => item.blocked_to_user_id));
         }
       } catch (e) {
         console.error(e);
@@ -164,7 +178,7 @@ export default function Home() {
     return <div>Loading...</div>;
   }
 
-  async function handleSubmit(event) {
+  async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
 
     const formData = {
@@ -173,7 +187,7 @@ export default function Home() {
       ...(showAgeRange && { min_age: ageRange[0], max_age: ageRange[1] }),
       ...(showDistanceRange && { min_distance: distanceRange[0], max_distance: distanceRange[1] }),
       ...(showFameRating && { min_fame_rating: fameRatingRange[0], max_fame_rating: fameRatingRange[1] }),
-      ...(showTags && { tags: selectedTags.map(tag => tag.value) }),
+      ...(showTags && { tags: selectedTags.map((tag: { value: number }) => tag.value) }),
     };
 
     try {
@@ -191,7 +205,7 @@ export default function Home() {
 
       if (response.status === 200) {
         const data = await response.json();
-        setUserList(data.filter((d) => d.id !== user.id));
+        setUserList(data.filter((d: { id: number }) => d.id !== user.id));
       } else {
         const data = await response.json();
         console.log("message", data.message);
@@ -308,7 +322,7 @@ export default function Home() {
                     options={tags}
                     className="basic-multi-select"
                     classNamePrefix="select"
-                    onChange={setSelectedTags}
+                    onChange={(newValue) => setSelectedTags(newValue as { value: number; label: string }[])}
                   />
                 </div>
               )}
@@ -388,9 +402,9 @@ export default function Home() {
       <div className="container mx-auto w-screen flex justify-center">
         <UsersList
           users={sortedUsers}
-          operationUserId={user.id}
-          likedUsersId={likedUsersId}
-          blockedUsersId={blockedUsersId}
+          operationUserId={user.id.toString()}
+          likedUsersId={likedUsersId.map(String)}
+          blockedUsersId={blockedUsersId.map(String)}
           link="/users"
         />
       </div>

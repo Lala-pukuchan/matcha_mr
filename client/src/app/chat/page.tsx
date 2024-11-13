@@ -1,26 +1,26 @@
 "use client";
 import React, { useState, useEffect, useContext } from 'react';
 import { useUser } from '../../../context/context';
-import { NotificationContext } from '../../../context/notification';
+//import { NotificationContext } from '../../../context/notification';
 import useWebSocket from '../hooks/useWebSocket';
 import useAuthCheck from '../hooks/useAuthCheck';
 import useChatRoom from '../hooks/useChatRoom';
 import './Chat.css';
 
 function Chat() {
-  useAuthCheck(null, "/login");
+  useAuthCheck("", "/login");
   const [roomID, setRoomID] = useState('');
-  const [matches, setMatches] = useState([]);
+  const [matches, setMatches] = useState<Array<{ id: string; room_id: string; profilePic?: string; username: string }>>([]);
   const [input, setInput] = useState('');
-  const [onlineStatus, setOnlineStatus] = useState({});
-  const [currentChatPartner, setCurrentChatPartner] = useState(null);
+  const [onlineStatus, setOnlineStatus] = useState<{ [key: string]: string }>({});
+  const [currentChatPartner, setCurrentChatPartner] = useState<{ room_id: string; profilePic?: string; username: string } | null>(null);
   const { user } = useUser();
   const socket = useWebSocket();
-  const { clearNotifications } = useContext(NotificationContext);
+  // const { clearNotifications } = useContext(NotificationContext);
 
   // 最初にマッチとオンラインステータスを取得する処理
   useEffect(() => {
-    clearNotifications && clearNotifications();
+    // clearNotifications && clearNotifications();
     
     if (user && user.id) {
       fetch(`http://localhost:4000/api/matches/${user.id}`)
@@ -31,28 +31,30 @@ function Chat() {
             setMatches(data);
           }
 
-          const matchIds = data.map(match => match.id);
-          fetch(`http://localhost:4000/api/users/onlineStatus`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ids: matchIds }),
-          })
-            .then(response => response.json())
-            .then(statuses => {
-              const statusMap = {};
-              (Array.isArray(statuses) ? statuses : [statuses]).forEach(({ id, status }) => {
-                statusMap[id] = status;
-              });
-              
-              // 状態が変わった場合のみ更新を行う
-              setOnlineStatus(prevStatus => {
-                const isStatusChanged = Object.keys(statusMap).some(
-                  key => statusMap[key] !== prevStatus[key]
-                );
-                return isStatusChanged ? statusMap : prevStatus;
-              });
+          const matchIds = data.map((match: { id: number }) => match.id);
+          if (matchIds.length > 0) {
+            fetch(`http://localhost:4000/api/users/onlineStatus`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ ids: matchIds }),
             })
-            .catch(error => console.error('Error fetching online status:', error));
+              .then(response => response.json())
+              .then(statuses => {
+                const statusMap: { [key: string]: string } = {};
+                (Array.isArray(statuses) ? statuses : [statuses]).forEach(({ id, status }) => {
+                  statusMap[id] = status;
+                });
+                
+                // 状態が変わった場合のみ更新を行う
+                setOnlineStatus((prevStatus: { [key: string]: string }) => {
+                  const isStatusChanged = Object.keys(statusMap).some(
+                    key => statusMap[key] !== prevStatus[key]
+                  );
+                  return isStatusChanged ? statusMap : prevStatus;
+                });
+              })
+              .catch(error => console.error('Error fetching online status:', error));
+          }
         })
         .catch(error => console.error('Error fetching matches:', error));
     }
@@ -68,7 +70,7 @@ function Chat() {
         }));
       });
     }
-
+  
     return () => {
       if (socket) {
         socket.off('user status');
@@ -96,7 +98,7 @@ function Chat() {
     }
   };
 
-  const handleUserClick = (match) => {
+  const handleUserClick = (match: { room_id: string; profilePic?: string; username: string }) => {
     setRoomID(match.room_id);
     setCurrentChatPartner(match);
   };

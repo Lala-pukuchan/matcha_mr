@@ -7,7 +7,7 @@ import { metadata } from "./matadata";
 
 export default function Home() {
   const { user } = useUser();
-  useAuthCheck(null, "/login");
+  useAuthCheck("", "/login");
 
   const [connectedUsers, setUserListConnected] = useState([]);
   const [users, setUserListClose] = useState([]);
@@ -34,7 +34,7 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUserListConnected(data.filter((d) => d.id !== user.id));
+          setUserListConnected(data.filter((d: { id: number }) => d.id !== user.id));
         } else {
           setUserListConnected([]);
         }
@@ -63,7 +63,7 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUserListClose(data.filter((d) => d.id !== user.id));
+          setUserListClose(data.filter((d: { id: number }) => d.id !== user.id));
         } else {
           setUserListClose([]);
         }
@@ -91,7 +91,7 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUsersCommonTags(data.filter((d) => d.id !== user.id));
+          setUsersCommonTags(data.filter((d: { id: number }) => d.id !== user.id));
         } else {
           setUsersCommonTags([]);
         }
@@ -118,7 +118,7 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-          setUsersFrequentlyLikedBack(data.filter((d) => d.id !== user?.id));
+          setUsersFrequentlyLikedBack(data.filter((d: { id: number }) => d.id !== user?.id));
         } else {
           setUsersFrequentlyLikedBack([]);
         }
@@ -145,7 +145,7 @@ export default function Home() {
           const responseData = await response.json();
           if (responseData) {
             const likedUsersIdArray = responseData.map(
-              (item) => item.liked_to_user_id
+              (item: { liked_to_user_id: number }) => item.liked_to_user_id
             );
             setLikedUsersId(likedUsersIdArray);
           }
@@ -174,7 +174,7 @@ export default function Home() {
           const responseData = await response.json();
           if (responseData) {
             const blockedUsersIdArray = responseData.map(
-              (item) => item.blocked_to_user_id
+              (item: { blocked_to_user_id: number }) => item.blocked_to_user_id
             );
             setBlockedUsersId(blockedUsersIdArray);
           }

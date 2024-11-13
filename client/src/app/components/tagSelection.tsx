@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 
-export default function TagSelection({ user }) {
+export default function TagSelection({ user }: { user: { tagIds: number[] } }) {
   // set tags
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState<{id: number, name: string}[]>([]);
 
   // set created tags
   useEffect(() => {
@@ -39,7 +39,7 @@ export default function TagSelection({ user }) {
               id={`tag-${tag.id}`}
               name="tagIds"
               value={tag.id}
-              defaultChecked={user?.tagIds?.includes(tag.id.toString())}
+              defaultChecked={user?.tagIds?.includes(tag.id)}
               className="checkbox-input"
             />
             <label htmlFor={`tag-${tag.id}`} className="pl-2">

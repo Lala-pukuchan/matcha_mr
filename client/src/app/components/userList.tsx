@@ -15,11 +15,17 @@ export default function UsersList({
   likedUsersId,
   blockedUsersId,
   link,
+}: {
+  users: Array<{ id: string; status: string; tagIds?: string[]; profilePic?: string; username: string; age: number; match_ratio: number; latitude: number; longitude: number; isRealUser: boolean; fake_account: boolean }>;
+  operationUserId: string;
+  likedUsersId: string[];
+  blockedUsersId: string[];
+  link: string;
 }) {
-  const [onlineStatus, setOnlineStatus] = useState({});
+  const [onlineStatus, setOnlineStatus] = useState<Record<string, string>>({});
   const [currentPage, setCurrentPage] = useState(1);
-  const [displayedUsers, setDisplayedUsers] = useState([]);
-  const [userTags, setUserTags] = useState({});
+  const [displayedUsers, setDisplayedUsers] = useState<Array<{ id: string; status: string; tagIds?: string[]; profilePic?: string; username: string; age: number; match_ratio: number; latitude: number; longitude: number; isRealUser: boolean; fake_account: boolean }>>([]);
+  const [userTags, setUserTags] = useState<Record<string, string[]>>({});
   const [loadingTags, setLoadingTags] = useState(true);
   const usersPerPage = 8;
   const dispatch = useDispatch();
@@ -31,7 +37,7 @@ export default function UsersList({
     const currentUsers = users.slice(startIndex, endIndex);
     setDisplayedUsers(currentUsers);
 
-    const initialStatus = currentUsers.reduce((acc, user) => {
+    const initialStatus = currentUsers.reduce((acc: Record<string, string>, user) => {
       acc[user.id] = user.status;
       return acc;
     }, {});
@@ -41,12 +47,12 @@ export default function UsersList({
       try {
         const tagsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`);
         const tagsData = await tagsResponse.json();
-        const tagsMap = tagsData.reduce((acc, tag) => {
+        const tagsMap = tagsData.reduce((acc: Record<string, string>, tag: { id: string; name: string }) => {
           acc[tag.id] = tag.name;
           return acc;
         }, {});
 
-        const userTagsMap = {};
+        const userTagsMap: Record<string, string[]> = {};
         for (const user of currentUsers) {
           const userTagIds = user.tagIds || [];
           userTagsMap[user.id] = userTagIds.map(tagId => tagsMap[tagId]);
@@ -64,7 +70,7 @@ export default function UsersList({
 
   useEffect(() => {
     if (socket) {
-      const handleUserStatus = ({ userId, status }) => {
+      const handleUserStatus = ({ userId, status }: { userId: string; status: string })  => {
         setOnlineStatus((prevStatus) => ({
           ...prevStatus,
           [userId]: status,
@@ -78,7 +84,7 @@ export default function UsersList({
     }
   }, [socket]);
 
-  const handleUnmatch = async (userId) => {
+  const handleUnmatch = async (userId: string) => {
     try {
       const response = await fetch('http://localhost:4000/api/unmatch', {
         method: 'POST',
@@ -113,7 +119,7 @@ export default function UsersList({
   };
 
   if (loadingTags) {
-    return <div>Loading...</div>;
+    return <div>Loading ...</div>;
   }
 
   return (
@@ -150,7 +156,7 @@ export default function UsersList({
                     alreadyLiked={likedUsersId.includes(user.id)}
                   />
                   <ReportFakeAccount
-                    reportedUserId={user.id}
+                    reportedUserId={Number(user.id)}
                     alreadyReported={user.fake_account}
                   />
                   <Block

@@ -1,15 +1,14 @@
 "use client";
-import { v4 as uuidv4 } from 'uuid';
+//import { v4 as uuidv4 } from 'uuid';
 import { useEffect, useState, useRef, useContext } from "react";
-import { io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { useUser } from "../../../context/context";
-import { NotificationContext } from "../../../context/notification"; // NotificationContextをインポート
 import { useDispatch } from 'react-redux';
 import { addNotification } from '../store/notificationSlice';
 
 
 function useWebSocket() {
-  const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
   const { user } = useUser();
   //const { addNotification: addContextNotification } = useContext(NotificationContext); // NotificationContextを使用
   const userRef = useRef(user);
@@ -19,7 +18,7 @@ function useWebSocket() {
     userRef.current = user;
   }, [user]);
 
-  const disconnectTimeoutRef = useRef(null);
+  const disconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (!socket) {

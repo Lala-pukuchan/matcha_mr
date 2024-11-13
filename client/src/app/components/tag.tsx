@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-export default function Tag({ user }) {
-  const [tags, setTags] = useState([]);
+export default function Tag({ user }: { user: { tagIds: number[] } }) {
+  const [tags, setTags] = useState<{id: number, name: string}[]>([]);
 
   useEffect(() => {
     async function setCreatedTags() {
@@ -29,7 +29,7 @@ export default function Tag({ user }) {
         (tag, index) =>
           user &&
           user.tagIds &&
-          user.tagIds.includes(tag.id.toString()) && (
+          user.tagIds.includes(tag.id) && (
             <span
               key={`${tag.id}-${index}`}
               className="bg-gray-200 px-2 py-1 rounded text-sm"

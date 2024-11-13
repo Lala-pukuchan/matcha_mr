@@ -3,7 +3,8 @@ import Link from "next/link";
 import NotificationBell from './notificationBell';
 import { useUser } from '../../../context/context';
 import { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
+import { useDispatch } from '../hooks/useDispatch';
 import { fetchNotifications, clearNotifications } from '../store/notificationSlice';
 import { RootState } from '../store/store';
 

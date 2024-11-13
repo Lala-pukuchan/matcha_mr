@@ -6,7 +6,7 @@ function AgeRangeSlider() {
     ageMax: 20,
   });
 
-  const handleSliderChange = (e) => {
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setAgeRange(prevRange => {
       const newValue = parseInt(value, 10);

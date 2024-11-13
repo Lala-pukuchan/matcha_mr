@@ -6,7 +6,7 @@ function FameRatingRangeSlider() {
     fameRatingMax: 20,
   });
 
-  const handleSliderChange = (e) => {
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFameRatingRange(prevRange => {
       const newValue = parseInt(value, 10);

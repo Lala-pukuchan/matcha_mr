@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
-function useChatRoom(socket, roomID) {
-  const [messages, setMessages] = useState([]);
+function useChatRoom(socket: any, roomID: string) {
+  const [messages, setMessages] = useState<Array<{ from_user_id: string; message: string; sent_at: string }>>([]);
 
   useEffect(() => {
     if (socket && roomID) {
@@ -19,7 +19,7 @@ function useChatRoom(socket, roomID) {
         })
         .catch(error => console.error('Error fetching messages:', error));
 
-      socket.on('chat message', (message) => {
+      socket.on('chat message', (message: { from_user_id: string; message: string; sent_at: string }) => {
         setMessages(prevMessages => [...prevMessages, message]);
       });
 
@@ -29,7 +29,7 @@ function useChatRoom(socket, roomID) {
     }
   }, [socket, roomID]);
 
-  const sendMessage = (message) => {
+  const sendMessage = (message: { from_user_id: string; message: string }) => {
     if (socket && roomID) {
       if (message.message.trim() === '') {
         console.error('Message cannot be empty.');

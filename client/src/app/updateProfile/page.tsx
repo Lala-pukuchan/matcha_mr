@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ChangeEvent } from "react";
 import { useUser } from "../../../context/context";
 import {
   validateName,
@@ -7,14 +7,14 @@ import {
   isValidLongitude,
 } from "../validations/validation";
 
-export default function updateProfile() {
+export default function UpdateProfile() {
   // set registered user information
   const { user, setUser } = useUser();
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreGender, setSelectedPreGender] = useState("");
-  const [selectedTagIds, setSelectedTagIds] = useState([]);
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]); 
+  const [latitude, setLatitude] = useState<number | null>(null); 
+  const [longitude, setLongitude] = useState<number | null>(null); 
 
   useEffect(() => {
     if (user) {
@@ -27,7 +27,7 @@ export default function updateProfile() {
       }
       if (user && user.tagIds) {
         const tagIds = Array.isArray(user.tagIds) ? user.tagIds : [user.tagIds];
-        const tagArray = tagIds.map((tagId) => parseInt(tagId, 10));
+        const tagArray = tagIds.map((tagId: string) => parseInt(tagId, 10));
         setSelectedTagIds(tagArray);
       }
       if (user && user.latitude) {
@@ -43,7 +43,7 @@ export default function updateProfile() {
   const [message, setMessage] = useState("");
 
   // set tags
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState<any[]>([]); 
   const [inputTag, setInputTag] = useState("");
 
   // set created tags
@@ -68,13 +68,13 @@ export default function updateProfile() {
   }, []);
 
   // change add tag value
-  const handleChange = (event) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputTag(event.target.value);
     setMessage("");
   };
 
   // handle checked tags
-  const handleTags = (event) => {
+  const handleTags = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
     const tagId = parseInt(value, 10);
     if (checked) {
@@ -119,14 +119,14 @@ export default function updateProfile() {
     }
   }
 
-  const addTag = (event) => {
+  const addTag = (event: React.FormEvent) => {
     event.preventDefault();
     createNewTag();
     setInputTag("");
   };
 
   // get current location
-  const addGeo = (event) => {
+  const addGeo = (event: React.FormEvent) => {
     event.preventDefault();
     function setGeo() {
       navigator.geolocation.getCurrentPosition((position) => {
@@ -138,15 +138,15 @@ export default function updateProfile() {
   };
 
   // handle change latitude and longitude
-  const handleChangeLatitude = (e) => {
-    setLatitude(e.target.value);
+  const handleChangeLatitude = (e: ChangeEvent<HTMLInputElement>) => {
+    setLatitude(parseFloat(e.target.value)); 
   };
-  const handleChangeLongitude = (e) => {
-    setLongitude(e.target.value);
+  const handleChangeLongitude = (e: ChangeEvent<HTMLInputElement>) => {
+    setLongitude(parseFloat(e.target.value));
   };
 
   // submit login form
-  async function updateProfile(event: FormEvent<HTMLFormElement>) {
+  async function updateProfile(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
     const validations = [
@@ -163,12 +163,12 @@ export default function updateProfile() {
       {
         key: "latitude",
         validate: () =>
-          isValidLatitude(formData.get("latitude") as string),
+          isValidLatitude(parseFloat(formData.get("latitude") as string)),
       },
       {
         key: "longitude",
         validate: () =>
-          isValidLongitude(formData.get("longitude") as string),
+          isValidLongitude(parseFloat(formData.get("longitude") as string)),
       },
     ];
     for (const { validate } of validations) {
@@ -366,7 +366,7 @@ export default function updateProfile() {
                 name="latitude"
                 placeholder="latitude"
                 required
-                value={latitude}
+                value={latitude ? latitude.toString() : ""}
                 onChange={handleChangeLatitude}
                 className="bg-gray-100 p-3 m-1 rounded"
               />
@@ -376,7 +376,7 @@ export default function updateProfile() {
                 name="longitude"
                 placeholder="longitude"
                 required
-                value={longitude}
+                value={longitude ? longitude.toString() : ""}
                 onChange={handleChangeLongitude}
                 className="bg-gray-100 p-3 m-1 rounded"
               />
