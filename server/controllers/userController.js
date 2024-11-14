@@ -74,7 +74,7 @@ const getUser =  async (req, res) => {
     return res.json(rows);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -118,7 +118,7 @@ const getUserById = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -138,7 +138,7 @@ const getUserNameById = async (req, res) => {
     return res.json({ username: rows[0].username });
   } catch (e) {
     console.error('Error fetching username: ', e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) await conn.end();
   }
@@ -259,7 +259,7 @@ const updateUser = async (req, res) => {
     return res.status(200).json({ message: "success" });
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -278,7 +278,7 @@ const enableUser = async (req, res) => {
       );
     } catch (e) {
       console.log(e);
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(422).json({ message: "Error processing request" });
     } finally {
       if (conn) conn.end();
     }
@@ -300,7 +300,7 @@ const reportUser = async (req, res) => {
       res.json({ message: "success" });
     } catch (e) {
       console.log(e);
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(422).json({ message: "Error processing request" });
     } finally {
       if (conn) conn.end();
     }
@@ -327,7 +327,7 @@ const insertViewed = async (req, res) => {
   } catch (e) {
     console.log(e);
     if (conn) await conn.rollback();
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -345,7 +345,7 @@ const getViewedUsers = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -385,7 +385,7 @@ const insertLiked = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -405,7 +405,7 @@ const insertBlocked = async (req, res) => {
     return res.status(200).json({ message: "Block status updated successfully" });
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -434,7 +434,7 @@ const getConnectedUsers = async (req, res) => {
     return res.json(usersConnected);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -458,7 +458,7 @@ const checkMatched = async (req, res) => {
     }
   } catch (error) {
     console.error('Error checking match status: ', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(422).json({ message: 'Error processing request' });
   } finally {
     if (conn) conn.end();
   }
@@ -487,7 +487,7 @@ const insertUnliked = async (req, res) => {
     return res.json({ message: "success" });
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -505,7 +505,7 @@ const getLikedUsers = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -531,7 +531,7 @@ const checkLikedStatus = async (req, res) => {
     return res.json({ likedByUser, likedByOther });
   } catch (e) {
     console.error('Error checking like status: ', e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -549,7 +549,7 @@ const getLikedToUsers = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -567,7 +567,7 @@ const getBlockedToUsers = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -597,7 +597,7 @@ const myAccount =  async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -611,7 +611,7 @@ const getTags = async (req, res) => {
     res.json(tags);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -638,7 +638,7 @@ const addNewTags = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -689,7 +689,7 @@ const closeAccount = async (req, res) => {
     return res.json(rows);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -724,7 +724,7 @@ const insertConnected = async (req, res) => {
     return res.json(usersConnected);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -791,7 +791,7 @@ const getCommonTags = async (req, res) => {
     return res.json(serializedRows);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -821,7 +821,7 @@ const getFrequentlyLikedBack = async (req, res) => {
     res.json(rows);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -844,7 +844,7 @@ const getBlockedTo = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) return conn.end();
   }
@@ -910,7 +910,7 @@ const onlineStatus = async (req, res) => {
     return res.json(result);
   } catch (e) {
     console.error('Error fetching online status: ', e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) await conn.end();
   }

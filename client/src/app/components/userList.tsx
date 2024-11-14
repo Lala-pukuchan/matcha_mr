@@ -16,7 +16,19 @@ export default function UsersList({
   blockedUsersId,
   link,
 }: {
-  users: Array<{ id: string; status: string; tagIds?: string[]; profilePic?: string; username: string; age: number; match_ratio: number; latitude: number; longitude: number; isRealUser: boolean; fake_account: boolean }>;
+  users: Array<{ 
+    id: string; 
+    status: string; 
+    tagIds?: string[]; 
+    profilePic?: string; 
+    username: string; 
+    age: number; 
+    match_ratio: number; 
+    latitude: number; 
+    longitude: number; 
+    isRealUser: boolean; 
+    fake_account: boolean 
+  }>;
   operationUserId: string;
   likedUsersId: string[];
   blockedUsersId: string[];
@@ -27,7 +39,7 @@ export default function UsersList({
   const [displayedUsers, setDisplayedUsers] = useState<Array<{ id: string; status: string; tagIds?: string[]; profilePic?: string; username: string; age: number; match_ratio: number; latitude: number; longitude: number; isRealUser: boolean; fake_account: boolean }>>([]);
   const [userTags, setUserTags] = useState<Record<string, string[]>>({});
   const [loadingTags, setLoadingTags] = useState(true);
-  const usersPerPage = 4;
+  const usersPerPage = 16;
   const dispatch = useDispatch();
   const socket = useWebSocket();
 
@@ -36,13 +48,13 @@ export default function UsersList({
     const endIndex = startIndex + usersPerPage;
     const currentUsers = users.slice(startIndex, endIndex);
     setDisplayedUsers(currentUsers);
-
+  
     const initialStatus = currentUsers.reduce((acc: Record<string, string>, user) => {
       acc[user.id] = user.status;
       return acc;
     }, {});
     setOnlineStatus(initialStatus);
-
+  
     const fetchTagsForUsers = async () => {
       try {
         const tagsResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`);
@@ -51,12 +63,13 @@ export default function UsersList({
           acc[tag.id] = tag.name;
           return acc;
         }, {});
-
+  
         const userTagsMap: Record<string, string[]> = {};
         for (const user of currentUsers) {
           const userTagIds = user.tagIds || [];
           userTagsMap[user.id] = userTagIds.map(tagId => tagsMap[tagId]);
         }
+        console.log("User tags map:::", userTagsMap);
         setUserTags(userTagsMap);
         setLoadingTags(false);
       } catch (error) {
@@ -64,7 +77,7 @@ export default function UsersList({
         setLoadingTags(false);
       }
     };
-
+  
     fetchTagsForUsers();
   }, [users, currentPage]);
 

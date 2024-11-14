@@ -17,7 +17,7 @@ router.get('/matches/:userId', async (req, res) => {
     res.json(rows);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(422).send('Error processing request');
   } finally {
     if (conn) conn.end();
   }
@@ -33,7 +33,7 @@ router.get('/messages/:roomID', async (req, res) => {
     res.json(messages);
   } catch (error) {
     console.error('Error fetching messages from database: ', error);
-    res.status(500).send('Internal Server Error');
+    res.status(422).send('Error processing request');
   } finally {
     if (conn) conn.end();
   }

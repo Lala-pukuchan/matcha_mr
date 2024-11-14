@@ -15,7 +15,7 @@ const getMatches = async (req, res) => {
     res.json(rows);
   } catch (error) {
     console.error(error);
-    res.status(500).send('Server error');
+    res.status(422).send('Error processing request');
   } finally {
     if (conn) conn.end();
   }
@@ -69,7 +69,7 @@ const getCommonTags = async (req, res) => {
     return res.json(rows);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -117,7 +117,7 @@ const getCloseUsers = async (req, res) => {
     return res.json(rows);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }
@@ -132,7 +132,7 @@ const getFrequentlyLikedBack = async (req, res) => {
     res.json(rows);
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error processing request" });
   } finally {
     if (conn) conn.end();
   }

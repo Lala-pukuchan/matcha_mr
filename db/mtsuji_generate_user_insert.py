@@ -26,7 +26,7 @@ def assign_tags(gender, preference):
     male_tags = ["fighting", "surf", "camping", "Craft Beer", "Biking"]
     female_tags = ["Yoga", "Vegan", "Vintage", "Art Galleries", "Meditation"]
     neutral_tags = [
-        "music", "piano", "study", "wine", "Photography", "Street Art",
+        "music", "piano", "study", "wine", "Photography", "Street Art", "Programming",
         "Indie Films", "Local Markets", "Sustainability", "Book Clubs",
         "Farmers Markets", "Artisanal Coffee", "Second-Hand Shopping", "Concept Stores"
     ]

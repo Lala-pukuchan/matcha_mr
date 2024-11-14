@@ -12,7 +12,7 @@ const getMessages = async (req, res) => {
     res.json(messages);
   } catch (error) {
     console.error('Error fetching messages from database: ', error);
-    res.status(500).send('Internal Server Error');
+    res.status(422).send('Error processing request');
   } finally {
     if (conn) conn.end();
   }
@@ -51,7 +51,7 @@ const saveMessage = [
       res.status(200).json({ success: true });
     } catch (error) {
       console.error('Error saving message to database: ', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(422).json({ error: 'Error processing request' });
     } finally {
       if (conn) conn.end();
     }

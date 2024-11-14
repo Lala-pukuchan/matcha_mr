@@ -5,7 +5,33 @@ import Geo from "./geo";
 import Tag from "./tag";
 import MatchRatio from "./matchRatio";
 
-export default function UserInfo({ user }: { user: { id: number; status: string; last_active: string; tagIds: number[], profilePic: string, pic1: string, pic2: string, pic3: string, pic4: string, pic5: string, lastname: string, firstname: string, username: string, age: number, gender: string, preference: string, biography: string, latitude: string, longitude: string, match_ratio: number, liked: string, matched: string, isRealUser: boolean } }) {
+export default function UserInfo({ user }: { 
+  user: { 
+    id: number; 
+    status: string; 
+    last_active: string; 
+    tagIds?: string[]; 
+    profilePic: string; 
+    pic1: string; 
+    pic2: string; 
+    pic3: string; 
+    pic4: string; 
+    pic5: string; 
+    lastname: string; 
+    firstname: string; 
+    username: string; 
+    age: number; 
+    gender: string; 
+    preference: string; 
+    biography: string; 
+    latitude: number; 
+    longitude: number; 
+    match_ratio: number; 
+    liked: string; 
+    matched: string; 
+    isRealUser: boolean 
+  } 
+}) {
   const [message, setMessage] = useState("");
   const [onlineStatus, setOnlineStatus] = useState(user.status || "offline");
   const [lastActive, setLastActive] = useState(user.last_active);
@@ -99,16 +125,16 @@ export default function UserInfo({ user }: { user: { id: number; status: string;
         </div>
         <div className="mx-auto w-full">
           <h2 className="font-bold">Tags</h2>
-          <Tag user={user} />
+          {user.tagIds ? <Tag user={{ tagIds: user.tagIds }} /> : null}
         </div>
 
         <div className="grid gap-4 grid-cols-2 mx-auto w-full">
           <p className="font-bold">Location</p>
           {user && user.latitude && user.longitude ? (
             <Geo
-            lat={parseFloat(user.latitude)}
-            lon={parseFloat(user.longitude)}
-              isRealUser={user.isRealUser}
+            lat={user.latitude}
+            lon={user.longitude}
+            isRealUser={user.isRealUser}
             />
           ) : (
             ""

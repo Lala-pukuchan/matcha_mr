@@ -68,7 +68,7 @@ const createUser = async (req, res) => {
       transporter.sendMail(mailSetting, (error, info) => {
         if (error) {
           console.error("Error sending email: ", error);
-          return res.status(500).json({ message: "Internal server error" });
+          return res.status(422).json({ message: "Error sending email" });
         } else {
           console.log("Email sent: ", info.response);
         }
@@ -84,7 +84,7 @@ const createUser = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error creating user" });
   } finally {
     if (conn) return conn.end();
   }
@@ -120,7 +120,7 @@ const login = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error logging in" });
   } finally {
     if (conn) conn.end();
   }
@@ -146,7 +146,7 @@ const logout = async (req, res) => {
     res.send({ message: "success", userId });
   } catch (e) {
     console.log(e);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(422).json({ message: "Error logging out" });
   } finally {
     if (conn) conn.end();
   }
@@ -173,7 +173,7 @@ const resetPassword = async (req, res) => {
     transporter.sendMail(mailSetting, (error, info) => {
       if (error) {
         console.error("Error sending email: ", error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(422).json({ message: "Error sending email" });
       } else {
         console.log("Email sent: ", info.response);
       }
@@ -181,7 +181,7 @@ const resetPassword = async (req, res) => {
     return res.json({ message: "Please confirm new password via email" });
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error resetting password" });
   } finally {
     if (conn) conn.end();
   }
@@ -204,7 +204,7 @@ const updatePassword = async (req, res) => {
     }
   } catch (e) {
     console.log(e);
-    return res.status(500).json({ message: "Internal server error" });
+    return res.status(422).json({ message: "Error updating password" });
   } finally {
     if (conn) conn.end();
   }

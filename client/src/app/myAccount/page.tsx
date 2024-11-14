@@ -13,7 +13,7 @@ export default function MyAccount() {
     id: number; 
     status: string; 
     last_active: string; 
-    tagIds: number[]; 
+    tagIds?: string[]; 
     profilePic: string; 
     pic1: string; 
     pic2: string; 
@@ -168,8 +168,8 @@ export default function MyAccount() {
       {user ? (
         <UserInfo user={{
             ...user,
-            latitude: user.latitude.toString(),
-            longitude: user.longitude.toString(),
+            latitude: user.latitude,
+            longitude: user.longitude,
         }} />
       ) : (
         <p>Loading user information...</p>

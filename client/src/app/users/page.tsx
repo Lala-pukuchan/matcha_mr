@@ -22,7 +22,7 @@ export default function Users() {
     id: number;
     status: string;
     last_active: string;
-    tagIds: number[];
+    tagIds?: string[];
     profilePic: string;
     pic1: string;
     pic2: string;
@@ -34,8 +34,8 @@ export default function Users() {
     username: string;
     age: number;
     match_ratio: number;
-    latitude: string;
-    longitude: string;
+    latitude: number;
+    longitude: number;
     distance: number;
     common_tags_count: number;
     fake_account: boolean;

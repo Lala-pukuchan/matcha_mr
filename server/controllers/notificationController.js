@@ -42,7 +42,7 @@ const getNotifications = async (req, res) => {
     res.status(200).json(rows);
   } catch (error) {
     console.error('Error fetching notifications:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(422).json({ message: 'Error processing request' });
   } finally {
     if (conn) conn.release();
   }
@@ -59,7 +59,7 @@ const markAsRead = async (req, res) => {
     res.status(200).json({ message: 'Notification marked as read' });
   } catch (error) {
     console.error('Error marking notification as read:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    res.status(422).json({ message: 'Error processing request' });
   } finally {
     if (conn) conn.release();
   }
