@@ -30,7 +30,7 @@ const ReportFakeAccount = ({ reportedUserId, alreadyReported }: { reportedUserId
             body: json,
           }
         );
-        console.log("response: ", response);
+        //console.log("response: ", response);
         if (response.ok) {
           const responseData = await response.json();
           console.log("responseData: ", responseData);

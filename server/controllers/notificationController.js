@@ -2,7 +2,7 @@ const pool = require('../services/dbService');
 
 const saveNotification = async (notification) => {
   const { id, userId, type, message, fromUser, timestamp, checked } = notification;
-  console.log('notfication table SAVE id:::', notification.id);
+  //console.log('notfication table SAVE id:::', notification.id);
   let conn;
   try {
     conn = await pool.getConnection();
@@ -17,7 +17,7 @@ const saveNotification = async (notification) => {
 };
 
 const deleteNotification = async (userId, fromUserId, type) => {
-  console.log(`Deleting notification for user ${userId} from ${fromUserId} with type ${type}`);
+  //console.log(`Deleting notification for user ${userId} from ${fromUserId} with type ${type}`);
   let conn;
   try {
     conn = await pool.getConnection();
@@ -50,7 +50,7 @@ const getNotifications = async (req, res) => {
 
 const markAsRead = async (req, res) => {
   const { notificationId } = req.params;
-  console.log("notificationId:::", notificationId);
+  //console.log("notificationId:::", notificationId);
   let conn;
   try {
     conn = await pool.getConnection();
@@ -67,7 +67,7 @@ const markAsRead = async (req, res) => {
 
 const deleteAndSaveNotification = async (notification) => {
   const { userId, fromUser, type } = notification;
-  console.log("nofitication.id:::", notification.id);
+  //console.log("nofitication.id:::", notification.id);
   let conn;
   const maxRetries = 3;
   let attempt = 0;

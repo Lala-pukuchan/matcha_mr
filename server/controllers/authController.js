@@ -54,7 +54,7 @@ const createUser = async (req, res) => {
       const token = jwt.sign(payload, process.env.JWT_SECRET, {
         expiresIn: "1d",
       });
-      console.log("token:\n\n", token);
+      //console.log("token:\n\n", token);
       
       // send email
       const mailSetting = {
@@ -83,7 +83,6 @@ const createUser = async (req, res) => {
       return res.status(400).json({ message: "Username already exists" });
     }
   } catch (e) {
-    console.log(e);
     return res.status(422).json({ message: "Error creating user" });
   } finally {
     if (conn) return conn.end();
@@ -112,7 +111,7 @@ const login = async (req, res) => {
       const token = await getJwt(rows[0], tagIdsArray);
       res.cookie("token", token, { maxAge: 86400000 });
 
-      console.log(`User ${rows[0].id} logged in`);
+      //console.log(`User ${rows[0].id} logged in`);
 
       return res.json({ message: "Success", userId: rows[0].id }); // userIdを返す
     } else {
@@ -140,7 +139,7 @@ const logout = async (req, res) => {
     conn = await pool.getConnection();
 
     await conn.query('UPDATE user SET status = ? WHERE id = ?', ['offline', userId]);
-    console.log(`User ${userId} logged out`);
+    //(`User ${userId} logged out`);
 
     res.clearCookie("token", { path: "/" });
     res.send({ message: "success", userId });
@@ -175,7 +174,7 @@ const resetPassword = async (req, res) => {
         console.error("Error sending email: ", error);
         return res.status(422).json({ message: "Error sending email" });
       } else {
-        console.log("Email sent: ", info.response);
+        //console.log("Email sent: ", info.response);
       }
     });
     return res.json({ message: "Please confirm new password via email" });
@@ -190,7 +189,7 @@ const resetPassword = async (req, res) => {
 const updatePassword = async (req, res) => {
   let conn;
   try {
-    console.log(req.body);
+    //console.log(req.body);
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
     const values = [hashedPassword, req.body.username];

@@ -23,7 +23,7 @@ const initialState: NotificationState = {
 export const fetchNotifications = createAsyncThunk(
   'notifications/fetchNotifications',
   async (userId: string) => {
-    console.log(`Fetching notifications from API for user ${userId}`);
+    //console.log(`Fetching notifications from API for user ${userId}`);
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/notifications/${userId}`);
     const data = await response.json();
     return data;
@@ -50,7 +50,7 @@ const notificationSlice = createSlice({
     markAsRead: (state, action: PayloadAction<string>) => {
       const notification = state.notifications.find(n => n.id === action.payload);
       if (notification) {
-        console.log(`Marking notification ${notification.id} as read in state`);
+        //console.log(`Marking notification ${notification.id} as read in state`);
         notification.checked = true;
       }
       state.unreadCount = state.notifications.filter(notification => !notification.checked).length;
@@ -62,7 +62,7 @@ const notificationSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(fetchNotifications.fulfilled, (state, action) => {
-      console.log('Fetched notifications from API', action.payload);
+      //console.log('Fetched notifications from API', action.payload);
       state.notifications = Array.isArray(action.payload) ? action.payload : [];
       state.unreadCount = state.notifications.filter(notification => !notification.checked).length;
     });

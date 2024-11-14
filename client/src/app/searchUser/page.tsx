@@ -157,8 +157,8 @@ export default function Home() {
   }, [user, isRedirecting]);
 
   useEffect(() => {
-    console.log('called');
-    console.log(users);
+    //console.log('called');
+    //console.log(users);
     const sorted = [...users].sort((a, b) => {
       if (sortOption === "age") {
         return sortOrder === "asc" ? a.age - b.age : b.age - a.age;

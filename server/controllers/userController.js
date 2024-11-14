@@ -43,7 +43,7 @@ const getUser =  async (req, res) => {
   }
   if (req.body.preference) {
     if (req.body.preference === "no") {
-      console.log("no preference");
+      //console.log("no preference");
     } else {
       queryFields.push("gender = ?");
       values.push(req.body.preference);
@@ -310,7 +310,6 @@ const reportUser = async (req, res) => {
 };
 
 const insertViewed = async (req, res) => {
-  console.log("insertViewed");
   let conn;
   try {
     conn = await pool.getConnection();
@@ -393,7 +392,6 @@ const insertLiked = async (req, res) => {
 
 const insertBlocked = async (req, res) => {
   let conn;
-  console.log("req.body: ", req.body);
   try {
     conn = await pool.getConnection();
     const values = [req.body.from, req.body.to];
@@ -413,7 +411,6 @@ const insertBlocked = async (req, res) => {
 
 const getConnectedUsers = async (req, res) => {
   let conn;
-  console.log("getConnectedUsers");
   try {
     conn = await pool.getConnection();
     const matchResult = await conn.query("SELECT * FROM matched WHERE matched_user_id_first = ? OR matched_user_id_second = ?", [req.body.id, req.body.id]);
@@ -873,7 +870,6 @@ const searchUser = async (req, res) => {
       ...row,
       common_tags_count: row.common_tags_count.toString(),
     }));
-    console.log('res.json(serializedRows):', serializedRows);
     return res.json(serializedRows);
   } catch (e) {
     console.log(e);

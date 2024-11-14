@@ -18,7 +18,7 @@ export default function UpdateProfile() {
 
   useEffect(() => {
     if (user) {
-      console.log("user: ", user);
+      //console.log("user: ", user);
       if (user && user.gender) {
         setSelectedGender(user.gender);
       }

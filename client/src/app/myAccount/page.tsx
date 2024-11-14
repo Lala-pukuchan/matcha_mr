@@ -45,7 +45,6 @@ export default function MyAccount() {
   const socket = useWebSocket(); 
   useEffect(() => {
     const fetchUser = async () => {
-      console.log("fetchUser called");
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/myAccount`,
@@ -65,7 +64,6 @@ export default function MyAccount() {
         longitude: parseFloat(data.longitude),
       };
       setUser(userData);
-      console.log("user: ", userData);
     } else {
       setUser(null);
     }
@@ -78,8 +76,6 @@ export default function MyAccount() {
     };
 
     const fetchUsers = async () => {
-      console.log("fetchUsers called");
-      console.log("user: ", user);
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/getUser`,

@@ -109,7 +109,6 @@ export default function Users() {
             },
             body: likeStatusJson,
           });
-          console.log("response:::::", response);
           if (response.ok) {
             const data = await response.json();
             setLikedByUser(data.likedByUser);
@@ -123,13 +122,11 @@ export default function Users() {
 
       // update viewed
       const updateViewed = async () => {
-        console.log("updateViewed");
         await new Promise((resolve) => setTimeout(resolve, 2000));
         setLoading(false);
         if (user) {
           try {
             const viewJson = JSON.stringify({ from: user.id, to: userId });
-            console.log("viewJson:::::", viewJson);
             const response = await fetch(
               `${process.env.NEXT_PUBLIC_API_URL}/api/users/viewed`,
               {
