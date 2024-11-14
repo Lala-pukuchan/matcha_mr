@@ -14,7 +14,7 @@ tags = [
     "Street Art", "Photography", "Minimalism", "Indie Films", "Local Markets", 
     "Sustainability", "Craft Beer", "Alternative Music", "Meditation", 
     "Book Clubs", "Farmers Markets", "Artisanal Coffee", "Second-Hand Shopping", 
-    "Concept Stores"
+    "Concept Stores", "Programming"
 ]
 
 def generate_last_active():
