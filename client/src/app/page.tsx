@@ -16,7 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [likedUsersId, setLikedUsersId] = useState([]);
   const [blockedUsersId, setBlockedUsersId] = useState([]);
-
+  const [blockedToUsersId, setBlockedToUsersId] = useState([]);
   useEffect(() => {
     const fetchConnectedUsers = async () => {
       try {
@@ -157,9 +157,29 @@ export default function Home() {
       }
     };
 
-    const blockedUsers = async () => {
+    const blockedFromUsers = async () => {
       try {
-        const userJson = JSON.stringify({ userId: user.id });
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/blockedFrom`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId: user.id }),
+          }
+        );
+        if (response.ok) {
+          const responseData = await response.json();
+          setBlockedUsersId(responseData.map((item: { from_user_id: number }) => item.from_user_id));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const blockedToUsers = async () => {
+      try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/blockedTo`,
           {
@@ -167,19 +187,12 @@ export default function Home() {
             headers: {
               "Content-Type": "application/json",
             },
-            body: userJson,
+            body: JSON.stringify({ userId: user.id }),
           }
         );
         if (response.ok) {
           const responseData = await response.json();
-          if (responseData) {
-            const blockedUsersIdArray = responseData.map(
-              (item: { blocked_to_user_id: number }) => item.blocked_to_user_id
-            );
-            setBlockedUsersId(blockedUsersIdArray);
-          }
-        } else {
-          console.error("updating liked is failed");
+          setBlockedToUsersId(responseData.map((item: { blocked_to_user_id: number }) => item.blocked_to_user_id));
         }
       } catch (e) {
         console.error(e);
@@ -192,7 +205,8 @@ export default function Home() {
         fetchUsersCommon();
         fetchUsersFrequentlyLikedBack();
         likedUsers();
-        blockedUsers();
+        blockedFromUsers();
+        blockedToUsers();
         setLoading(false);
       }
   }, [user]);
@@ -220,6 +234,7 @@ export default function Home() {
             operationUserId={user.id}
             likedUsersId={likedUsersId}
             blockedUsersId={blockedUsersId}
+            blockedToUsersId={blockedToUsersId}
             link="/chat"
           />
         </div>

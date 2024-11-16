@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
-const Block = ({ blockedFromUserId, blockedToUserId }: { blockedFromUserId: string; blockedToUserId: string }) => {
-  const [isClicked, setIsClicked] = useState(false);
+const Block = ({ blockedFromUserId, blockedToUserId, alreadyBlocked }: { blockedFromUserId: string; blockedToUserId: string; alreadyBlocked: boolean }) => {
+  const [isClicked, setIsClicked] = useState(alreadyBlocked);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  useEffect(() => {
+    setIsClicked(alreadyBlocked);
+  }, [alreadyBlocked]);
 
   const block = () => {
     // update state
@@ -45,7 +50,7 @@ const Block = ({ blockedFromUserId, blockedToUserId }: { blockedFromUserId: stri
     <div className="container">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        fill="red"
+        fill={isClicked ? "red" : "none"}
         viewBox="0 0 24 24"
         strokeWidth="1.5"
         stroke="currentColor"

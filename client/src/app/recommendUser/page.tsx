@@ -29,6 +29,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [likedUsersId, setLikedUsersId] = useState<number[]>([]);
   const [blockedUsersId, setBlockedUsersId] = useState<number[]>([]);
+  const [blockedToUsersId, setBlockedToUsersId] = useState<number[]>([]);
   const [tags, setTags] = useState<{ value: number; label: string }[]>([]);
   const [selectedTags, setSelectedTags] = useState<{ value: number; label: string }[]>([]);
   const [ageRange, setAgeRange] = useState<[number, number]>([18, 60]); 
@@ -130,7 +131,28 @@ export default function Home() {
       }
     };
 
-    const blockedUsers = async () => {
+    const blockedFromUsers = async () => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/users/blockedFrom`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ userId: user.id }),
+          }
+        );
+        if (response.ok) {
+          const responseData = await response.json();
+          setBlockedUsersId(responseData.map((item: { from_user_id: number }) => item.from_user_id));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+
+    const blockedToUsers = async () => {
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_API_URL}/api/users/blockedTo`,
@@ -144,7 +166,7 @@ export default function Home() {
         );
         if (response.ok) {
           const responseData = await response.json();
-          setBlockedUsersId(responseData.map((item: { blocked_to_user_id: number }) => item.blocked_to_user_id));
+          setBlockedToUsersId(responseData.map((item: { blocked_to_user_id: number }) => item.blocked_to_user_id));
         }
       } catch (e) {
         console.error(e);
@@ -154,7 +176,8 @@ export default function Home() {
     if (user) {
       fetchUsers();
       likedUsers();
-      blockedUsers();
+      blockedFromUsers();
+      blockedToUsers();
       setLoading(false);
     }
   }, [user, isRedirecting]);
@@ -409,6 +432,7 @@ export default function Home() {
           operationUserId={user.id.toString()}
           likedUsersId={likedUsersId.map(String)}
           blockedUsersId={blockedUsersId.map(String)}
+          blockedToUsersId={blockedToUsersId.map(String)}
           link="/users"
         />
       </div>

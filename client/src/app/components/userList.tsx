@@ -14,6 +14,7 @@ export default function UsersList({
   operationUserId,
   likedUsersId,
   blockedUsersId,
+  blockedToUsersId,
   link,
 }: {
   users: Array<{ 
@@ -32,6 +33,7 @@ export default function UsersList({
   operationUserId: string;
   likedUsersId: string[];
   blockedUsersId: string[];
+  blockedToUsersId: string[];
   link: string;
 }) {
   const [onlineStatus, setOnlineStatus] = useState<Record<string, string>>({});
@@ -175,6 +177,7 @@ export default function UsersList({
                   <Block
                     blockedFromUserId={operationUserId}
                     blockedToUserId={user.id}
+                    alreadyBlocked={(blockedToUsersId || []).includes(user.id)}
                   />
                 </div>
               </div>

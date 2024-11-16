@@ -35,6 +35,7 @@ router.post('/checkMatched', userController.checkMatched);
 router.post('/commonTags', userController.getCommonTags);
 router.post('/frequentlyLikedBack', userController.getFrequentlyLikedBack);
 router.post('/blockedTo', userController.getBlockedTo);
+router.post('/blockedFrom', userController.getBlockedFrom);
 router.post('/searchUser', upload.none(), userController.searchUser);
 router.post('/onlineStatus', userController.onlineStatus);
 router.post('/checkLikedStatus', userController.checkLikedStatus);

@@ -397,6 +397,13 @@ const insertBlocked = async (req, res) => {
     const values = [req.body.from, req.body.to];
     if (req.body.blocked) {
       await conn.query("INSERT INTO blocked (from_user_id, blocked_to_user_id, blocked_at) VALUES (?, ?, NOW())", values);
+      
+      await conn.query("DELETE FROM matched WHERE (matched_user_id_first = ? AND matched_user_id_second = ?) OR (matched_user_id_first = ? AND matched_user_id_second = ?)", [req.body.from, req.body.to, req.body.to, req.body.from]);
+
+      await conn.query("DELETE FROM liked WHERE from_user_id = ? AND liked_to_user_id = ?", values);
+
+      await conn.query("DELETE FROM room_messages WHERE room_id IN (SELECT room_id FROM rooms WHERE (user_id_first = ? AND user_id_second = ?) OR (user_id_first = ? AND user_id_second = ?))", [req.body.from, req.body.to, req.body.to, req.body.from]);
+      await conn.query("DELETE FROM rooms WHERE (user_id_first = ? AND user_id_second = ?) OR (user_id_first = ? AND user_id_second = ?)", [req.body.from, req.body.to, req.body.to, req.body.from]);
     } else {
       await conn.query("DELETE FROM blocked WHERE from_user_id = ? AND blocked_to_user_id = ?", values);
     }
@@ -408,6 +415,7 @@ const insertBlocked = async (req, res) => {
     if (conn) conn.end();
   }
 };
+
 
 const getConnectedUsers = async (req, res) => {
   let conn;
@@ -847,6 +855,28 @@ const getBlockedTo = async (req, res) => {
   }
 };
 
+const getBlockedFrom = async (req, res) => {
+  let conn;
+  try {
+    // get viwed from users
+    conn = await pool.getConnection();
+    let queryString =
+      "SELECT DISTINCT from_user_id FROM blocked WHERE blocked_to_user_id = ?";
+    let values = [req.body.userId];
+    const blockedFromUsers = await conn.query(queryString, values);
+    if (blockedFromUsers.length > 0) {
+      res.json(blockedFromUsers);
+    } else {
+      res.json([]);
+    }
+  } catch (e) {
+    console.log(e);
+    return res.status(422).json({ message: "Error processing request" });
+  } finally {
+    if (conn) return conn.end();
+  }
+};
+
 const searchUser = async (req, res) => {
   // validate user
   let conn;
@@ -939,6 +969,7 @@ module.exports = {
   getCommonTags,
   getFrequentlyLikedBack,
   getBlockedTo,
+  getBlockedFrom,
   searchUser,
   onlineStatus,
 };
