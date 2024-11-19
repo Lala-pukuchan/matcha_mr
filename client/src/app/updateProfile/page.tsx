@@ -403,18 +403,20 @@ export default function UpdateProfile() {
                 onChange={handleChangeLongitude}
                 className="bg-gray-100 p-3 m-1 rounded"
               />
-              <button
-                onClick={addGeo}
-                className="m-3 w-15 p-1 h-7 rounded bg-cyan-400 text-white inline-block"
-              >
-                Use My Location
-              </button>
-              <button
-                onClick={handleIPGeo}
-                className="m-3 w-15 p-1 h-7 rounded bg-gray-400 text-white inline-block"
-              >
-                Estimate My Location
-              </button>
+              <div className="flex space-x-3">
+                <button
+                  onClick={addGeo}
+                  className="w-15 p-1 h-7 rounded bg-cyan-400 text-white inline-block"
+                >
+                  Use My Location
+                </button>
+                <button
+                  onClick={handleIPGeo}
+                  className="w-15 p-1 h-7 rounded bg-gray-400 text-white inline-block"
+                >
+                  Estimate My Location
+                </button>
+              </div>
             </div>
           </div>
           <div className="grid grid-cols-2">
