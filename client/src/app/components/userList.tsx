@@ -86,6 +86,7 @@ export default function UsersList({
   useEffect(() => {
     if (socket) {
       const handleUserStatus = ({ userId, status }: { userId: string; status: string })  => {
+        console.log("handleUserStatus called from socket:", userId, status);
         setOnlineStatus((prevStatus) => ({
           ...prevStatus,
           [userId]: status,
@@ -98,28 +99,6 @@ export default function UsersList({
       };
     }
   }, [socket]);
-
-  const handleUnmatch = async (userId: string) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/unmatch`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId1: operationUserId, userId2: userId }),
-      });
-
-      if (response.ok) {
-        dispatch(addNotification({
-          id: new Date().getTime().toString(),
-          type: 'unmatch',
-          message: 'You have unmatched with a user',
-          fromUser: userId,
-          timestamp: new Date().toISOString(),
-        }));
-      }
-    } catch (error) {
-      console.error('Error unmatching user:', error);
-    }
-  };
 
   const handleNextPage = () => {
     if (currentPage * usersPerPage < users.length) {

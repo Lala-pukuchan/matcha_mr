@@ -6,9 +6,20 @@ import { useUser } from "../../../context/context";
 import { useDispatch } from 'react-redux';
 import { addNotification } from '../store/notificationSlice';
 
-
+let socketInstance: Socket | null = null;
+function getSocketInstance() {
+  if (!socketInstance) {
+    socketInstance = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
+      withCredentials: true,
+      reconnectionAttempts: 5,
+      reconnectionDelay: 5000,
+      transports: ['websocket', 'polling'],
+    });
+  }
+  return socketInstance;
+}
 function useWebSocket() {
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const socket = getSocketInstance();
   const { user } = useUser();
   //const { addNotification: addContextNotification } = useContext(NotificationContext); // NotificationContextを使用
   const userRef = useRef(user);
@@ -20,29 +31,23 @@ function useWebSocket() {
 
   const disconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
-    if (!socket) {
-      const newSocket = io(`${process.env.NEXT_PUBLIC_API_URL}`, {
-        withCredentials: true,
-        reconnectionAttempts: 5,
-        reconnectionDelay: 5000,
-        transports: ['websocket', 'polling'],
-      });
 
-      newSocket.on('connect', () => {
+      socket.off('connect');
+      socket.on('connect', () => {
         if (userRef.current && userRef.current.id) {
           console.log("WebSocket connected: ", userRef.current.id);
-          newSocket.emit('login', userRef.current.id);
+          socket.emit('login', userRef.current.id);
         }
       });
 
-      newSocket.on('disconnect', (reason) => {
+      socket.off('disconnect');
+      socket.on('disconnect', (reason) => {
         console.log('WebSocket disconnected. reason: ', reason);
         if (reason === 'transport close' || reason === 'io client disconnect') {
           console.log("reason is: ", reason);
           setTimeout(() => {
-            if (!newSocket.connected) {
-              newSocket.emit('login');
+            if (!socket.connected) {
+              socket.emit('login');
             }
           }, 5000);
         }
@@ -50,24 +55,26 @@ function useWebSocket() {
           if (userRef.current && userRef.current.id) {
             console.log('User is now offline due to disconnect');
             console.log("offline: userRef.current.id: ", userRef.current.id);
-            newSocket.emit('logout', userRef.current.id);
+            socket.emit('logout', userRef.current.id);
           }
         }, 5000);
       });
 
-      newSocket.on('reconnect', (attempt) => {
+      socket.off('reconnect');
+      socket.on('reconnect', (attempt) => {
         if (disconnectTimeoutRef.current) {
           clearTimeout(disconnectTimeoutRef.current);
           disconnectTimeoutRef.current = null;
         }
         if (userRef.current && userRef.current.id) {
           console.log("reconnect: userRef.current.id: ", userRef.current.id);
-          newSocket.connect();
-          newSocket.emit('login', userRef.current.id);
+          socket.connect();
+          socket.emit('login', userRef.current.id);
         }
       });
 
-      newSocket.on('message received', async (notification) => {
+      socket.off('message received');
+      socket.on('message received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
@@ -97,7 +104,8 @@ function useWebSocket() {
         }
       });
 
-      newSocket.on('like received', async (notification) => {
+      socket.off('like received');
+      socket.on('like received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
@@ -127,7 +135,8 @@ function useWebSocket() {
         }
       });
 
-      newSocket.on('viewed received', async (notification) => {
+      socket.off('viewed received');
+      socket.on('viewed received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
@@ -156,7 +165,8 @@ function useWebSocket() {
         }
       });
 
-      newSocket.on('unlike received', async (notification) => {
+      socket.off('unlike received');
+      socket.on('unlike received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
@@ -185,7 +195,8 @@ function useWebSocket() {
         }
       });
 
-      newSocket.on('match received', async (notification) => {
+      socket.off('match received');
+      socket.on('match received', async (notification) => {
         if (userRef.current && userRef.current.id !== notification.from_user_id) {
           try {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/getUserNameById`, {
@@ -213,17 +224,6 @@ function useWebSocket() {
           }
         }
       });
-
-      setSocket(newSocket);
-    }
-
-    return () => {
-      console.log('Cleaning up socket');
-      if (socket) {
-        socket.close();
-      }
-    };
-  }, [socket, dispatch]);
 
   return socket;
 }
