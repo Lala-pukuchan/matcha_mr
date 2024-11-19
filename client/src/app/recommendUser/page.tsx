@@ -47,25 +47,35 @@ export default function Home() {
   const [sortOrder, setSortOrder] = useState("asc");
 
   useEffect(() => {
-    if (isRedirecting || !user) {
-      return;
-    }
-
-    const fetchTags = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`);
-        if (response.ok) {
-          const data = await response.json();
-          setTags(data.map((tag: { id: number; name: string }) => ({ value: tag.id, label: tag.name })));
+        const [userResponse, tagsResponse] = await Promise.all([
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`),
+          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`)
+        ]);
+
+        if (userResponse.ok && tagsResponse.ok) {
+          const usersData = await userResponse.json();
+          const tagsData = await tagsResponse.json();
+
+          // ユーザーとタグのデータを状態に保存
+          setUsers(usersData);
+          setTags(tagsData.map((tag: { id: number; name: string }) => ({ value: tag.id, label: tag.name })));
         } else {
-          console.error("Failed to fetch tags");
+          console.error("Failed to fetch data");
         }
-      } catch (e) {
-        console.error(e);
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchTags();
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (isRedirecting || !user) {
+      return;
+    }
 
     const fetchUsers = async () => {
       try {
