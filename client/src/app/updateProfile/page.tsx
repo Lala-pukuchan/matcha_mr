@@ -137,6 +137,29 @@ export default function UpdateProfile() {
     setGeo();
   };
 
+  // get location based on IP
+  async function setGeoByIP() {
+    try {
+      const response = await fetch('https://ipapi.co/json/');
+      if (response.ok) {
+        const data = await response.json();
+        setLatitude(data.latitude);
+        setLongitude(data.longitude);
+      } else {
+        setMessage("Unable to fetch location from IP.");
+      }
+    } catch (error) {
+      console.error("Error fetching IP-based location:", error);
+      setMessage("An error occurred while fetching location.");
+    }
+  }
+
+  // handle IP-based location button click
+  const handleIPGeo = (event: React.FormEvent) => {
+    event.preventDefault();
+    setGeoByIP();
+  };
+
   // handle change latitude and longitude
   const handleChangeLatitude = (e: ChangeEvent<HTMLInputElement>) => {
     setLatitude(parseFloat(e.target.value)); 
@@ -384,7 +407,13 @@ export default function UpdateProfile() {
                 onClick={addGeo}
                 className="m-3 w-15 p-1 h-7 rounded bg-cyan-400 text-white inline-block"
               >
-                Get Current Location
+                Use My Location
+              </button>
+              <button
+                onClick={handleIPGeo}
+                className="m-3 w-15 p-1 h-7 rounded bg-gray-400 text-white inline-block"
+              >
+                Estimate My Location
               </button>
             </div>
           </div>
