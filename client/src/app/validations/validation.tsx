@@ -18,8 +18,10 @@ export function validatePassword(password: string): string {
     return "Password should have at least one special character (e.g., !, @, #, etc.).";
   }
   const commonWords = ["password", "123456", "qwerty", "abc123", "letmein", "motdepasse"];
-  if (commonWords.includes(password.toLowerCase())) {
-    return "Password should not be a common word.";
+  for (const word of commonWords) {
+    if (password.toLowerCase().includes(word)) {
+      return "Password should not contain common words or sequences.";
+    }
   }
   return "";
 }

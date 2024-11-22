@@ -150,7 +150,7 @@ export default function UsersList({
                     alreadyLiked={likedUsersId.includes(user.id)}
                   />
                   <ReportFakeAccount
-                    reportedUserId={Number(user.id)}
+                    reportedUserId={user.id}
                     alreadyReported={user.fake_account}
                   />
                   <Block
