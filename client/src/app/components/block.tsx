@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import useWebSocket from "../hooks/useWebSocket";
 
 const Block = ({ blockedFromUserId, blockedToUserId, alreadyBlocked }: { blockedFromUserId: string; blockedToUserId: string; alreadyBlocked: boolean }) => {
   const [isClicked, setIsClicked] = useState(alreadyBlocked);
   const [errorMessage, setErrorMessage] = useState("");
+  const socket = useWebSocket();
 
   useEffect(() => {
     setIsClicked(alreadyBlocked);
@@ -35,6 +37,7 @@ const Block = ({ blockedFromUserId, blockedToUserId, alreadyBlocked }: { blocked
         console.log("response: ", response);
         if (response.ok) {
           const responseData = await response.json();
+          socket.emit('block', { fromUserId: blockedFromUserId, toUserId: blockedToUserId });
           console.log("responseData: ", responseData);
         } else {
           console.error("updating blockd is failed");

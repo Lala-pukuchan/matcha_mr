@@ -72,13 +72,24 @@ function Chat() {
           [userId]: status,
         }));
       });
-    }
   
-    return () => {
-      if (socket) {
-        socket.off('user status');
-      }
-    };
+      const handleBlocked = ({ from_user_id }: { from_user_id: string }) => {
+        setMatches(prevMatches => prevMatches.filter(match => match.id !== from_user_id));
+        if (currentChatPartner && currentChatPartner.room_id === from_user_id) {
+          setCurrentChatPartner(null);
+          setRoomID('');
+          setInput('');
+        }
+      };
+      socket.on('blocked', handleBlocked);
+  
+      return () => { 
+        if (socket) {
+          socket.off('user status');
+          socket.off('blocked', handleBlocked);
+        }
+      };
+    }
   }, [socket]);
 
   const { messages, sendMessage } = useChatRoom(socket, roomID);

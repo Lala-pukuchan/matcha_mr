@@ -46,6 +46,20 @@ export default function UsersList({
   const socket = useWebSocket();
 
   useEffect(() => {
+    if (socket) {
+      const handleBlocked = ({ from_user_id }: { from_user_id: string }) => {
+        setDisplayedUsers((prevUsers) => prevUsers.filter(user => user.id !== from_user_id));
+      };
+
+      socket.on("blocked", handleBlocked);
+
+      return () => {
+        socket.off("blocked", handleBlocked);
+      };
+    }
+  }, [socket]);
+
+  useEffect(() => {
     const startIndex = (currentPage - 1) * usersPerPage;
     const endIndex = startIndex + usersPerPage;
     const currentUsers = users.slice(startIndex, endIndex);

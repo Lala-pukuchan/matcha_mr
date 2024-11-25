@@ -96,7 +96,7 @@ export default function Login() {
             <Link href="signup">Create an account?</Link>
           </div>
           <div className="text-cyan-400">
-            <Link href="Passwordreset">Forget Password?</Link>
+            <Link href="passwordreset">Forget Password?</Link>
           </div>
         </div>
       </form>

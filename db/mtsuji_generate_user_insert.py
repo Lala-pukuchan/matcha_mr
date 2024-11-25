@@ -3,10 +3,24 @@ import hashlib
 import random
 from datetime import datetime, timedelta
 
-# サンプルデータ
-first_names_male = ["James", "John", "Robert", "Michael", "William"]
-first_names_female = ["Mary", "Patricia", "Jennifer", "Linda", "Elizabeth"]
-last_names = ["Smith", "Johnson", "Williams", "Brown", "Jones"]
+first_names_male = [
+    "James", "John", "Robert", "Michael", "William", "David", "Richard", "Charles", "Joseph", "Thomas",
+    "Daniel", "Paul", "Mark", "George", "Steven", "Edward", "Brian", "Ronald", "Anthony", "Kevin",
+    "Hiroshi", "Kazuo", "Satoshi", "Yuki", "Ren", "Étienne", "Olivier", "Louis", "Pierre", "Julien",
+    "Pierre", "Alexandre", "Thomas", "François", "Jacques", "Henri", "Gérard", "Philippe", "Bernard", "Michel"
+]
+first_names_female = [
+    "Mary", "Patricia", "Jennifer", "Linda", "Elizabeth", "Barbara", "Susan", "Jessica", "Sarah", "Karen",
+    "Nancy", "Betty", "Lisa", "Sandra", "Helen", "Maria", "Kimberly", "Donna", "Michelle", "Emily",
+    "Aiko", "Sakura", "Yuki", "Hana", "Miyu", "Camille", "Marie", "Claire", "Sophie", "Chloé", "Ruru", "Mika",
+    "Maki", "Yumi", "Yuriko", "Yuko", "Agnès", "Élise", "Léa", "Manon", "Sarah"
+]
+last_names = [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Miller", "Davis", "Garcia", "Rodriguez", "Martinez",
+    "Anderson", "Taylor", "Thomas", "Hernandez", "Moore", "Martin", "Jackson", "Thompson", "White", "Lopez",
+    "Suzuki", "Takahashi", "Tanaka", "Yamamoto", "Kobayashi", "Durand", "Lefevre", "Bernard", "Moreau", "Dubois",
+    "Sato", "Saito", "Tsuji", "Bonnet", "Aoki", "Sawai", "Ono", "Kawasaki", "Nakamura", "Kato"
+]
 
 tags = [
     "camping", "fighting", "music", "piano", "study", "surf", "wine",
@@ -24,7 +38,7 @@ def generate_last_active():
 
 def assign_tags(gender, preference):
     male_tags = ["fighting", "surf", "camping", "Craft Beer", "Biking"]
-    female_tags = ["Yoga", "Vegan", "Vintage", "Art Galleries", "Meditation"]
+    female_tags = ["Yoga", "Vegan", "Vintage", "Art Galleries", "Meditation", ]
     neutral_tags = [
         "music", "piano", "study", "wine", "Photography", "Street Art", "Programming",
         "Indie Films", "Local Markets", "Sustainability", "Book Clubs",

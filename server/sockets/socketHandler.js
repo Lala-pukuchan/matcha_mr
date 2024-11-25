@@ -199,6 +199,15 @@ function setupSocket(io, pool) {
         console.error('Error handling like event: ', error);
       }
     });
+
+    socket.on('block', async (data) => {
+      const { fromUserId, toUserId } = data;
+      if (socketIdMap.has(toUserId)) {
+        io.to(socketIdMap.get(toUserId)).emit('blocked', {
+          from_user_id: fromUserId,
+        });
+      }
+    });
   
     socket.on('unlike', async (data) => {
       const { fromUserId, toUserId } = data;
