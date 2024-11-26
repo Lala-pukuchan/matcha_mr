@@ -91,7 +91,7 @@ export default function Home() {
           max_age: max_age,
           min_distance: 0,
           max_distance: 1000,
-          min_fame_rating: 20,
+          min_fame_rating: 0,
           max_fame_rating: 100,
           min_common_tag_count: 1,
         };
