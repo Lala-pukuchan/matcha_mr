@@ -20,13 +20,13 @@ export default function Logout() {
       .then((res) => res.json())
       .then((data) => {
         if (data.message === "success") {
-          console.log('Logout successful');
+          //console.log('Logout successful');
           if (socket && socket.connected) {
             socket.emit('logout', data.userId);
           }
           window.location.href = "/login";
         } else {
-          console.log(data);
+          //console.log(data);
           setMessage("Error logging out");
         }
       });

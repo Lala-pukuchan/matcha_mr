@@ -401,6 +401,7 @@ const insertBlocked = async (req, res) => {
       await conn.query("DELETE FROM matched WHERE (matched_user_id_first = ? AND matched_user_id_second = ?) OR (matched_user_id_first = ? AND matched_user_id_second = ?)", [req.body.from, req.body.to, req.body.to, req.body.from]);
 
       await conn.query("DELETE FROM liked WHERE from_user_id = ? AND liked_to_user_id = ?", values);
+      await conn.query("DELETE FROM liked WHERE liked_to_user_id = ? AND from_user_id = ?", values);
 
       await conn.query("DELETE FROM room_messages WHERE room_id IN (SELECT room_id FROM rooms WHERE (user_id_first = ? AND user_id_second = ?) OR (user_id_first = ? AND user_id_second = ?))", [req.body.from, req.body.to, req.body.to, req.body.from]);
       await conn.query("DELETE FROM rooms WHERE (user_id_first = ? AND user_id_second = ?) OR (user_id_first = ? AND user_id_second = ?)", [req.body.from, req.body.to, req.body.to, req.body.from]);

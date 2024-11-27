@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- ホスト: db:3306
--- 生成日時: 2024 年 11 月 25 日 17:58
+-- 生成日時: 2024 年 11 月 27 日 17:06
 -- サーバのバージョン： 10.5.8-MariaDB-1:10.5.8+maria~focal
 -- PHP のバージョン: 8.2.8
 
@@ -39,7 +39,8 @@ CREATE TABLE `blocked` (
 --
 
 INSERT INTO `blocked` (`id`, `from_user_id`, `blocked_to_user_id`, `blocked_at`) VALUES
-(3, '73de925b-0b9a-4a11-a7c4-d95fec823a9b', '70326ac8-3f29-4faa-aed8-a72b3bfe9ca5', '2024-02-23 04:59:03');
+(3, '73de925b-0b9a-4a11-a7c4-d95fec823a9b', '70326ac8-3f29-4faa-aed8-a72b3bfe9ca5', '2024-02-23 04:59:03'),
+(30, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '9eb62964-c7b3-4f40-81ce-a23f42572949', '2024-11-27 17:00:07');
 
 -- --------------------------------------------------------
 
@@ -79,8 +80,6 @@ INSERT INTO `liked` (`id`, `from_user_id`, `liked_to_user_id`, `liked_at`) VALUE
 (49, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'ee583dd0-4da8-4b77-848f-78a515a0fc22', '2024-11-08 10:36:40'),
 (50, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '77743911-bb39-408b-af66-d84df45d73fa', '2024-11-08 10:36:41'),
 (51, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:39:20'),
-(52, '511c3f3b-0200-4c5c-9745-8060e2403673', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:57:41'),
-(53, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-08 10:58:28'),
 (54, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-08 11:01:31'),
 (55, '511c3f3b-0200-4c5c-9745-8060e2403673', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '2024-11-08 11:02:27'),
 (56, '511c3f3b-0200-4c5c-9745-8060e2403673', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', '2024-11-08 11:03:12'),
@@ -91,7 +90,9 @@ INSERT INTO `liked` (`id`, `from_user_id`, `liked_to_user_id`, `liked_at`) VALUE
 (67, 'e9bea5f8-453c-4715-8532-163c0c348dfb', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 15:43:38'),
 (68, '63fb855d-5267-4caa-a038-1a1274f67796', 'e9bea5f8-453c-4715-8532-163c0c348dfb', '2024-11-25 15:43:40'),
 (69, 'e9bea5f8-453c-4715-8532-163c0c348dfb', '750f838c-356f-4c1d-8ad2-0b4e76882595', '2024-11-25 15:44:38'),
-(72, '63fb855d-5267-4caa-a038-1a1274f67796', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-25 16:41:40');
+(72, '63fb855d-5267-4caa-a038-1a1274f67796', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-25 16:41:40'),
+(87, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-27 17:03:28'),
+(88, '511c3f3b-0200-4c5c-9745-8060e2403673', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-27 17:03:31');
 
 -- --------------------------------------------------------
 
@@ -117,11 +118,11 @@ INSERT INTO `matched` (`id`, `matched_user_id_first`, `matched_user_id_second`, 
 (12, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:27:24'),
 (13, '97ff9f6e-aa79-45cd-9641-5f649447d6c4', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:27:37'),
 (14, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:39:20'),
-(15, '511c3f3b-0200-4c5c-9745-8060e2403673', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:58:28'),
 (16, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-08 11:02:27'),
 (18, '97ff9f6e-aa79-45cd-9641-5f649447d6c4', '55f6c362-94c2-4fdb-9bc9-5da9d463393a', '2024-11-25 15:40:55'),
 (19, '97ff9f6e-aa79-45cd-9641-5f649447d6c4', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 15:42:38'),
-(21, 'e9bea5f8-453c-4715-8532-163c0c348dfb', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 15:43:40');
+(21, 'e9bea5f8-453c-4715-8532-163c0c348dfb', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 15:43:40'),
+(32, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-27 17:03:31');
 
 -- --------------------------------------------------------
 
@@ -172,6 +173,7 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `message`, `from_user_id`,
 ('0c747739-2447-4758-b99c-cca880acca85', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'like', 'You received a like from Arthur', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-08 10:57:41', 1),
 ('12dd2144-c6df-4ef1-9dbb-80aaffb3af03', '63fb855d-5267-4caa-a038-1a1274f67796', 'match', 'You have a new match with Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-25 17:54:24', 1),
 ('17404899-3f44-43bd-b5fe-3c82d55274d3', '70326ac8-3f29-4faa-aed8-a72b3bfe9ca5', 'unlike', 'You received an unlike from BigGayAl', 'e9bea5f8-453c-4715-8532-163c0c348dfb', '2024-11-25 15:44:26', 0),
+('176b8748-a6f8-43aa-b106-9f0bef4e700b', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'match', 'You have a new match with Arthur', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-27 17:03:31', 1),
 ('255d7be3-4c61-4206-99d3-2915c2316e7d', '511c3f3b-0200-4c5c-9745-8060e2403673', 'like', 'You received a like from Heidi', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '2024-11-08 11:01:31', 1),
 ('2bfa8276-9348-48e1-a6a1-26bc588ed7ce', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', 'match', 'You have a new match with Liane', '55f6c362-94c2-4fdb-9bc9-5da9d463393a', '2024-11-25 15:40:55', 1),
 ('2d22ebfb-37a4-4fd7-a9a2-9d2df771e84a', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', 'like', 'You received a like from Liane', '55f6c362-94c2-4fdb-9bc9-5da9d463393a', '2024-11-25 15:40:55', 1),
@@ -179,9 +181,12 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `message`, `from_user_id`,
 ('39eaab34-42f4-409c-b374-b0e548cae48a', 'ee583dd0-4da8-4b77-848f-78a515a0fc22', 'viewed', 'Your profile was viewed by Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 11:43:45', 0),
 ('3ad4d27e-a8ee-410e-89cc-10baad5a0fc7', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'match', 'You have a new match with Eric', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:27:24', 1),
 ('3ef90382-0f11-4a6b-8fd6-2f553c6c8095', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', 'match', 'You have a new match with Garrison', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 15:42:38', 0),
+('3f32892a-305a-44a3-b218-753e2983028b', 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', 'like', 'You received a like from testuser2', '9eb62964-c7b3-4f40-81ce-a23f42572949', '2024-11-27 16:59:56', 0),
 ('40167cda-8a84-43f9-88d3-c61c015d837b', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'like', 'You received a like from Eric', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:27:24', 1),
+('4af95ef5-a7b3-4571-9641-e2101012646f', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'like', 'You received a like from Arthur', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-27 17:02:30', 1),
 ('4edee811-3626-4067-b48e-ebd604eae68c', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'viewed', 'Your profile was viewed by Heidi', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '2024-11-08 11:03:38', 0),
 ('5766f7fe-c93c-4ded-8e25-bd212795e917', 'ee583dd0-4da8-4b77-848f-78a515a0fc22', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:36:40', 0),
+('5a48580d-9ba7-4c09-8f8e-fc239eabb89b', '511c3f3b-0200-4c5c-9745-8060e2403673', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-27 17:03:28', 1),
 ('660b6621-4971-4f36-a4f3-6317b59f985a', '73de925b-0b9a-4a11-a7c4-d95fec823a9b', 'like', 'You received a like from Eric', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:28:11', 0),
 ('6a89fb0d-a6be-4daf-baaf-277d361335d7', '750f838c-356f-4c1d-8ad2-0b4e76882595', 'like', 'You received a like from BigGayAl', 'e9bea5f8-453c-4715-8532-163c0c348dfb', '2024-11-25 15:44:38', 0),
 ('6efc77c4-12a6-416b-b7e4-eb20581c49ec', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', 'match', 'You have a new match with Eric', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:27:37', 1),
@@ -192,18 +197,30 @@ INSERT INTO `notifications` (`id`, `user_id`, `type`, `message`, `from_user_id`,
 ('912f611a-c406-43b4-803f-0cf355a44f5c', '77743911-bb39-408b-af66-d84df45d73fa', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:36:41', 0),
 ('99f56ee0-e3a0-43ed-9223-98b1368ad702', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'like', 'You received a like from Eric', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:39:20', 1),
 ('9ade5c93-1e60-42f4-a0e7-85e7c0411af6', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', 'like', 'You received a like from Garrison', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 15:42:38', 0),
+('9d14ac65-a50f-4966-9f6c-24b0f492bdd2', '511c3f3b-0200-4c5c-9745-8060e2403673', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-27 17:02:23', 1),
 ('aa526162-a8de-4bc2-877c-daf6c069c548', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:36:34', 0),
+('ab2b0de3-2d2d-4252-8e27-a113e3b242cf', 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', 'match', 'You have a new match with testuser2', '9eb62964-c7b3-4f40-81ce-a23f42572949', '2024-11-27 16:59:56', 0),
 ('af16eda0-c4a3-4f5a-9eec-94713b62a9b0', 'e9bea5f8-453c-4715-8532-163c0c348dfb', 'like', 'You received a like from Garrison', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 15:43:40', 0),
+('afa14d9b-76bd-4e0f-8909-bff6b2a41e8d', 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', 'like', 'You received a like from testuser2', '9eb62964-c7b3-4f40-81ce-a23f42572949', '2024-11-27 16:58:56', 1),
+('b62e690a-c47a-4413-911a-82ca0b29d1ba', '9eb62964-c7b3-4f40-81ce-a23f42572949', 'match', 'You have a new match with testuser1', 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '2024-11-27 16:55:08', 1),
+('b811566b-e67e-42e8-91fa-9afe7bb96b8d', 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', 'like', 'You received a like from testuser2', '9eb62964-c7b3-4f40-81ce-a23f42572949', '2024-11-27 16:40:53', 1),
+('b89877ff-5bf1-4bb6-b899-f192f48686b0', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'message', 'New message received from Arthur', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-27 17:01:59', 1),
 ('b9bf3b8a-0a19-4673-9574-a72a9d9289e5', '8727a67e-1a50-48bb-b854-355c3ec200ea', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:36:35', 0),
+('bc9397ba-da41-4e75-94ab-ec7e4dd1eb42', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'like', 'You received a like from Arthur', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-27 17:03:31', 1),
 ('bfbf50c6-b76e-49bd-b75d-75941c14c320', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', 'like', 'You received a like from Eric', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:27:37', 1),
 ('c35d126b-e87b-4e99-b375-fd1f9aa163a6', '63fb855d-5267-4caa-a038-1a1274f67796', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-25 17:52:49', 1),
+('c37b1ceb-5888-4521-a274-aed69251cd3a', '511c3f3b-0200-4c5c-9745-8060e2403673', 'message', 'New message received from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-27 17:02:36', 1),
+('d1db53cb-1747-41d1-ab69-173cb60e174c', 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', 'message', 'New message received from testuser2', '9eb62964-c7b3-4f40-81ce-a23f42572949', '2024-11-27 17:00:04', 0),
+('d4d6a7c4-8fb9-4237-96ab-92da65e5e3c3', '9eb62964-c7b3-4f40-81ce-a23f42572949', 'message', 'New message received from testuser1', 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '2024-11-27 16:41:52', 1),
 ('d4fedbe3-f114-4bcb-b961-5f0a5d75c3d5', 'e9bea5f8-453c-4715-8532-163c0c348dfb', 'match', 'You have a new match with Garrison', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 15:43:40', 0),
+('d67c1b42-5b2e-467a-8e71-1804273fca6a', '511c3f3b-0200-4c5c-9745-8060e2403673', 'viewed', 'Your profile was viewed by testuser2', '9eb62964-c7b3-4f40-81ce-a23f42572949', '2024-11-27 15:32:04', 1),
 ('d8054473-caf5-4436-8b5c-af3d021547c2', 'e4707942-09b2-4667-a9e8-e87b75b594c7', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:36:37', 0),
 ('e7228c88-3021-4f28-b50e-57fade1b2dfe', '511c3f3b-0200-4c5c-9745-8060e2403673', 'like', 'You received a like from Mariko', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '2024-11-08 10:58:28', 1),
 ('f22423c2-8df6-4ec4-96d5-5aff56fc48a4', 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', 'like', 'You received a like from Arthur', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-08 11:02:27', 0),
 ('f24c0387-a2a0-4f50-8f3b-fce164053422', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'match', 'You have a new match with Eric', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 10:39:20', 1),
 ('f60ce529-d9fb-401e-830d-d82a6b4e28e7', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', 'like', 'You received a like from Arthur', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-08 11:03:12', 1),
-('f9ca108f-012a-4fa7-b72a-336009acc85c', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'like', 'You received a like from Garrison', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 16:41:40', 1);
+('f9ca108f-012a-4fa7-b72a-336009acc85c', 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'like', 'You received a like from Garrison', '63fb855d-5267-4caa-a038-1a1274f67796', '2024-11-25 16:41:40', 1),
+('fec41366-1d52-4507-8173-9039ac8a54fb', '9eb62964-c7b3-4f40-81ce-a23f42572949', 'like', 'You received a like from testuser1', 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '2024-11-27 16:59:43', 0);
 
 -- --------------------------------------------------------
 
@@ -232,13 +249,13 @@ INSERT INTO `rooms` (`room_id`, `user_id_first`, `user_id_second`) VALUES
 (10, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'f7124659-ea40-4df8-b2dc-f2f8c5f7b1b7'),
 (11, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'ee583dd0-4da8-4b77-848f-78a515a0fc22'),
 (12, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '77743911-bb39-408b-af66-d84df45d73fa'),
-(13, '511c3f3b-0200-4c5c-9745-8060e2403673', 'efe21ca7-f46f-4c7b-b816-a9858cffced5'),
 (14, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '511c3f3b-0200-4c5c-9745-8060e2403673'),
 (15, '511c3f3b-0200-4c5c-9745-8060e2403673', '97ff9f6e-aa79-45cd-9641-5f649447d6c4'),
 (17, '97ff9f6e-aa79-45cd-9641-5f649447d6c4', '55f6c362-94c2-4fdb-9bc9-5da9d463393a'),
 (21, '97ff9f6e-aa79-45cd-9641-5f649447d6c4', '63fb855d-5267-4caa-a038-1a1274f67796'),
 (22, 'e9bea5f8-453c-4715-8532-163c0c348dfb', '63fb855d-5267-4caa-a038-1a1274f67796'),
-(23, 'e9bea5f8-453c-4715-8532-163c0c348dfb', '750f838c-356f-4c1d-8ad2-0b4e76882595');
+(23, 'e9bea5f8-453c-4715-8532-163c0c348dfb', '750f838c-356f-4c1d-8ad2-0b4e76882595'),
+(37, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', '511c3f3b-0200-4c5c-9745-8060e2403673');
 
 -- --------------------------------------------------------
 
@@ -513,7 +530,7 @@ INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `passwor
 ('4e218cce-f007-4442-bfba-5ac50af52f0a', 'alexandre70@example.com', 'Alexandre70', 'Garcia', 'Alexandre', '34fe23cf9636ea9d587823e90887a150c7e22e6f330dcae8ff5d3fa1bbc37852', 0, 41, 'male', 'no', 'Hi, I\'m Alexandre Garcia, welcome to my profile!', 'http://localhost:4000/uploads/8_boy.png', 0, 'offline', '', '', '', '', '', -95.369804, 29.760427, 0, 0, '2024-07-14 03:01:04'),
 ('4f84b47e-a3be-437e-91e7-2c8f54d8dbdc', 'alexandre67@example.com', 'Alexandre67', 'Jackson', 'Alexandre', 'fb8a6ce5d0214341f9c78591b4e4ef31050cc952a56ef18c3a597fe0dcb3cd49', 1, 28, 'male', 'female', 'Hi, I\'m Alexandre Jackson, welcome to my profile!', 'http://localhost:4000/uploads/10_boy.png', 0, 'offline', '', '', '', '', '', 130.557116, 31.596554, 0, 0, '2024-08-09 08:42:52'),
 ('503b3cfc-d173-4056-9ded-c1f0cf208041', 'camille93@example.com', 'Camille93', 'Jackson', 'Camille', 'd7564185a138164df46bfd84a11627c0fdd37295b89ae7230afdd51c0c983b77', 1, 52, 'female', 'male', 'Hi, I\'m Camille Jackson, welcome to my profile!', 'http://localhost:4000/uploads/1_girl.png', 0, 'offline', '', '', '', '', '', 4.402464, 51.219448, 0, 0, '2024-08-12 12:37:09'),
-('511c3f3b-0200-4c5c-9745-8060e2403673', 'robe.de.chambre6@gmail.com', 'Arthur', 'Tutur', 'Tutur', '$2b$10$mMeyD8HTZ4pYRikmQHDcXOkOgGo0HXh46boskxN6hztxKCOnlfs6S', 1, 29, 'male', 'female', 'ca va ?', 'http://localhost:4000/uploads/5EF45C61-3F9A-4567-A7E1-978AD64C32FF.jpeg', 1, 'offline', 'http://localhost:4000/uploads/IMG_2369.jpeg', '', '', '', '', 2.319370, 48.896120, 67, 0, '2024-11-25 15:47:53'),
+('511c3f3b-0200-4c5c-9745-8060e2403673', 'robe.de.chambre6@gmail.com', 'Arthur', 'Tutur', 'Tutur', '$2b$10$mMeyD8HTZ4pYRikmQHDcXOkOgGo0HXh46boskxN6hztxKCOnlfs6S', 1, 29, 'male', 'female', 'ca va ?', 'http://localhost:4000/uploads/5EF45C61-3F9A-4567-A7E1-978AD64C32FF.jpeg', 1, 'offline', 'http://localhost:4000/uploads/IMG_2369.jpeg', '', '', '', '', 2.319370, 48.896120, 67, 0, '2024-11-27 17:04:13'),
 ('5121beef-f229-483f-bd60-960650c130b9', 'thomas253@example.com', 'Thomas253', 'Davis', 'Thomas', '92ff640f693ad2e8c1884b6f19014386e6db613e3a2ee524cb93249320987cbe', 0, 29, 'male', 'female', 'Hi, I\'m Thomas Davis, welcome to my profile!', 'http://localhost:4000/uploads/6_boy.png', 0, 'offline', '', '', '', '', '', 1.099971, 49.443232, 0, 1, '2024-06-01 18:17:14'),
 ('512a112b-2d9d-47df-aa5d-daceab66573c', 'gérard144@example.com', 'Gérard144', 'Tanaka', 'Gérard', 'ad6cd891ccf7d78ead86fb2788e8a32948d59b001706bce811750a9e77471060', 1, 54, 'male', 'female', 'Hi, I\'m Gérard Tanaka, welcome to my profile!', 'http://localhost:4000/uploads/10_boy.png', 0, 'offline', '', '', '', '', '', -5.984459, 37.389092, 0, 1, '2024-05-30 20:06:17'),
 ('5291901b-e3d2-4074-9a41-31d170f0282f', 'edward326@example.com', 'Edward326', 'Davis', 'Edward', '2fc2980f8a9acaf990ba2c1cd4a562a0df3db8e4fbe482945d510980f81c30b9', 1, 32, 'male', 'female', 'Hi, I\'m Edward Davis, welcome to my profile!', 'http://localhost:4000/uploads/5_boy.png', 0, 'offline', '', '', '', '', '', 2.173404, 41.385064, 0, 0, '2024-06-10 19:53:07'),
@@ -548,7 +565,7 @@ INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `passwor
 ('61426630-891f-40a1-a704-1dd12518d08d', 'sandra54@example.com', 'Sandra54', 'Martin', 'Sandra', '49a9b3d96db1310ff79b9ae1cdb1e148b4d5995b7f889e5ad2b611f452fecf71', 0, 32, 'female', 'male', 'Hi, I\'m Sandra Martin, welcome to my profile!', 'http://localhost:4000/uploads/11_girl.png', 0, 'offline', '', '', '', '', '', 135.768029, 35.011636, 0, 0, '2024-07-30 21:16:51'),
 ('614b7df4-cd43-47b5-9695-c3b2883f3ed5', 'lisa164@example.com', 'Lisa164', 'Tanaka', 'Lisa', '47ff280e0bd430c979d828dd3a5a07749603b73233c5f0f418d6364b1431412f', 1, 51, 'female', 'male', 'Hi, I\'m Lisa Tanaka, welcome to my profile!', 'http://localhost:4000/uploads/4_girl.png', 0, 'offline', '', '', '', '', '', -121.886329, 37.338208, 0, 0, '2024-06-16 19:34:33'),
 ('6200a2bd-8e85-4fab-a9a8-80aef99df8e4', 'pierre143@example.com', 'Pierre143', 'Lopez', 'Pierre', '4e7388c7dae5f47d4aaaad0f4dd6fc6eb80be023949efeaad42594d7a85e5673', 1, 56, 'male', 'female', 'Hi, I\'m Pierre Lopez, welcome to my profile!', 'http://localhost:4000/uploads/8_boy.png', 0, 'offline', '', '', '', '', '', -82.998794, 39.961176, 0, 0, '2024-07-09 04:46:57'),
-('63fb855d-5267-4caa-a038-1a1274f67796', 'tsujimarico@gmail.com', 'Garrison', 'Garrison', 'Herbert', '$2b$10$j1lzlXI2i.IlhyQfUd2OyOlFzX8YF4YJcRhQWcEVGAv/hN3adEy6e', 1, 30, 'male', 'no', 'I\'m garrison', 'http://localhost:4000/uploads/mrgarrison.png', 1, 'online', '', '', '', '', '', 2.319370, 48.896120, 67, 0, '2024-11-25 17:57:39'),
+('63fb855d-5267-4caa-a038-1a1274f67796', 'tsujimarico@gmail.com', 'Garrison', 'Garrison', 'Herbert', '$2b$10$j1lzlXI2i.IlhyQfUd2OyOlFzX8YF4YJcRhQWcEVGAv/hN3adEy6e', 1, 30, 'male', 'no', 'I\'m garrison', 'http://localhost:4000/uploads/mrgarrison.png', 1, 'offline', '', '', '', '', '', 2.319370, 48.896120, 67, 0, '2024-11-27 15:29:08'),
 ('647dddb6-fad3-49af-bb14-1b303aeb8cce', 'henri232@example.com', 'Henri232', 'Tsuji', 'Henri', '00d779e256d1ba7de18135735dc18c8b112cd7cadf3587e9c106b88a91b6933e', 0, 62, 'male', 'male', 'Hi, I\'m Henri Tsuji, welcome to my profile!', 'http://localhost:4000/uploads/10_boy.png', 0, 'offline', '', '', '', '', '', -0.579180, 44.837789, 0, 0, '2024-06-09 23:28:14'),
 ('64d3afe1-e47b-4d06-a5f5-90586f9458bf', 'gérard34@example.com', 'Gérard34', 'Lopez', 'Gérard', '72f1ffa2d7a9c9d60c2369fffce54372eea054d567c77f8a518f4f4c06b3856a', 0, 29, 'male', 'female', 'Hi, I\'m Gérard Lopez, welcome to my profile!', 'http://localhost:4000/uploads/6_boy.png', 0, 'offline', '', '', '', '', '', 1.099971, 49.443232, 0, 0, '2024-06-16 07:21:24'),
 ('65a5bdad-ea27-4083-83b7-2fd75e55056b', 'étienne390@example.com', 'Étienne390', 'Yamamoto', 'Étienne', 'd9f8af1fb1b612158de3510408defa029cf893354174564faa954aad1d96b024', 1, 36, 'male', 'male', 'Hi, I\'m Étienne Yamamoto, welcome to my profile!', 'http://localhost:4000/uploads/4_boy.png', 0, 'offline', '', '', '', '', '', -3.703790, 40.416775, 0, 1, '2024-07-26 13:09:54'),
@@ -826,7 +843,7 @@ INSERT INTO `user` (`id`, `email`, `username`, `lastname`, `firstname`, `passwor
 ('edf9aa8d-e8e1-4e57-a6b0-8f746874879e', 'henri150@example.com', 'Henri150', 'Yamamoto', 'Henri', 'c2141786d5c40007fdda8d5cdf5b541213c82e3b408723b4fb0a80697123c002', 0, 18, 'male', 'no', 'Hi, I\'m Henri Yamamoto, welcome to my profile!', 'http://localhost:4000/uploads/10_boy.png', 0, 'offline', '', '', '', '', '', -1.553621, 47.218371, 0, 0, '2024-08-01 11:50:45'),
 ('ee583dd0-4da8-4b77-848f-78a515a0fc22', 'ruruover1105@gmail.com', 'Kebin', 'Edimbara', 'Kebin', '$2b$10$8SVuv2h6911KE14EKpgtJuNCb7dJdnYIWjXBjC5OyDqw2j4BcnKPO', 1, 40, 'male', 'female', 'let\'s drink beer', 'http://localhost:4000/uploads/jack-finnigan-rriAI0nhcbc-unsplash.jpg', 0, 'offline', '', '', '', '', '', -0.113968, 51.506734, 0, 0, NULL),
 ('ef297076-3f4c-4ccf-8781-557378ad9bbd', 'robert430@example.com', 'Robert430', 'Bonnet', 'Robert', '64ea23e86124b199b71fda952a2650c3300c8361bae3af43556360004c6ad987', 1, 64, 'male', 'female', 'Hi, I\'m Robert Bonnet, welcome to my profile!', 'http://localhost:4000/uploads/12_boy.png', 0, 'offline', '', '', '', '', '', -0.579180, 44.837789, 0, 1, '2024-05-21 04:45:30'),
-('efe21ca7-f46f-4c7b-b816-a9858cffced5', 'robe.de.chambre6@gmail.com', 'Mariko', 'Mariko', 'Tsuji', '$2b$10$HwEdGtB1pzLLK4GQv1Ov8uY1GF3yhMDIZASRS4Grgx79F2SqtG5ZW', 1, 34, 'female', 'male', 'Bonjour je suis mariko', 'http://localhost:4000/uploads/0126DE72-9C85-4835-8828-508A0A5291BA.jpeg', 1, 'online', 'http://localhost:4000/uploads/1d4dbb0d-64d2-486b-88fc-745fd4432ad9.jpeg', 'http://localhost:4000/uploads/IMG_2366.jpeg', '', '', '', 2.319370, 48.896120, 33, 0, '2024-11-25 17:57:27'),
+('efe21ca7-f46f-4c7b-b816-a9858cffced5', 'robe.de.chambre6@gmail.com', 'Mariko', 'Mariko', 'Tsuji', '$2b$10$HwEdGtB1pzLLK4GQv1Ov8uY1GF3yhMDIZASRS4Grgx79F2SqtG5ZW', 1, 34, 'female', 'male', 'Bonjour je suis mariko', 'http://localhost:4000/uploads/0126DE72-9C85-4835-8828-508A0A5291BA.jpeg', 1, 'offline', 'http://localhost:4000/uploads/1d4dbb0d-64d2-486b-88fc-745fd4432ad9.jpeg', 'http://localhost:4000/uploads/IMG_2366.jpeg', '', '', '', 2.319370, 48.896120, 13, 0, '2024-11-27 17:05:49'),
 ('f044d5ab-a8e1-4c2e-948a-b8a60b5ea454', 'manon216@example.com', 'Manon216', 'Jackson', 'Manon', '77d0972aa80957c6c650d7f5ded32b8f9f0dde09f1ff3078662198f3a281e7fa', 1, 29, 'female', 'male', 'Hi, I\'m Manon Jackson, welcome to my profile!', 'http://localhost:4000/uploads/5_girl.png', 0, 'offline', '', '', '', '', '', 7.752111, 48.573405, 0, 1, '2024-06-25 05:35:43'),
 ('f0469f49-921d-4a0d-8101-12245e19b6ea', 'françois140@example.com', 'François140', 'Aoki', 'François', 'e04a387e36bfe81fff02a09d9ef010c35466cc20ebd08b0c23be31a7f9bab368', 1, 64, 'male', 'male', 'Hi, I\'m François Aoki, welcome to my profile!', 'http://localhost:4000/uploads/5_boy.png', 0, 'offline', '', '', '', '', '', -5.984459, 37.389092, 0, 1, '2024-05-31 17:59:16'),
 ('f10ec4f5-2e06-4bef-bfef-cd64585848b4', 'patricia267@example.com', 'Patricia267', 'Kawasaki', 'Patricia', '1cec00e2e9dda8cccd6b605c4e249ca92a562a61163b1fcdea69bb3d448edec5', 1, 51, 'female', 'male', 'Hi, I\'m Patricia Kawasaki, welcome to my profile!', 'http://localhost:4000/uploads/2_girl.png', 0, 'offline', '', '', '', '', '', -80.843127, 35.227087, 0, 1, '2024-08-12 10:29:31'),
@@ -2262,7 +2279,56 @@ INSERT INTO `usertag` (`id`, `user_id`, `tag_id`) VALUES
 (1477, '46c0f548-e6b5-40ed-a81f-0c12a823f763', '36'),
 (1478, 'c5e01047-266b-4ebc-9672-2ecad7a4266b', '37'),
 (1479, 'c5e01047-266b-4ebc-9672-2ecad7a4266b', '50'),
-(1480, 'c5e01047-266b-4ebc-9672-2ecad7a4266b', '42');
+(1480, 'c5e01047-266b-4ebc-9672-2ecad7a4266b', '42'),
+(1481, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '43'),
+(1482, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '33'),
+(1483, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '47'),
+(1484, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '34'),
+(1485, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '45'),
+(1486, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '26'),
+(1487, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '49'),
+(1488, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '42'),
+(1489, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '46'),
+(1490, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '28'),
+(1491, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '39'),
+(1492, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '40'),
+(1493, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '44'),
+(1494, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '38'),
+(1495, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '24'),
+(1496, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '35'),
+(1497, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '37'),
+(1498, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '25'),
+(1499, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '50'),
+(1500, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '48'),
+(1501, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '36'),
+(1502, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '27'),
+(1503, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '29'),
+(1504, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '41'),
+(1505, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '51'),
+(1506, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '31'),
+(1507, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '32'),
+(1508, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '23'),
+(1509, 'ef7a3348-cecb-4e2a-80e9-0488b92602e0', '30'),
+(1530, '9eb62964-c7b3-4f40-81ce-a23f42572949', '43'),
+(1531, '9eb62964-c7b3-4f40-81ce-a23f42572949', '33'),
+(1532, '9eb62964-c7b3-4f40-81ce-a23f42572949', '47'),
+(1533, '9eb62964-c7b3-4f40-81ce-a23f42572949', '34'),
+(1534, '9eb62964-c7b3-4f40-81ce-a23f42572949', '45'),
+(1535, '9eb62964-c7b3-4f40-81ce-a23f42572949', '26'),
+(1536, '9eb62964-c7b3-4f40-81ce-a23f42572949', '49'),
+(1537, '9eb62964-c7b3-4f40-81ce-a23f42572949', '42'),
+(1538, '9eb62964-c7b3-4f40-81ce-a23f42572949', '46'),
+(1539, '9eb62964-c7b3-4f40-81ce-a23f42572949', '28'),
+(1540, '9eb62964-c7b3-4f40-81ce-a23f42572949', '39'),
+(1541, '9eb62964-c7b3-4f40-81ce-a23f42572949', '40'),
+(1542, '9eb62964-c7b3-4f40-81ce-a23f42572949', '44'),
+(1543, '9eb62964-c7b3-4f40-81ce-a23f42572949', '38'),
+(1544, '9eb62964-c7b3-4f40-81ce-a23f42572949', '24'),
+(1545, '9eb62964-c7b3-4f40-81ce-a23f42572949', '35'),
+(1546, '9eb62964-c7b3-4f40-81ce-a23f42572949', '37'),
+(1547, '9eb62964-c7b3-4f40-81ce-a23f42572949', '25'),
+(1548, '9eb62964-c7b3-4f40-81ce-a23f42572949', '50'),
+(1549, '9eb62964-c7b3-4f40-81ce-a23f42572949', '48');
 
 -- --------------------------------------------------------
 
@@ -2329,7 +2395,8 @@ INSERT INTO `viewed` (`id`, `from_user_id`, `viewed_to_user_id`, `viewed_at`) VA
 (135, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', '2024-08-17 00:00:00'),
 (136, '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '97ff9f6e-aa79-45cd-9641-5f649447d6c4', '2024-08-17 00:00:00'),
 (137, 'bd91dab6-9d53-4b06-92e1-a1bfdd271273', '1a4f2486-dcea-4876-bf73-e7ae6eb451bd', '2024-11-08 11:03:38'),
-(138, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'ee583dd0-4da8-4b77-848f-78a515a0fc22', '2024-11-08 11:43:45');
+(138, 'efe21ca7-f46f-4c7b-b816-a9858cffced5', 'ee583dd0-4da8-4b77-848f-78a515a0fc22', '2024-11-08 11:43:45'),
+(140, '9eb62964-c7b3-4f40-81ce-a23f42572949', '511c3f3b-0200-4c5c-9745-8060e2403673', '2024-11-27 15:32:04');
 
 --
 -- ダンプしたテーブルのインデックス
@@ -2417,31 +2484,31 @@ ALTER TABLE `viewed`
 -- テーブルの AUTO_INCREMENT `blocked`
 --
 ALTER TABLE `blocked`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- テーブルの AUTO_INCREMENT `liked`
 --
 ALTER TABLE `liked`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=75;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=89;
 
 --
 -- テーブルの AUTO_INCREMENT `matched`
 --
 ALTER TABLE `matched`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- テーブルの AUTO_INCREMENT `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- テーブルの AUTO_INCREMENT `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
+  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- テーブルの AUTO_INCREMENT `room_messages`
@@ -2459,13 +2526,13 @@ ALTER TABLE `tag`
 -- テーブルの AUTO_INCREMENT `usertag`
 --
 ALTER TABLE `usertag`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1481;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1550;
 
 --
 -- テーブルの AUTO_INCREMENT `viewed`
 --
 ALTER TABLE `viewed`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=139;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=141;
 
 --
 -- ダンプしたテーブルの制約

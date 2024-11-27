@@ -34,11 +34,11 @@ const Block = ({ blockedFromUserId, blockedToUserId, alreadyBlocked }: { blocked
           },
           body: blockJson,
         });
-        console.log("response: ", response);
+        //console.log("response: ", response);
         if (response.ok) {
           const responseData = await response.json();
           socket.emit('block', { fromUserId: blockedFromUserId, toUserId: blockedToUserId });
-          console.log("responseData: ", responseData);
+          //console.log("responseData: ", responseData);
         } else {
           console.error("updating blockd is failed");
         }

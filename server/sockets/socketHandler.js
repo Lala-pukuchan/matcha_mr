@@ -25,10 +25,10 @@ async function getUserNameById(userId) {
 
 function setupSocket(io, pool) {
   io.on('connection', (socket) => {
-    console.log(`Client ${socket.id} connected`);
+    //console.log(`Client ${socket.id} connected`);
 
     socket.on('login', async (userId) => {
-      console.log(`User ${userId} logged in with socket ${socket.id}`);
+      //console.log(`User ${userId} logged in with socket ${socket.id}`);
       socketIdMap.set(userId, socket.id);
       if (!onlineUsers.has(userId)) {
         onlineUsers.set(userId, new Set());
@@ -50,7 +50,7 @@ function setupSocket(io, pool) {
     });
 
     socket.on('logout', async (userId) => {
-      console.log(`User ${userId} logged out with socket ${socket.id}`);
+      //console.log(`User ${userId} logged out with socket ${socket.id}`);
       if (onlineUsers.has(userId)) {
         onlineUsers.get(userId).delete(socket.id);
         if (onlineUsers.get(userId).size === 0) {
@@ -79,10 +79,10 @@ function setupSocket(io, pool) {
     });
 
     socket.on('disconnect', async (reason) => {
-      console.log("disconnect!!! : socket.id: ", socket.id);
-      console.log("reason is: ", reason);
-      console.log(`Client ${socket.id} disconnected`);
-      console.log("socket.connected: ", socket.connected);
+      //console.log("disconnect!!! : socket.id: ", socket.id);
+      //console.log("reason is: ", reason);
+      //console.log(`Client ${socket.id} disconnected`);
+      //console.log("socket.connected: ", socket.connected);
 
       let userId;
       for (let [key, value] of onlineUsers) {
@@ -117,12 +117,12 @@ function setupSocket(io, pool) {
 
     socket.on('joinRoom', (room) => {
       socket.join(room);
-      console.log(`Socket ${socket.id} joined room ${room}`);
+      //console.log(`Socket ${socket.id} joined room ${room}`);
     });
 
     socket.on('leaveRoom', (room) => {
       socket.leave(room);
-      console.log(`Socket ${socket.id} left room ${room}`);
+      //console.log(`Socket ${socket.id} left room ${room}`);
     });
 
     socket.on('chat message', async (room, message) => {

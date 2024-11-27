@@ -211,9 +211,9 @@ export default function Home() {
       }
   }, [user]);
 
-  useEffect(() => {
-    console.log("Filtered data:", usersFrequentlyLikedBack);
-  }, [usersFrequentlyLikedBack]);
+  //useEffect(() => {
+  //  console.log("Filtered data:", usersFrequentlyLikedBack);
+  //}, [usersFrequentlyLikedBack]);
 
   if (loading) {
     return <div>Loading...</div>;

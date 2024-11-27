@@ -66,7 +66,7 @@ function Chat() {
   useEffect(() => {
     if (socket) {
       socket.on('user status', ({ userId, status }) => {
-        console.log("handleUserStatus called from socket:", userId, status);
+        //console.log("handleUserStatus called from socket:", userId, status);
         setOnlineStatus(prevStatus => ({
           ...prevStatus,
           [userId]: status,

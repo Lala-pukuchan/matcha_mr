@@ -231,7 +231,7 @@ export default function Home() {
         setUserList(data.filter((d: { id: number }) => d.id !== user.id));
       } else {
         const data = await response.json();
-        console.log("message", data.message);
+        //console.log("message", data.message);
         setUserList([]);
       }
     } catch (e) {

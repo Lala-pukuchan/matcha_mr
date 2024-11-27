@@ -85,7 +85,7 @@ export default function UsersList({
           const userTagIds = user.tagIds || [];
           userTagsMap[user.id] = userTagIds.map(tagId => tagsMap[tagId]);
         }
-        console.log("User tags map:::", userTagsMap);
+        //console.log("User tags map:::", userTagsMap);
         setUserTags(userTagsMap);
         setLoadingTags(false);
       } catch (error) {
@@ -100,7 +100,7 @@ export default function UsersList({
   useEffect(() => {
     if (socket) {
       const handleUserStatus = ({ userId, status }: { userId: string; status: string })  => {
-        console.log("handleUserStatus called from socket:", userId, status);
+        //console.log("handleUserStatus called from socket:", userId, status);
         setOnlineStatus((prevStatus) => ({
           ...prevStatus,
           [userId]: status,

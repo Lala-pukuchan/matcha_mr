@@ -42,9 +42,9 @@ function useWebSocket() {
 
       socket.off('disconnect');
       socket.on('disconnect', (reason) => {
-        console.log('WebSocket disconnected. reason: ', reason);
+        //console.log('WebSocket disconnected. reason: ', reason);
         if (reason === 'transport close' || reason === 'io client disconnect') {
-          console.log("reason is: ", reason);
+          //console.log("reason is: ", reason);
           setTimeout(() => {
             if (!socket.connected) {
               socket.emit('login');
@@ -53,8 +53,8 @@ function useWebSocket() {
         }
         disconnectTimeoutRef.current = setTimeout(() => {
           if (userRef.current && userRef.current.id) {
-            console.log('User is now offline due to disconnect');
-            console.log("offline: userRef.current.id: ", userRef.current.id);
+            //console.log('User is now offline due to disconnect');
+            //console.log("offline: userRef.current.id: ", userRef.current.id);
             socket.emit('logout', userRef.current.id);
           }
         }, 5000);
@@ -67,7 +67,7 @@ function useWebSocket() {
           disconnectTimeoutRef.current = null;
         }
         if (userRef.current && userRef.current.id) {
-          console.log("reconnect: userRef.current.id: ", userRef.current.id);
+          //console.log("reconnect: userRef.current.id: ", userRef.current.id);
           socket.connect();
           socket.emit('login', userRef.current.id);
         }
