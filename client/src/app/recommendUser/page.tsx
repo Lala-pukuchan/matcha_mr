@@ -49,17 +49,14 @@ export default function Home() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [userResponse, tagsResponse] = await Promise.all([
-          fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`),
+        const [tagsResponse] = await Promise.all([
           fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users/tags`)
         ]);
 
-        if (userResponse.ok && tagsResponse.ok) {
-          const usersData = await userResponse.json();
+        if (tagsResponse.ok) {
           const tagsData = await tagsResponse.json();
 
           // ユーザーとタグのデータを状態に保存
-          setUsers(usersData);
           setTags(tagsData.map((tag: { id: number; name: string }) => ({ value: tag.id, label: tag.name })));
         } else {
           console.error("Failed to fetch data");
@@ -109,7 +106,6 @@ export default function Home() {
         );
         if (response.ok) {
           const data = await response.json();
-
           setUsers(data.filter((d: { id: number }) => d.id !== user.id));
         } else {
           setUsers([]);
